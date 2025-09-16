@@ -39,6 +39,7 @@ Nous allons devoir créer un moteur physique pour les jeux vidéo en équipe de 
 Liste des dépendances nécessaires avant de compiler et exécuter le programme :
 
 **Langage / compilateur** : C++
+
 **Framework** : [OpenFrameworks](https://openframeworks.cc/)
 
 ## Compilation
