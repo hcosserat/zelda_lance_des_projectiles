@@ -1,43 +1,32 @@
 #include "Particle.h"
 
-Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass) {
-    this->pos = pos;
-    this->prevPos = Vector(NAN, NAN, NAN);
-    this->vel = vel;
-    this->acc = acc;
-    this->mass = mass;
-    this->inverseMass = 1 / mass;
+Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass)
+    : pos(pos)
+      , vel(vel)
+      , acc(acc)
+      , prevPos(pos)
+      , mass(mass)
+      , inverseMass(mass != 0.f ? 1.f / mass : 0.f)
+      , firstVerletStep(true) {
 }
 
 Vector Particle::updateEuler(const float dt, const float dampingFactor) {
     prevPos = pos;
-
-    acc -= dampingFactor * vel;  // damping force
-
-    const auto prevVel = vel;
-    const auto posIncr = prevVel + dt * 0.5f * acc;
-
-    vel += dt * acc;
-    pos += dt * posIncr;
-
+    const Vector effectiveAcc = acc - dampingFactor * vel;
+    pos += vel * dt + effectiveAcc * (0.5f * dt * dt);
+    vel += effectiveAcc * dt;
     return pos;
 }
 
 Vector Particle::updateVerlet(const float dt, const float dampingFactor) {
-    // First iteration uses Eurler method, to initialize prevPos
-    if (prevPos == Vector(NAN, NAN, NAN)) {
-        return this->updateEuler(dt);
+    if (firstVerletStep) {
+        firstVerletStep = false;
+        return updateEuler(dt, dampingFactor);
     }
-
-    acc -= dampingFactor * vel; // damping force
-
-    const auto temp = pos;
-    const auto velIncr = dt * acc;
-
-    vel += velIncr;
-    pos += pos - prevPos + dt * velIncr;
-
-    prevPos = temp;
-
+    const Vector effectiveAcc = acc - dampingFactor * vel;
+    const Vector newPos = pos + (pos - prevPos) + effectiveAcc * (dt * dt);
+    vel = (newPos - prevPos) * (0.5f / dt);
+    prevPos = pos;
+    pos = newPos;
     return pos;
 }

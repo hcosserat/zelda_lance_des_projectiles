@@ -5,10 +5,11 @@
 class Particle {
 public:
     // all units should be SI
-    Vector pos, vel, acc;  // postion, velocity, acceleration vectors
-    Vector prevPos;  // previous position
+    Vector pos, vel, acc; // postion, velocity, acceleration vectors
+    Vector prevPos; // previous position
     float mass;
     float inverseMass; // inverse of mass
+    bool firstVerletStep; // true until first Verlet integration step done
 
     // Constructor
     explicit Particle(
