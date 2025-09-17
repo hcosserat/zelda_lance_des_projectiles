@@ -14,11 +14,10 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	std::cout << "Delay :" << dt;
-	std::cout << "ms" << std::endl;
 
 	ofSetColor(255);
-	for (auto& p : particles) {
+	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
+	for (auto & p : particles) {
 		p.integrate(dt);
 		ofDrawCircle(p.pos.x, p.pos.y, 5);
 	}
@@ -100,7 +99,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 void ofApp::SpawnParticle(Vector v, Vector a, float m) {
 
-	Particle Particle(Vector(100, 700, 0), v, a, m);
+	Particle Particle(Vector(100, 100, 100), v, a, m);
 
 	particles.push_back(Particle);
 
