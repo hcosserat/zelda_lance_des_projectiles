@@ -16,6 +16,12 @@ void ofApp::update() {
 void ofApp::draw() {
 	std::cout << "Delay :" << dt;
 	std::cout << "ms" << std::endl;
+
+	ofSetColor(255);
+	for (auto& p : particles) {
+		//p.updateVerlet(0.016f, 0.1f);
+		ofDrawCircle(p.pos.x, p.pos.y, 5);
+	}
 }
 
 //--------------------------------------------------------------
@@ -24,6 +30,28 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+
+	switch (key)
+	{
+	default:
+		break;
+
+	case 'a':
+		SpawnParticle(Vector(100, 100, 0), Vector(0, 9.8, 0), 1);
+		break;
+
+	case 'z':
+		SpawnParticle(Vector(200, 100, 0), Vector(0, 9.8, 0), 10);
+		break;
+
+	case 'e':
+		SpawnParticle(Vector(300, 100, 0), Vector(0, 9.8, 0), 100);
+		break;
+
+	case 'r':
+		SpawnParticle(Vector(400, 100, 0), Vector(0, 9.8, 0), 1000);
+		break;
+	}
 }
 
 //--------------------------------------------------------------
@@ -68,4 +96,12 @@ void ofApp::gotMessage(ofMessage msg) {
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo) {
+}
+
+void ofApp::SpawnParticle(Vector v, Vector a, float m) {
+
+	Particle Particle(Vector(100, 100, 100), v, a, m);
+
+	particles.push_back(Particle);
+
 }

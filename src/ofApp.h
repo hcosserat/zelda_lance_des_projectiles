@@ -39,4 +39,8 @@ public:
 	void dragEvent(ofDragInfo dragInfo) override;
 
 	void gotMessage(ofMessage msg) override;
+
+	void SpawnParticle(Vector v, Vector a, float m);
+
+	std::vector<Particle> particles;
 };
