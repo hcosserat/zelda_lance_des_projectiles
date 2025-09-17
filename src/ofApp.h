@@ -6,6 +6,8 @@
 
 class ofApp : public ofBaseApp {
 public:
+	float dt;
+
 	void setup() override;
 
 	void update() override;
