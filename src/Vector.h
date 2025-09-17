@@ -34,6 +34,9 @@ public:
 
     bool operator==(const Vector &other) const;
 
+    // Checks if x, y and z are all NAN
+    bool isNAN() const;
+
     float normSquared() const;
 
     float norm() const;

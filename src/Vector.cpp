@@ -67,6 +67,9 @@ bool Vector::operator==(const Vector &other) const {
     return (x == other.x) && (y == other.y) && (z == other.z);
 }
 
+bool Vector::isNAN() const {
+    return isnan(x) && isnan(y) && isnan(z);
+}
 
 float Vector::normSquared() const {
     return x * x + y * y + z * z;
