@@ -45,3 +45,11 @@ Liste des dépendances nécessaires avant de compiler et exécuter le programme 
 ## Compilation
 
 Expliquer clairement comment compiler le programme. 
+
+## Auteurs
+
+Membres du groupe :
+- Hippolyte COSSERAT
+- Emeline GÉHANNO
+- Florian HEME
+- Dimitri JASICA
