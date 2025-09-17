@@ -1,34 +1,15 @@
 #include "Particle.h"
 
-Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass)
+Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass, const float d)
     : pos(pos)
       , vel(vel)
       , acc(acc)
-      , prevPos(pos)
-      , mass(mass)
       , inverseMass(mass != 0.f ? 1.f / mass : 0.f)
-      , firstVerletStep(true) {
+      , damping_factor(d > 0 ? logf(d) : 0) {
 }
 
-Vector Particle::updateEuler(const float dt, const float dampingFactor) {
-    prevPos = pos;
-    const Vector effectiveAcc = acc - dampingFactor * vel; // la force de damping est proportionnelle à -v
-    pos += vel * dt + effectiveAcc * (0.5f * dt * dt); // méthode d'Eurler
-    vel += effectiveAcc * dt;
-    return pos;
-}
-
-Vector Particle::updateVerlet(const float dt, const float dampingFactor) {
-    if (firstVerletStep) {
-        // Si c'est la première itération de l'intégrateur de Verlet, on a pas encore la précédente
-        // position et on doit utiliser Euler
-        firstVerletStep = false;
-        return updateEuler(dt, dampingFactor);
-    }
-    const Vector effectiveAcc = acc - dampingFactor * vel; // la force de damping est proportionnelle à -v
-    const Vector newPos = pos + (pos - prevPos) + effectiveAcc * (dt * dt); // intégrateur de Verlet
-    vel = (newPos - prevPos) * (0.5f / dt);
-    prevPos = pos;
-    pos = newPos;
+Vector Particle::updateEuler(const float dt) {
+    vel = expf(damping_factor * dt) * vel + dt * acc;
+    pos += dt * vel;
     return pos;
 }
