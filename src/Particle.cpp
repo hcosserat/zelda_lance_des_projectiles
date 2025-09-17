@@ -12,19 +12,21 @@ Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const f
 
 Vector Particle::updateEuler(const float dt, const float dampingFactor) {
     prevPos = pos;
-    const Vector effectiveAcc = acc - dampingFactor * vel;
-    pos += vel * dt + effectiveAcc * (0.5f * dt * dt);
+    const Vector effectiveAcc = acc - dampingFactor * vel; // la force de damping est proportionnelle à -v
+    pos += vel * dt + effectiveAcc * (0.5f * dt * dt); // méthode d'Eurler
     vel += effectiveAcc * dt;
     return pos;
 }
 
 Vector Particle::updateVerlet(const float dt, const float dampingFactor) {
     if (firstVerletStep) {
+        // Si c'est la première itération de l'intégrateur de Verlet, on a pas encore la précédente
+        // position et on doit utiliser Euler
         firstVerletStep = false;
         return updateEuler(dt, dampingFactor);
     }
-    const Vector effectiveAcc = acc - dampingFactor * vel;
-    const Vector newPos = pos + (pos - prevPos) + effectiveAcc * (dt * dt);
+    const Vector effectiveAcc = acc - dampingFactor * vel; // la force de damping est proportionnelle à -v
+    const Vector newPos = pos + (pos - prevPos) + effectiveAcc * (dt * dt); // intégrateur de Verlet
     vel = (newPos - prevPos) * (0.5f / dt);
     prevPos = pos;
     pos = newPos;
