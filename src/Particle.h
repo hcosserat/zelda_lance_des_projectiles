@@ -18,5 +18,5 @@ public:
         float d = 1);
 
     // Euler method, returns new position
-    Vector updateEuler(float dt);
+    Vector integrate(float dt);
 };

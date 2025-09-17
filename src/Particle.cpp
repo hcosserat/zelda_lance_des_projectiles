@@ -8,7 +8,7 @@ Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const f
       , damping_factor(d > 0 ? logf(d) : 0) {
 }
 
-Vector Particle::updateEuler(const float dt) {
+Vector Particle::integrate(const float dt) {
     vel = expf(damping_factor * dt) * vel + dt * acc;
     pos += dt * vel;
     return pos;
