@@ -19,7 +19,7 @@ void ofApp::draw() {
 
 	ofSetColor(255);
 	for (auto& p : particles) {
-		//p.updateVerlet(0.016f, 0.1f);
+		p.integrate(dt);
 		ofDrawCircle(p.pos.x, p.pos.y, 5);
 	}
 }
@@ -100,7 +100,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 void ofApp::SpawnParticle(Vector v, Vector a, float m) {
 
-	Particle Particle(Vector(100, 100, 100), v, a, m);
+	Particle Particle(Vector(100, 700, 0), v, a, m);
 
 	particles.push_back(Particle);
 
