@@ -46,4 +46,6 @@ public:
 
 	void DrawTrajectory(Vector startPos, Vector v, Vector a, Particle::projectileType t);
 
+	Vector spawnPos = Vector(220, ofGetHeight() - 155, 0);
+
 };

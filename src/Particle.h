@@ -12,7 +12,8 @@ public:
     // Projectile type
     enum projectileType { Balle, Boulet, Laser, BouleDeFeu };
 	projectileType type;
-	bool showTrajectory = true;
+	bool showTrajectory = true; // Whether to show trajectory or not
+	Vector velStart; // Initial velocity for trajectory calculation
 
     // Constructor
     explicit Particle(

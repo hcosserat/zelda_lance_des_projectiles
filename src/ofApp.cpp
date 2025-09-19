@@ -29,19 +29,19 @@ void ofApp::draw() {
 	ofDrawBitmapString("'r' = Boule de feu", 10, 120);
 
 	// Cannon
-	Vector spawnPos(100, ofGetHeight() - 120, 0);
+	Vector cannonPos(100, ofGetHeight() - 120, 0);
 	ofSetColor(100, 100, 100);
-	ofDrawRectangle(spawnPos.x - 45, spawnPos.y - 70, 90, 70);
+	ofDrawRectangle(cannonPos.x - 45, cannonPos.y - 70, 90, 70);
 	ofSetColor(80, 80, 80);
-	ofDrawRectangle(spawnPos.x + 40, spawnPos.y - 50, 80, 30);
+	ofDrawRectangle(cannonPos.x + 40, cannonPos.y - 50, 80, 30);
 	ofSetColor(90, 90, 90);
-	ofDrawRectangle(spawnPos.x - 15, spawnPos.y - 65, 55, 25);
+	ofDrawRectangle(cannonPos.x - 15, cannonPos.y - 65, 55, 25);
 	ofSetColor(50, 50, 50);
-	ofDrawCircle(spawnPos.x + 120, spawnPos.y - 35, 18);
+	ofDrawCircle(cannonPos.x + 120, cannonPos.y - 35, 18);
 	ofSetColor(70, 70, 70);
 	ofSetLineWidth(8);
-	ofDrawLine(spawnPos.x - 10, spawnPos.y, spawnPos.x - 40, spawnPos.y + 60);
-	ofDrawLine(spawnPos.x + 10, spawnPos.y, spawnPos.x + 40, spawnPos.y + 60);
+	ofDrawLine(cannonPos.x - 10, cannonPos.y, cannonPos.x - 40, cannonPos.y + 60);
+	ofDrawLine(cannonPos.x + 10, cannonPos.y, cannonPos.x + 40, cannonPos.y + 60);
 
 	// Delta Time
 	ofSetColor(255); 
@@ -55,48 +55,56 @@ void ofApp::draw() {
 		case Particle::projectileType::Balle:
 			// Draw trajectory
 			if (p.showTrajectory) {
-				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(300, 0, 0), Vector(0, 9.8, 0), p.type);
+				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(245, 211, 101);
-			ofDrawCircle(p.pos.x, p.pos.y, 10);
-			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
+				ofDrawCircle(p.pos.x, p.pos.y, 10);
+			}
+			else {
 				p.showTrajectory = false;
 			}
 			break;
 		case Particle::projectileType::Boulet:
 			// Draw trajectory
 			if (p.showTrajectory) {
-				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(200, 0, 0), Vector(0, 9.8, 0), p.type);
+				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(205, 205, 205);
-			ofDrawCircle(p.pos.x, p.pos.y, 20);
-			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
+				ofDrawCircle(p.pos.x, p.pos.y, 20);
+			}
+			else {
 				p.showTrajectory = false;
 			}
 			break;
 		case Particle::projectileType::Laser:
 			// Draw trajectory
 			if (p.showTrajectory) {
-				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(500, 0, 0), Vector(0, 9.8, 0), p.type);
+				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(0, 255, 0);
-			ofDrawRectangle(p.pos.x, p.pos.y, 30, 5);
-			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
+				ofDrawRectangle(p.pos.x, p.pos.y, 30, 5);
+			}
+			else {
 				p.showTrajectory = false;
 			}
 			break;
 		case Particle::projectileType::BouleDeFeu:
 			// Draw trajectory
 			if (p.showTrajectory) {
-				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(250, 0, 0), Vector(0, 9.8, 0), p.type);
+				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(255, 165, 0);
-			ofDrawCircle(p.pos.x, p.pos.y, 15);
-			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
+				ofDrawCircle(p.pos.x, p.pos.y, 15);
+			}
+			else {
 				p.showTrajectory = false;
 			}
 			break;
@@ -113,25 +121,30 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 
+	// Direction from spawn position to mouse position
+	Vector mousePos(ofGetMouseX(), ofGetMouseY(), 0);
+	Vector dir = mousePos - spawnPos;
+	dir.normalize();
+
 	switch (key)
 	{
 	default:
 		break;
 
 	case 'a': // Balle
-		SpawnParticle(Vector(300, 0, 0), Vector(0, 9.8, 0), 1, Particle::projectileType::Balle);
+		SpawnParticle(dir * 300, Vector(0, 9.8, 0), 1, Particle::projectileType::Balle);
 		break;
 
 	case 'z': // Boulet
-		SpawnParticle(Vector(200, 0, 0), Vector(0, 9.8, 0), 10, Particle::projectileType::Boulet);
+		SpawnParticle(dir * 200, Vector(0, 9.8, 0), 10, Particle::projectileType::Boulet);
 		break;
 
 	case 'e': // Laser
-		SpawnParticle(Vector(500, 0, 0), Vector(0, 9.8, 0), 0.1, Particle::projectileType::Laser);
+		SpawnParticle(dir * 500, Vector(0, 9.8, 0), 0.1, Particle::projectileType::Laser);
 		break;
 
 	case 'r': // Boule de feu
-		SpawnParticle(Vector(250, 0, 0), Vector(0, 9.8, 0), 5, Particle::projectileType::BouleDeFeu);
+		SpawnParticle(dir * 250, Vector(0, 9.8, 0), 5, Particle::projectileType::BouleDeFeu);
 		break;
 	}
 }
@@ -182,8 +195,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 void ofApp::SpawnParticle(Vector v, Vector a, float m, Particle::projectileType t) {
 
-	Particle Particle(Vector(220, ofGetHeight() - 155, 0), v, a, m, 1, t);
-
+	Particle Particle(spawnPos, v, a, m, 1, t);
 	particles.push_back(Particle);
 
 }

@@ -7,6 +7,10 @@ Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const f
       , inverseMass(mass != 0.f ? 1.f / mass : 0.f)
       , damping_factor(d > 0 ? logf(d) : 0)
       , type(type) {
+
+    if (velStart.isNAN() || velStart == Vector(0, 0, 0)) {
+        velStart = vel;
+	}
 }
 
 Vector Particle::integrate(const float dt) {
