@@ -12,6 +12,7 @@ public:
     // Projectile type
     enum projectileType { Balle, Boulet, Laser, BouleDeFeu };
 	projectileType type;
+	bool showTrajectory = true;
 
     // Constructor
     explicit Particle(

@@ -54,31 +54,51 @@ void ofApp::draw() {
 		{
 		case Particle::projectileType::Balle:
 			// Draw trajectory
-			DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(300, 0, 0), Vector(0, 9.8, 0), p.type);
+			if (p.showTrajectory) {
+				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(300, 0, 0), Vector(0, 9.8, 0), p.type);
+			}
 			// Draw particle
 			ofSetColor(245, 211, 101);
 			ofDrawCircle(p.pos.x, p.pos.y, 10);
+			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+				p.showTrajectory = false;
+			}
 			break;
 		case Particle::projectileType::Boulet:
 			// Draw trajectory
-			DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(200, 0, 0), Vector(0, 9.8, 0), p.type);
+			if (p.showTrajectory) {
+				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(200, 0, 0), Vector(0, 9.8, 0), p.type);
+			}
 			// Draw particle
 			ofSetColor(205, 205, 205);
 			ofDrawCircle(p.pos.x, p.pos.y, 20);
+			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+				p.showTrajectory = false;
+			}
 			break;
 		case Particle::projectileType::Laser:
 			// Draw trajectory
-			DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(500, 0, 0), Vector(0, 9.8, 0), p.type);
+			if (p.showTrajectory) {
+				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(500, 0, 0), Vector(0, 9.8, 0), p.type);
+			}
 			// Draw particle
 			ofSetColor(0, 255, 0);
 			ofDrawRectangle(p.pos.x, p.pos.y, 30, 5);
+			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+				p.showTrajectory = false;
+			}
 			break;
 		case Particle::projectileType::BouleDeFeu:
 			// Draw trajectory
-			DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(250, 0, 0), Vector(0, 9.8, 0), p.type);
+			if (p.showTrajectory) {
+				DrawTrajectory(Vector(220, ofGetHeight() - 155, 0), Vector(250, 0, 0), Vector(0, 9.8, 0), p.type);
+			}
 			// Draw particle
 			ofSetColor(255, 165, 0);
 			ofDrawCircle(p.pos.x, p.pos.y, 15);
+			if (p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0) {
+				p.showTrajectory = false;
+			}
 			break;
 		default:
 			break;
