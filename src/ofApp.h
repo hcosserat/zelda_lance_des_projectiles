@@ -44,4 +44,6 @@ public:
 
 	std::vector<Particle> particles;
 
+	void DrawTrajectory(Vector startPos, Vector v, Vector a, Particle::projectileType t);
+
 };
