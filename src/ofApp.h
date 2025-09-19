@@ -40,7 +40,8 @@ public:
 
 	void gotMessage(ofMessage msg) override;
 
-	void SpawnParticle(Vector v, Vector a, float m);
+	void SpawnParticle(Vector v, Vector a, float m, Particle::projectileType t);
 
 	std::vector<Particle> particles;
+
 };

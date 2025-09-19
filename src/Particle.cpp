@@ -1,11 +1,12 @@
 #include "Particle.h"
 
-Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass, const float d)
+Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass, const float d, projectileType type)
     : pos(pos)
       , vel(vel)
       , acc(acc)
       , inverseMass(mass != 0.f ? 1.f / mass : 0.f)
-      , damping_factor(d > 0 ? logf(d) : 0) {
+      , damping_factor(d > 0 ? logf(d) : 0)
+      , type(type) {
 }
 
 Vector Particle::integrate(const float dt) {
