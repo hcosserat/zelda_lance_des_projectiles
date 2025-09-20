@@ -48,61 +48,61 @@ void ofApp::draw() {
 	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
 
 	// Particles
-	for (auto & p : particles) {
-		p.integrate(dt);
+	for (auto & p : projectiles) {
+		p.particle.integrate(dt);
 		switch (p.type)
 		{
-		case Particle::projectileType::Balle:
+		case Projectile::projectileType::Balle:
 			// Draw trajectory
 			if (p.showTrajectory) {
 				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(245, 211, 101);
-			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
-				ofDrawCircle(p.pos.x, p.pos.y, 10);
+			if (!(p.particle.pos.y >= ofGetHeight() - 50 || p.particle.pos.x > ofGetWidth() || p.particle.pos.x < 0 || p.particle.pos.y < 0)) {	// If not out of bounds
+				ofDrawCircle(p.particle.pos.x, p.particle.pos.y, 10);
 			}
 			else {
 				p.showTrajectory = false;
 			}
 			break;
-		case Particle::projectileType::Boulet:
+		case Projectile::projectileType::Boulet:
 			// Draw trajectory
 			if (p.showTrajectory) {
 				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(205, 205, 205);
-			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
-				ofDrawCircle(p.pos.x, p.pos.y, 20);
+			if (!(p.particle.pos.y >= ofGetHeight() - 50 || p.particle.pos.x > ofGetWidth() || p.particle.pos.x < 0 || p.particle.pos.y < 0)) {	// If not out of bounds
+				ofDrawCircle(p.particle.pos.x, p.particle.pos.y, 20);
 			}
 			else {
 				p.showTrajectory = false;
 			}
 			break;
-		case Particle::projectileType::Laser:
+		case Projectile::projectileType::Laser:
 			// Draw trajectory
 			if (p.showTrajectory) {
 				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(0, 255, 0);
-			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
-				ofDrawRectangle(p.pos.x, p.pos.y, 30, 5);
+			if (!(p.particle.pos.y >= ofGetHeight() - 50 || p.particle.pos.x > ofGetWidth() || p.particle.pos.x < 0 || p.particle.pos.y < 0)) {	// If not out of bounds
+				ofDrawRectangle(p.particle.pos.x, p.particle.pos.y, 30, 5);
 			}
 			else {
 				p.showTrajectory = false;
 			}
 			break;
-		case Particle::projectileType::BouleDeFeu:
+		case Projectile::projectileType::BouleDeFeu:
 			// Draw trajectory
 			if (p.showTrajectory) {
 				DrawTrajectory(spawnPos, p.velStart, Vector(0, 9.8, 0), p.type);
 			}
 			// Draw particle
 			ofSetColor(255, 165, 0);
-			if (!(p.pos.y >= ofGetHeight() - 50 || p.pos.x > ofGetWidth() || p.pos.x < 0 || p.pos.y < 0)) {	// If not out of bounds
-				ofDrawCircle(p.pos.x, p.pos.y, 15);
+			if (!(p.particle.pos.y >= ofGetHeight() - 50 || p.particle.pos.x > ofGetWidth() || p.particle.pos.x < 0 || p.particle.pos.y < 0)) {	// If not out of bounds
+				ofDrawCircle(p.particle.pos.x, p.particle.pos.y, 15);
 			}
 			else {
 				p.showTrajectory = false;
@@ -132,19 +132,19 @@ void ofApp::keyPressed(int key) {
 		break;
 
 	case 'a': // Balle
-		SpawnParticle(dir * 300, Vector(0, 9.8, 0), 1, Particle::projectileType::Balle);
+		SpawnProjectile(dir * 300, Vector(0, 9.8, 0), 1, Projectile::projectileType::Balle);
 		break;
 
 	case 'z': // Boulet
-		SpawnParticle(dir * 200, Vector(0, 9.8, 0), 10, Particle::projectileType::Boulet);
+		SpawnProjectile(dir * 200, Vector(0, 9.8, 0), 10, Projectile::projectileType::Boulet);
 		break;
 
 	case 'e': // Laser
-		SpawnParticle(dir * 500, Vector(0, 9.8, 0), 0.1, Particle::projectileType::Laser);
+		SpawnProjectile(dir * 500, Vector(0, 9.8, 0), 0.1, Projectile::projectileType::Laser);
 		break;
 
 	case 'r': // Boule de feu
-		SpawnParticle(dir * 250, Vector(0, 9.8, 0), 5, Particle::projectileType::BouleDeFeu);
+		SpawnProjectile(dir * 250, Vector(0, 9.8, 0), 5, Projectile::projectileType::BouleDeFeu);
 		break;
 	}
 }
@@ -193,30 +193,30 @@ void ofApp::gotMessage(ofMessage msg) {
 void ofApp::dragEvent(ofDragInfo dragInfo) {
 }
 
-void ofApp::SpawnParticle(Vector v, Vector a, float m, Particle::projectileType t) {
+void ofApp::SpawnProjectile(Vector v, Vector a, float m, Projectile::projectileType t) {
 
-	Particle Particle(spawnPos, v, a, m, 1, t);
-	particles.push_back(Particle);
+	Projectile Projectile(Particle(spawnPos, v, a, m, 1), t);
+	projectiles.push_back(Projectile);
 
 }
 
-void ofApp::DrawTrajectory(Vector startPos, Vector v, Vector a, Particle::projectileType t) {
+void ofApp::DrawTrajectory(Vector startPos, Vector v, Vector a, Projectile::projectileType t) {
 
 	float timeStep = 0.016f; // ~60 FPS
 	int maxSteps = 300; // Limit to avoid infinite loops
 
 	switch (t)
 	{
-	case Particle::Balle:
+	case Projectile::Balle:
 		ofSetColor(245, 211, 101, 100);
 		break;
-	case Particle::Boulet:
+	case Projectile::Boulet:
 		ofSetColor(205, 205, 205, 100);
 		break;
-	case Particle::Laser:
+	case Projectile::Laser:
 		ofSetColor(0, 255, 0, 100);
 		break;
-	case Particle::BouleDeFeu:
+	case Projectile::BouleDeFeu:
 		ofSetColor(255, 165, 0, 100);
 		break;
 	}

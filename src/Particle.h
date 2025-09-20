@@ -9,11 +9,7 @@ public:
     Vector pos, vel, acc; // postion, velocity, acceleration vectors
     float inverseMass; // inverse of mass
     float damping_factor; // = ln(d)
-    // Projectile type
-    enum projectileType { Balle, Boulet, Laser, BouleDeFeu };
-	projectileType type;
-	bool showTrajectory = true; // Whether to show trajectory or not
-	Vector velStart; // Initial velocity for trajectory calculation
+    
 
     // Constructor
     explicit Particle(
@@ -21,8 +17,7 @@ public:
         Vector vel = Vector{0, 0, 0},
         Vector acc = Vector{0, 0, 0},
         float mass = 1,
-        float d = 1,
-        projectileType type = Balle);
+        float d = 1);
 
     // Euler method, returns new position
     Vector integrate(float dt);

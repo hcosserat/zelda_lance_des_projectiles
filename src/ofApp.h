@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "Vector.h"
 #include "Particle.h"
+#include "Projectile.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -40,11 +41,11 @@ public:
 
 	void gotMessage(ofMessage msg) override;
 
-	void SpawnParticle(Vector v, Vector a, float m, Particle::projectileType t);
+	void SpawnProjectile(Vector v, Vector a, float m, Projectile::projectileType t);
 
-	std::vector<Particle> particles;
+	std::vector<Projectile> projectiles;
 
-	void DrawTrajectory(Vector startPos, Vector v, Vector a, Particle::projectileType t);
+	void DrawTrajectory(Vector startPos, Vector v, Vector a, Projectile::projectileType t);
 
 	Vector spawnPos = Vector(220, ofGetHeight() - 155, 0);
 
