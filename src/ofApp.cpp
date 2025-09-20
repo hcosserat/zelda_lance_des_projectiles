@@ -132,19 +132,19 @@ void ofApp::keyPressed(int key) {
 		break;
 
 	case 'a': // Balle
-		SpawnProjectile(dir * 300, Vector(0, 9.8, 0), 1, Projectile::projectileType::Balle);
+		SpawnProjectile(dir * 100, Vector(0, 9.8, 0), 1, Projectile::projectileType::Balle);
 		break;
 
 	case 'z': // Boulet
-		SpawnProjectile(dir * 200, Vector(0, 9.8, 0), 10, Projectile::projectileType::Boulet);
+		SpawnProjectile(dir * 50, Vector(0, 9.8, 0), 10, Projectile::projectileType::Boulet);
 		break;
 
 	case 'e': // Laser
-		SpawnProjectile(dir * 500, Vector(0, 9.8, 0), 0.1, Projectile::projectileType::Laser);
+		SpawnProjectile(dir * 150, Vector(0, 9.8, 0), 0.1, Projectile::projectileType::Laser);
 		break;
 
 	case 'r': // Boule de feu
-		SpawnProjectile(dir * 250, Vector(0, 9.8, 0), 5, Projectile::projectileType::BouleDeFeu);
+		SpawnProjectile(dir * 125, Vector(0, 9.8, 0), 5, Projectile::projectileType::BouleDeFeu);
 		break;
 	}
 }
@@ -203,7 +203,7 @@ void ofApp::SpawnProjectile(Vector v, Vector a, float m, Projectile::projectileT
 void ofApp::DrawTrajectory(Vector startPos, Vector v, Vector a, Projectile::projectileType t) {
 
 	float timeStep = 0.016f; // ~60 FPS
-	int maxSteps = 300; // Limit to avoid infinite loops
+	int maxSteps = 500; // Limit to avoid infinite loops
 
 	switch (t)
 	{
