@@ -44,7 +44,11 @@ Liste des dépendances nécessaires avant de compiler et exécuter le programme 
 
 ## Compilation
 
-Expliquer clairement comment compiler le programme. 
+1. Génerer un projet avec projectGenerator 
+
+2. Cloner le repo et copier son contenu à la racine du projet pour remplacer le `src/`
+
+3. Compiler et lancer selon le type de projet
 
 ## Auteurs
 
