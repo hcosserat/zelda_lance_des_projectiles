@@ -13,6 +13,7 @@ class ParticleForceRegistry
 
 	// Dynamic array of registrations
 	typedef std::vector<ParticleForceRegistration> Registry;
+	Registry registrations;
 
 	// Add a new registration to the registry
 	void add(Particle* particle, ParticleForceGenerator* fg);
