@@ -1,15 +1,24 @@
 #include "Particle.h"
 
-Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass, const float d)
+Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const float mass, const Vector accumForce)
     : pos(pos)
       , vel(vel)
       , acc(acc)
       , inverseMass(mass != 0.f ? 1.f / mass : 0.f)
-      , damping_factor(d > 0 ? logf(d) : 0) {
+      , accumForce(accumForce) {
 }
 
 Vector Particle::integrate(const float dt) {
-    vel = expf(damping_factor * dt) * vel + dt * acc;
+	acc = accumForce * inverseMass;
+    vel += dt * acc;
     pos += dt * vel;
     return pos;
+}
+
+void Particle::addforce(const Vector & force) {
+	accumForce += force;
+}
+
+void Particle::clearAccum() {
+	accumForce = Vector { 0, 0, 0 };
 }

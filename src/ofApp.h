@@ -41,12 +41,4 @@ public:
 
 	void gotMessage(ofMessage msg) override;
 
-	void SpawnProjectile(Vector v, Vector a, float m, Projectile::projectileType t);
-
-	std::vector<Projectile> projectiles;
-
-	void DrawTrajectory(Vector startPos, Vector v, Vector a, Projectile::projectileType t);
-
-	Vector spawnPos = Vector(220, ofGetHeight() - 155, 0);
-
 };
