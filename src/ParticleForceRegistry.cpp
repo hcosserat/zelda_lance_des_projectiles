@@ -10,9 +10,9 @@ void ParticleForceRegistry::add(Particle* particle, ParticleForceGenerator* fg)
 
 void ParticleForceRegistry::remove(Particle* particle, ParticleForceGenerator* fg)
 {
-	for (auto& x : registrations) {
-		if (x.particle == particle && x.fg == fg) {
-			registrations.erase(std::remove(registrations.begin(), registrations.end(), x), registrations.end());
+	for (auto x = registrations.begin(); x != registrations.end(); ++x) {
+		if (x->particle == particle && x->fg == fg) {
+			registrations.erase(x);
 			break;
 		}
 	}
