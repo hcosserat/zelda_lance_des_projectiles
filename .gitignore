@@ -47,6 +47,8 @@ Release/
 *.swp
 *.swo
 *.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 *~
 
 # CLion
