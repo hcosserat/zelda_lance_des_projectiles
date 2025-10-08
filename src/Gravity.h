@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/ParticleForceGenerator.h"
-#include "src/Vector.h"
+#include "ParticleForceGenerator.h"
+#include "Vector.h"
 
 class Particle;
 
