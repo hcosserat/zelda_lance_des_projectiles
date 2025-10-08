@@ -1,9 +1,12 @@
 #pragma once
 
 #include "ofMain.h"
+#include "Maths/VectorTest.h"
 #include "Maths/Vector.h"
 #include "PhysicObjects/Particle.h"
 #include "PhysicObjects/Projectile.h"
+#include "PhysicObjects/Circle.h"
+#include "PhysicObjects/Rect.h"
 
 class ofApp : public ofBaseApp {
 public:

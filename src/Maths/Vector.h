@@ -1,5 +1,7 @@
 #pragma once
 
+#include <CollisionResult.h>
+
 #include "../ofMain.h"
 
 class Vector {
@@ -27,6 +29,8 @@ public:
     void operator%=(float a);
 
     Vector operator-(const Vector &other) const;
+
+    Vector operator-() const;
 
     void operator-=(const Vector &other);
 
