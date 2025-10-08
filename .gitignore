@@ -43,8 +43,10 @@ Release/
 
 # IDE files
 .vscode/
+.vs/
 *.swp
 *.swo
+*.vcxproj
 *~
 
 # CLion
@@ -78,3 +80,6 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+*.make
+*.rc
+*.sln
