@@ -28,8 +28,6 @@ public:
 
     Vector operator-(const Vector &other) const;
 
-    Vector operator-() const;
-
     void operator-=(const Vector &other);
 
     Vector operator*(const Vector &other) const;

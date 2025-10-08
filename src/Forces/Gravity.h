@@ -12,13 +12,14 @@ public:
     Vector gravity;
 
     // Initialise la gravit�
-    explicit ParticleGravity(const Vector &g) : gravity(g) {
-    }
+	explicit ParticleGravity(
+		Vector g = Vector { 0, -9.8, 0 }
+	);
 
     // Modifie la gravit�
     void set(const Vector &g) { gravity = g; }
     const Vector &get() const { return gravity; }
 
     // Applique la force de gravit� sur la particule
-    virtual void updateForce(Particle *particle, float duration);
+    virtual void updateforce(Particle *particle, float duration);
 };

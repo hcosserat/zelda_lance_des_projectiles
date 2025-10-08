@@ -1,15 +1,24 @@
 #include "ofApp.h"
+#include "Maths/VectorTest.h"
+#include "PhysicObjects/Particle.h"
+#include "Forces/Gravity.h"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
 	test_vector();
-	Circle *c;
-	Rect *r;
+	dt = 1 / 60;
+	test = Particle(Vector { 100, 200, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0.1 , Vector { 0, 0, 0 });
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	dt = ofGetLastFrameTime();
+	ParticleGravity grav;
+	Registry.add(&test,&grav);
+	Registry.updateForces(dt);
+	Registry.clear();
+	test.pos = test.integrate(dt);
+	test.clearAccum();
 }
 
 //--------------------------------------------------------------
@@ -17,6 +26,9 @@ void ofApp::draw() {
 	// Delta Time
 	ofSetColor(255);
 	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
+	// Particles
+	ofSetColor(245, 0, 0);
+	ofDrawCircle(test.pos.x, test.pos.y, 10);
 }
 
 //--------------------------------------------------------------
