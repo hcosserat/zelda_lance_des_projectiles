@@ -1,10 +1,9 @@
 #include "ofApp.h"
-#include "VectorTest.h"
+#include "Maths/VectorTest.h"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
 	test_vector();
-	float dt = 1/60;
 }
 
 //--------------------------------------------------------------
@@ -14,11 +13,9 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-
 	// Delta Time
-	ofSetColor(255); 
-	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
-
+	ofSetColor(255);
+	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 dÃ©cimales, Ã  (10, 20)
 }
 
 //--------------------------------------------------------------

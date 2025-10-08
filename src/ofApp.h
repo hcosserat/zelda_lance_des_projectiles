@@ -1,9 +1,9 @@
 #pragma once
 
 #include "ofMain.h"
-#include "Vector.h"
-#include "Particle.h"
-#include "Projectile.h"
+#include "Maths/Vector.h"
+#include "PhysicObjects/Particle.h"
+#include "PhysicObjects/Projectile.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -40,5 +40,4 @@ public:
 	void dragEvent(ofDragInfo dragInfo) override;
 
 	void gotMessage(ofMessage msg) override;
-
 };

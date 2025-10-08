@@ -1,5 +1,4 @@
 #include "Gravity.h"
-#include "Particle.h"
 
 void ParticleGravity::updateForce(Particle * p, float /*dt*/) {
 	if (!p) return;
