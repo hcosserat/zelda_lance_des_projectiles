@@ -1,7 +1,5 @@
 #pragma once
 
-#include <CollisionResult.h>
-
 #include "../ofMain.h"
 
 class Vector {
