@@ -5,12 +5,14 @@
 #include "PhysicObjects/Particle.h"
 #include "PhysicObjects/Projectile.h"
 #include "Forces/ParticleForceRegistry.h"
+#include <Blob.h>
 
 class ofApp : public ofBaseApp {
 public:
 	float dt;
 	Particle test;
 	ParticleForceRegistry Registry;
+	Blob blob;
 
 	void setup() override;
 

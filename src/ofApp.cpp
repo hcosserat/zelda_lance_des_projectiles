@@ -8,6 +8,8 @@ void ofApp::setup() {
 	test_vector();
 	dt = 1 / 60;
 	test = Particle(Vector { 100, 200, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0.1 , Vector { 0, 0, 0 });
+	blob = Blob();
+	blob.addCircle();
 }
 
 //--------------------------------------------------------------
@@ -29,6 +31,13 @@ void ofApp::draw() {
 	// Particles
 	ofSetColor(245, 0, 0);
 	ofDrawCircle(test.pos.x, test.pos.y, 10);
+	// Blob
+	ofSetColor(0, 0, 245); // Blue
+	ofDrawCircle(blob.center.centerParticle.pos.x, blob.center.centerParticle.pos.y, blob.center.radius);
+	for (const auto& c : blob.circles) {
+		ofSetColor(0, 245, 0); // Green
+		ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+	}
 }
 
 //--------------------------------------------------------------
@@ -37,6 +46,17 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+	switch (key)
+	{
+	case 'a':
+		blob.addCircle();
+		break;
+	case 'r':
+		blob.removeCircle();
+		break;
+	default:
+		break;
+	}
 }
 
 //--------------------------------------------------------------
