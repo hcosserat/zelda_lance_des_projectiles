@@ -9,7 +9,8 @@ public:
     Particle centerParticle;
 
     explicit Actor(const Particle &centerParticle)
-            : centerParticle(centerParticle) {}
+        : centerParticle(centerParticle) {
+    }
 
     virtual ~Actor() = default;
 
