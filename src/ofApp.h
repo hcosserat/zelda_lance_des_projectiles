@@ -3,20 +3,18 @@
 #include "ofMain.h"
 #include "Maths/Vector.h"
 #include "PhysicObjects/Particle.h"
-#include "PhysicObjects/Projectile.h"
-#include "Forces/ParticleForceRegistry.h"
 #include "Maths/VectorTest.h"
-#include "Forces/Gravity.h"
 #include "PhysicObjects/Circle.h"
 #include "PhysicObjects/Rect.h"
-#include <Blob.h>
+#include "Blob.h"
+#include "PhysicObjects/World.h"
 
 class ofApp : public ofBaseApp {
 public:
     float dt;
     Particle test;
-    ParticleForceRegistry Registry;
-    Blob blob;
+    World world;
+	Blob blob;
 
     void setup() override;
 

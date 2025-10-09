@@ -7,10 +7,9 @@
 void ofApp::setup() {
 	test_vector();
 	dt = 1.0f / 60;
-	test = Particle(Vector{100, 200, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.1, Vector{0, 0, 0});
 	blob = Blob();
 	blob.addCircle();
-
+	world = World();
 	// Svp pas touche
 	Rect *r;
 	Circle *c;
@@ -20,12 +19,7 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 	dt = ofGetLastFrameTime();
-	ParticleGravity grav;
-	Registry.add(&test, &grav);
-	Registry.updateForces(dt);
-	Registry.clear();
-	test.pos = test.integrate(dt);
-	test.clearAccum();
+	world.WorldForces(dt);
 }
 
 //--------------------------------------------------------------
