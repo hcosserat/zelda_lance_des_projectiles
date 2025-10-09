@@ -9,6 +9,11 @@ Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const f
 }
 
 Vector Particle::integrate(const float dt) {
+	if (inverseMass == 0.0f) {
+		// Infinite mass, no movement
+		return pos;
+	}
+
 	acc = accumForce * inverseMass;
 	vel += dt * acc;
 	pos += dt * vel;
@@ -16,9 +21,19 @@ Vector Particle::integrate(const float dt) {
 }
 
 void Particle::addforce(const Vector &force) {
+	if (inverseMass == 0.0f) {
+		// Infinite mass, no movement
+		return;
+	}
+
 	accumForce += force;
 }
 
 void Particle::clearAccum() {
+	if (inverseMass == 0.0f) {
+		// Infinite mass, no movement
+		return;
+	}
+
 	accumForce = Vector{0, 0, 0};
 }

@@ -53,7 +53,10 @@ CollisionResult Rect::collidesWith(const Actor &other) {
         }
         case RectShape:
             return collidesWithRect(dynamic_cast<const Rect &>(other));
-        default:
-            return {false, Vector{0, 0, 0}};
+        default: {
+            std::cout << "Collision non gérée dans Rect :( C'est quoi un " << other.getShape() << " ?" << std::endl;
+            return {false, Vector{0, 0, 0}
+            };
+        }
     }
 }

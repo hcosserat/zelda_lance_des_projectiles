@@ -69,7 +69,9 @@ CollisionResult Circle::collidesWith(const Actor &other) {
             return collidesWithCircle(dynamic_cast<const Circle &>(other));
         case RectShape:
             return collidesWithRect(dynamic_cast<const Rect &>(other));
-        default:
-            return {false, Vector{0, 0, 0}};
+        default:{
+            std::cout << "Collision non gérée dans Circle :( C'est quoi un " << other.getShape() << " ?" << std::endl;
+            return {false, Vector{0, 0, 0}
+            };
     }
 }
