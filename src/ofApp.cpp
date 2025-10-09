@@ -7,7 +7,7 @@
 void ofApp::setup() {
 	test_vector();
 	dt = 1 / 60;
-	test = Particle(Vector { 100, 200, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0.1 , Vector { 0, 0, 0 });
+	test = Particle(Vector { 100, 200, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0.01 , Vector { 0, 0, 0 });
 }
 
 //--------------------------------------------------------------
