@@ -9,12 +9,14 @@
 #include "Forces/Gravity.h"
 #include "PhysicObjects/Circle.h"
 #include "PhysicObjects/Rect.h"
+#include <Blob.h>
 
 class ofApp : public ofBaseApp {
 public:
     float dt;
     Particle test;
     ParticleForceRegistry Registry;
+	Blob blob;
 
     void setup() override;
 
