@@ -29,6 +29,22 @@ void ofApp::draw() {
 	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
 	// Particles
 	ofSetColor(245, 0, 0);
+	for (Actor * actor : world.actors) {
+		switch (actor->getShape()) {
+		case CircleShape: {
+			ofDrawCircle(actor->centerParticle.pos.x, actor->centerParticle.pos.y, dynamic_cast<Circle *>(actor)->radius);
+			break;
+		}
+		case RectShape: {
+			std::cout << "C'est un rectangle" << std::endl;
+			break;
+		}
+		default: {
+			std::cout << "Forme inconnu" << std::endl;
+			break;
+		}
+		}
+	}
 	ofDrawCircle(test.pos.x, test.pos.y, 10);
 	// Blob
 	ofSetColor(0, 0, 245); // Blue
