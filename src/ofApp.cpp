@@ -1,20 +1,23 @@
 #include "ofApp.h"
-#include "Maths/VectorTest.h"
-#include "PhysicObjects/Particle.h"
-#include "Forces/Gravity.h"
+
 
 //--------------------------------------------------------------
 void ofApp::setup() {
 	test_vector();
-	dt = 1 / 60;
-	test = Particle(Vector { 100, 200, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0.01 , Vector { 0, 0, 0 });
+	dt = 1.0f / 60;
+	test = Particle(Vector{100, 200, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.01, Vector{0, 0, 0});
+
+	// Svp pas touche
+	Rect *r;
+	Circle *c;
+	Actor *a;
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	dt = ofGetLastFrameTime();
 	ParticleGravity grav;
-	Registry.add(&test,&grav);
+	Registry.add(&test, &grav);
 	Registry.updateForces(dt);
 	Registry.clear();
 	test.pos = test.integrate(dt);

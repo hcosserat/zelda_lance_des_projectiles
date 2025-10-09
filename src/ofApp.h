@@ -5,42 +5,46 @@
 #include "PhysicObjects/Particle.h"
 #include "PhysicObjects/Projectile.h"
 #include "Forces/ParticleForceRegistry.h"
+#include "Maths/VectorTest.h"
+#include "Forces/Gravity.h"
+#include "PhysicObjects/Circle.h"
+#include "PhysicObjects/Rect.h"
 
 class ofApp : public ofBaseApp {
 public:
-	float dt;
-	Particle test;
-	ParticleForceRegistry Registry;
+    float dt;
+    Particle test;
+    ParticleForceRegistry Registry;
 
-	void setup() override;
+    void setup() override;
 
-	void update() override;
+    void update() override;
 
-	void draw() override;
+    void draw() override;
 
-	void exit() override;
+    void exit() override;
 
-	void keyPressed(int key) override;
+    void keyPressed(int key) override;
 
-	void keyReleased(int key) override;
+    void keyReleased(int key) override;
 
-	void mouseMoved(int x, int y) override;
+    void mouseMoved(int x, int y) override;
 
-	void mouseDragged(int x, int y, int button) override;
+    void mouseDragged(int x, int y, int button) override;
 
-	void mousePressed(int x, int y, int button) override;
+    void mousePressed(int x, int y, int button) override;
 
-	void mouseReleased(int x, int y, int button) override;
+    void mouseReleased(int x, int y, int button) override;
 
-	void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
+    void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
-	void mouseEntered(int x, int y) override;
+    void mouseEntered(int x, int y) override;
 
-	void mouseExited(int x, int y) override;
+    void mouseExited(int x, int y) override;
 
-	void windowResized(int w, int h) override;
+    void windowResized(int w, int h) override;
 
-	void dragEvent(ofDragInfo dragInfo) override;
+    void dragEvent(ofDragInfo dragInfo) override;
 
-	void gotMessage(ofMessage msg) override;
+    void gotMessage(ofMessage msg) override;
 };

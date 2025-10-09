@@ -1,6 +1,12 @@
 #include "Circle.h"
+#include "Rect.h"
 
-CollisionResult Circle::collidesWith(const Circle &other) const {
+Shape Circle::getShape() const {
+    return CircleShape;
+}
+
+
+CollisionResult Circle::collidesWithCircle(const Circle &other) const {
     const auto dist_squared = centerParticle.pos.distanceSquared(other.centerParticle.pos);
     const auto radii_sum = radius + other.radius;
 
@@ -11,7 +17,7 @@ CollisionResult Circle::collidesWith(const Circle &other) const {
     return {false, Vector{0, 0, 0}};
 }
 
-CollisionResult Circle::collidesWith(const Rect &rect) const {
+CollisionResult Circle::collidesWithRect(const Rect &rect) const {
     // Circle center relative to rect center, expressed in rect basis
     const Vector d = centerParticle.pos - rect.centerParticle.pos;
     const float x = d.dot(rect.axisU);
@@ -55,4 +61,15 @@ CollisionResult Circle::collidesWith(const Rect &rect) const {
     }
 
     return {true, normal};
+}
+
+CollisionResult Circle::collidesWith(const Actor &other) {
+    switch (other.getShape()) {
+        case CircleShape:
+            return collidesWithCircle(dynamic_cast<const Circle &>(other));
+        case RectShape:
+            return collidesWithRect(dynamic_cast<const Rect &>(other));
+        default:
+            return {false, Vector{0, 0, 0}};
+    }
 }

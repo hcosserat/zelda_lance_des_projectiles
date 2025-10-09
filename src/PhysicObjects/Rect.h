@@ -2,13 +2,16 @@
 
 #include "CollisionResult.h"
 #include "Particle.h"
+#include "Shape.h"
+#include "Actor.h"
 
 #include <array>
 #include <limits>
 #include <cmath>
 
+class Circle;
 
-class Rect {
+class Rect : public Actor {
 public:
     /*
      Schema (vectors from the center to two adjacent sides):
@@ -54,5 +57,9 @@ public:
         }
     }
 
-    CollisionResult collidesWith(const Rect &other) const;
+    Shape getShape() const override;
+
+    CollisionResult collidesWithRect(const Rect &other) const;
+
+    CollisionResult collidesWith(const Actor &other) override;
 };

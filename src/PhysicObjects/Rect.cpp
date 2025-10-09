@@ -1,6 +1,13 @@
 #include "Rect.h"
+#include "Circle.h"
 
-CollisionResult Rect::collidesWith(const Rect &other) const {
+
+Shape Rect::getShape() const {
+    return RectShape;
+}
+
+
+CollisionResult Rect::collidesWithRect(const Rect &other) const {
     const Vector d = other.centerParticle.pos - centerParticle.pos;
 
     const std::array axes = {axisU, axisV, other.axisU, other.axisV};
@@ -36,4 +43,17 @@ CollisionResult Rect::collidesWith(const Rect &other) const {
     }
 
     return {true, bestAxisRaw.normalized()};
+}
+
+CollisionResult Rect::collidesWith(const Actor &other) {
+    switch (other.getShape()) {
+        case CircleShape: {
+            const CollisionResult collision_result = dynamic_cast<const Circle &>(other).collidesWithRect(*this);
+            return {collision_result.collides, -collision_result.normalVector};
+        }
+        case RectShape:
+            return collidesWithRect(dynamic_cast<const Rect &>(other));
+        default:
+            return {false, Vector{0, 0, 0}};
+    }
 }

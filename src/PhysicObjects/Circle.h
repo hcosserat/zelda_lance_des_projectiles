@@ -1,10 +1,13 @@
 #pragma once
 
 #include "Particle.h"
-#include "Rect.h"
+#include "Actor.h"
 #include "CollisionResult.h"
+#include "Shape.h"
 
-class Circle {
+class Rect;
+
+class Circle : public Actor {
 public:
     Particle centerParticle;
     float radius;
@@ -13,7 +16,11 @@ public:
                                                                               radius(radius) {
     }
 
-    CollisionResult collidesWith(const Circle &other) const;
+    Shape getShape() const override;
 
-    CollisionResult collidesWith(const Rect &rect) const;
+    CollisionResult collidesWithCircle(const Circle &other) const;
+
+    CollisionResult collidesWithRect(const Rect &rect) const;
+
+    CollisionResult collidesWith(const Actor &other) override;
 };

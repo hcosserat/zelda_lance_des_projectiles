@@ -12,9 +12,9 @@ public:
     Vector gravity;
 
     // Initialise la gravit�
-	explicit ParticleGravity(
-		Vector g = Vector { 0, 9.8, 0 }
-	);
+    explicit ParticleGravity(
+        Vector g = Vector{0, 9.8, 0}
+    );
 
     // Modifie la gravit�
     void set(const Vector &g) { gravity = g; }
