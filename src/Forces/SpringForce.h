@@ -7,7 +7,7 @@ class SpringForce : public ParticleForceGenerator {
     float restLength; // length at rest L0
 
 public:
-    SpringForce(Particle* other, float springConstant, float restLength);
+    SpringForce(Particle *other, float springConstant, float restLength);
 
-    void updateforce(Particle* particule, float duration);
+    void updateforce(Particle *particule, float duration);
 };
