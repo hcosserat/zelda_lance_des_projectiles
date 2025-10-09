@@ -12,7 +12,7 @@ public:
     Particle centerParticle;
     float radius;
 
-    explicit Circle(const Particle &centerParticle, const float radius = 1) : centerParticle(centerParticle),
+    explicit Circle(const Particle &centerParticle, const float radius = 1) : Actor(centerParticle),
                                                                               radius(radius) {
     }
 

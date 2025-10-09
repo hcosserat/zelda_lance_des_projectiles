@@ -37,7 +37,7 @@ public:
     float halfB;
 
     explicit Rect(const Particle &centerParticle, const Vector &toSideA,
-                  const Vector &toSideB) : centerParticle(centerParticle) {
+                  const Vector &toSideB) : Actor(centerParticle) {
         const float a = toSideA.norm();
         if (a > 0.0f) {
             axisU = (1.0f / a) * toSideA;
