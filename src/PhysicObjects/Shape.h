@@ -1,3 +1,3 @@
 #pragma once
 
-enum Shape { CircleShape, RectShape };
+enum Shape { CircleShape, RectShape, BlobShape };

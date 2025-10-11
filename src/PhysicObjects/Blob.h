@@ -3,19 +3,25 @@
 #include "../Forces/SpringForce.h"
 #include "../Forces/ParticleForceRegistry.h"
 
-class Blob {
+class Blob : public Actor {
 public:
     Circle center;
     std::vector<Circle> circles;
-    ParticleForceRegistry PFR;
 
     explicit Blob(
-        const Circle &center = Circle(Particle(Vector(ofGetWidth() / 2, ofGetHeight() / 2, 0), Vector(0, 0, 0),
-                                               Vector(0, 0, 0), 1), 50),
-        const std::vector<Circle> &circles = {}) : center(center), circles(circles) {
+        const Circle& center = Circle(Particle(Vector(400, 500, 0), Vector(0, 0, 0),
+            Vector(0, 0, 0), 50), 20),
+        const std::vector<Circle>& circles = {}) : Actor(center), center(center), circles(circles) {
+    }
+
+    Shape getShape() const override {
+        return BlobShape;
+	}
+
+    CollisionResult collidesWith(const Actor& other) override {
+        return center.collidesWith(other);
     }
 
     void addCircle();
-
     void removeCircle();
 };

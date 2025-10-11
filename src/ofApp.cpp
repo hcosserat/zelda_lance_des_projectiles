@@ -7,8 +7,6 @@
 void ofApp::setup() {
 	test_vector();
 	dt = 1.0f / 60;
-	blob = Blob();
-	blob.addCircle();
 	world = World();
 	// Svp pas touche
 	Rect *r;
@@ -39,20 +37,23 @@ void ofApp::draw() {
 			std::cout << "C'est un rectangle" << std::endl;
 			break;
 		}
+		case BlobShape: {
+			Blob* blob = dynamic_cast<Blob*>(actor);
+			ofSetColor(0, 0, 245); // Blue
+			ofDrawCircle(blob->centerParticle.pos.x, blob->centerParticle.pos.y, blob->center.radius);
+			for (const auto& c : blob->circles) {
+				ofSetColor(0, 245, 0); // Green
+				ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+			}
+			break;
+		}
 		default: {
 			std::cout << "Forme inconnu" << std::endl;
 			break;
 		}
 		}
 	}
-	ofDrawCircle(test.pos.x, test.pos.y, 10);
-	// Blob
-	ofSetColor(0, 0, 245); // Blue
-	ofDrawCircle(blob.center.centerParticle.pos.x, blob.center.centerParticle.pos.y, blob.center.radius);
-	for (const auto &c: blob.circles) {
-		ofSetColor(0, 245, 0); // Green
-		ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
-	}
+	//ofDrawCircle(test.pos.x, test.pos.y, 10);
 }
 
 //--------------------------------------------------------------
@@ -63,10 +64,10 @@ void ofApp::exit() {
 void ofApp::keyPressed(int key) {
 	switch (key) {
 		case 'a':
-			blob.addCircle();
+			//blob.addCircle();
 			break;
 		case 'r':
-			blob.removeCircle();
+			//blob.removeCircle();
 			break;
 		default:
 			break;
