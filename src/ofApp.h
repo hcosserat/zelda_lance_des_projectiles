@@ -14,7 +14,7 @@ public:
     float dt;
     Particle test;
     World world;
-	//Blob blob;
+    Blob* blob;
 
     void setup() override;
 

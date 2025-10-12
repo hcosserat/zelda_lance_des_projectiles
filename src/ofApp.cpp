@@ -12,6 +12,14 @@ void ofApp::setup() {
 	Rect *r;
 	Circle *c;
 	Actor *a;
+
+	// Get the blob
+	for (Actor* actor : world.actors) {
+		if (actor->getShape() == BlobShape) {
+			blob = dynamic_cast<Blob*>(actor);
+			break;
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -64,10 +72,10 @@ void ofApp::exit() {
 void ofApp::keyPressed(int key) {
 	switch (key) {
 		case 'a':
-			//blob.addCircle();
+			blob->addCircle();
 			break;
 		case 'r':
-			//blob.removeCircle();
+			blob->removeCircle();
 			break;
 		default:
 			break;
