@@ -26,6 +26,14 @@ void ofApp::setup() {
 void ofApp::update() {
 	dt = ofGetLastFrameTime();
 	world.WorldForces(dt);
+
+	// Update display value in HUD
+	int totalBlobParticles = 0;
+	if (blob) {
+		totalBlobParticles = blob->circles.size();
+	}
+	hud.setTargetValue(static_cast<float>(totalBlobParticles));
+	hud.update(dt);
 }
 
 //--------------------------------------------------------------
@@ -33,6 +41,8 @@ void ofApp::draw() {
 	// Delta Time
 	ofSetColor(255);
 	ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
+	// HUD
+	hud.draw(10, 40);
 	// Particles
 	ofSetColor(245, 0, 0);
 	for (Actor * actor : world.actors) {

@@ -11,18 +11,22 @@ void BlobSpringForce::updateforce(Particle* particule, float duration) {
     float magnitude = force.norm();
 
     float deltaL = magnitude - restLength;
+    if (magnitude <= 0.001f) {
+        return;
+    }
+    float finalMagnitude;
     if (deltaL > 0) {
         // Tension: L > L_0. On plafonne l'étirement maximum à elasticLimit.
         // Si l'étirement dépasse la limite, deltaL est coupé, simulant une tension maximale ou un câble très tendu.
         deltaL = std::fmin(deltaL, elasticLimit);
-    }
-    float finalMagnitude = -springConstant * deltaL;
-    if (magnitude > 0) {
-        force.normalize();
-        force *= finalMagnitude;
+		finalMagnitude = springConstant * deltaL;
+		force.normalize();
+		force *= -finalMagnitude;
     }
     else {
-        force = Vector{ 0, 0, 0 };
+		finalMagnitude = springConstant * std::fabs(deltaL); // Compression: L < L_0
+		force.normalize();
+		force *= finalMagnitude;
     }
     particule->addforce(force);
     other->addforce(force * -1);

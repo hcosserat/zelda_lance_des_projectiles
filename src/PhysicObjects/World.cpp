@@ -32,11 +32,10 @@ void World::WorldForces(float dt) {
 			Blob* blob = dynamic_cast<Blob*>(actor);
 			for (auto & c : blob->circles) {
 				Registry.add(&c.centerParticle, &grav);
-				float restLength = (blob->center.radius + c.radius) * 1.5f;
-				BlobSpringForce* bsf = new BlobSpringForce(&blob->centerParticle, 50.0f, restLength, restLength * 0.5f);
+				float restLength = (blob->center.radius + c.radius);
+				BlobSpringForce* bsf = new BlobSpringForce(&blob->centerParticle, 1500.0f, restLength, 1.0f);
 				blobForces.push_back(bsf);
 				Registry.add(&c.centerParticle, bsf);
-				Registry.add(&blob->centerParticle, bsf);
 			}
 		}
 	}

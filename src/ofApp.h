@@ -8,6 +8,7 @@
 #include "PhysicObjects/Rect.h"
 #include "Blob.h"
 #include "PhysicObjects/World.h"
+#include <HUD.h>
 
 class ofApp : public ofBaseApp {
 public:
@@ -15,6 +16,7 @@ public:
     Particle test;
     World world;
     Blob* blob;
+	HUD hud;
 
     void setup() override;
 
