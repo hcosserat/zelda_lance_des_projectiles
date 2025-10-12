@@ -77,6 +77,12 @@ void ofApp::keyPressed(int key) {
 		case 'r':
 			blob->removeCircle();
 			break;
+		case OF_KEY_LEFT:
+			blob->centerParticle.vel.x = -100;
+			break;
+		case OF_KEY_RIGHT:
+			blob->centerParticle.vel.x = 100;
+			break;
 		default:
 			break;
 	}
