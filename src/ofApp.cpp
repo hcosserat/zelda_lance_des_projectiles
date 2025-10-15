@@ -14,9 +14,9 @@ void ofApp::setup() {
 	Actor *a;
 
 	// Get the blob
-	for (Actor* actor : world.actors) {
+	for (Actor *actor: world.actors) {
 		if (actor->getShape() == BlobShape) {
-			blob = dynamic_cast<Blob*>(actor);
+			blob = dynamic_cast<Blob *>(actor);
 			break;
 		}
 	}
@@ -45,30 +45,31 @@ void ofApp::draw() {
 	hud.draw(10, 40);
 	// Particles
 	ofSetColor(245, 0, 0);
-	for (Actor * actor : world.actors) {
+	for (Actor *actor: world.actors) {
 		switch (actor->getShape()) {
-		case CircleShape: {
-			ofDrawCircle(actor->centerParticle.pos.x, actor->centerParticle.pos.y, dynamic_cast<Circle *>(actor)->radius);
-			break;
-		}
-		case RectShape: {
-			std::cout << "C'est un rectangle" << std::endl;
-			break;
-		}
-		case BlobShape: {
-			Blob* blob = dynamic_cast<Blob*>(actor);
-			ofSetColor(0, 0, 245); // Blue
-			ofDrawCircle(blob->centerParticle.pos.x, blob->centerParticle.pos.y, blob->center.radius);
-			for (const auto& c : blob->circles) {
-				ofSetColor(0, 245, 0); // Green
-				ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+			case CircleShape: {
+				ofDrawCircle(actor->centerParticle.pos.x, actor->centerParticle.pos.y,
+				             dynamic_cast<Circle *>(actor)->radius);
+				break;
 			}
-			break;
-		}
-		default: {
-			std::cout << "Forme inconnu" << std::endl;
-			break;
-		}
+			case RectShape: {
+				std::cout << "C'est un rectangle" << std::endl;
+				break;
+			}
+			case BlobShape: {
+				Blob *blob = dynamic_cast<Blob *>(actor);
+				ofSetColor(0, 0, 245); // Blue
+				ofDrawCircle(blob->centerParticle.pos.x, blob->centerParticle.pos.y, blob->center.radius);
+				for (const auto &c: blob->circles) {
+					ofSetColor(0, 245, 0); // Green
+					ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+				}
+				break;
+			}
+			default: {
+				std::cout << "Forme inconnu" << std::endl;
+				break;
+			}
 		}
 	}
 	//ofDrawCircle(test.pos.x, test.pos.y, 10);
@@ -112,7 +113,8 @@ void ofApp::keyReleased(int key) {
 			blob->centerParticle.vel.x = 0;
 			break;
 		case ' ':
-			blob->centerParticle.vel.y = 0;	// TODO : No need to set to 0, just let gravity do its job but doesn't work well for now
+			blob->centerParticle.vel.y = 0;
+			// TODO : No need to set to 0, just let gravity do its job but doesn't work well for now
 			break;
 		default:
 			break;

@@ -5,10 +5,12 @@
 
 class World {
 public:
-    std::vector<Actor*> actors;
-	ParticleForceRegistry Registry;
+    std::vector<Actor *> actors;
+    ParticleForceRegistry Registry;
 
     explicit World();
+
     void WorldCollisions();
+
     void WorldForces(float dt);
 };

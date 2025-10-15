@@ -6,12 +6,12 @@
 
 class BlobSpringForce : public ParticleForceGenerator {
 public:
-    Particle* other;
+    Particle *other;
     float springConstant;
     float restLength;
     float elasticLimit; // Distance limit
 
-    BlobSpringForce(Particle* other, float springConstant, float restLength, float elasticLimit);
+    BlobSpringForce(Particle *other, float springConstant, float restLength, float elasticLimit);
 
-    void updateforce(Particle* particule, float duration) override;
+    void updateforce(Particle *particule, float duration) override;
 };

@@ -3,5 +3,5 @@
 
 class FrictionForce : public ParticleForceGenerator {
 public:
-	explicit FrictionForce();
+    explicit FrictionForce();
 };

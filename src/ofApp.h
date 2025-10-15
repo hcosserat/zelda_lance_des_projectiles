@@ -15,8 +15,8 @@ public:
     float dt;
     Particle test;
     World world;
-    Blob* blob;
-	HUD hud;
+    Blob *blob;
+    HUD hud;
 
     void setup() override;
 
