@@ -2,6 +2,7 @@
 
 #include "../ofMain.h"
 
+
 class Vector {
 public:
     // Attributs

@@ -61,5 +61,5 @@ public:
 
     CollisionResult collidesWithRect(const Rect &other) const;
 
-    CollisionResult collidesWith(const Actor &other) override;
+    CollisionResult _collidesWith(const Actor &other) override;
 };

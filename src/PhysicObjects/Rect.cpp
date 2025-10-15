@@ -29,7 +29,7 @@ CollisionResult Rect::collidesWithRect(const Rect &other) const {
         const float overlap = r1 + r2 - std::fabs(t);
 
         if (overlap <= 0.0f) {
-            return {false, Vector{0.0f, 0.0f, 0.0f}};
+            return {false};
         }
 
         if (overlap < minOverlap) {
@@ -39,13 +39,13 @@ CollisionResult Rect::collidesWithRect(const Rect &other) const {
     }
 
     if (bestAxisRaw.normSquared() <= eps) {
-        return {false, Vector{0.0f, 0.0f, 0.0f}};
+        return {false};
     }
 
     return {true, bestAxisRaw.normalized()};
 }
 
-CollisionResult Rect::collidesWith(const Actor &other) {
+CollisionResult Rect::_collidesWith(const Actor &other) {
     switch (other.getShape()) {
         case CircleShape: {
             const CollisionResult collision_result = dynamic_cast<const Circle &>(other).collidesWithRect(*this);
@@ -56,7 +56,7 @@ CollisionResult Rect::collidesWith(const Actor &other) {
         default: {
             std::cout << "Collision non gérée dans Rect :( C'est quoi un " << other.getShape() << " ?" << std::endl;
             return {
-                false, Vector{0, 0, 0}
+                false
             };
         }
     }

@@ -14,7 +14,7 @@ CollisionResult Circle::collidesWithCircle(const Circle &other) const {
         return {true, (other.centerParticle.pos - centerParticle.pos).normalized()};
     }
 
-    return {false, Vector{0, 0, 0}};
+    return {false};
 }
 
 CollisionResult Circle::collidesWithRect(const Rect &rect) const {
@@ -39,7 +39,7 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
     const float dist2 = delta.normSquared();
 
     if (dist2 > radius * radius) {
-        return {false, Vector{0, 0, 0}};
+        return {false};
     }
 
     // Compute collision normal pointing from circle toward the rectangle
@@ -63,7 +63,7 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
     return {true, normal};
 }
 
-CollisionResult Circle::collidesWith(const Actor &other) {
+CollisionResult Circle::_collidesWith(const Actor &other) {
     switch (other.getShape()) {
         case CircleShape:
             return collidesWithCircle(dynamic_cast<const Circle &>(other));
@@ -72,7 +72,7 @@ CollisionResult Circle::collidesWith(const Actor &other) {
         default: {
             std::cout << "Collision non gérée dans Circle :( C'est quoi un " << other.getShape() << " ?" << std::endl;
             return {
-                false, Vector{0, 0, 0}
+                false
             };
         }
     }
