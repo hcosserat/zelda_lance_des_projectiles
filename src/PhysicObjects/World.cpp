@@ -1,6 +1,7 @@
 #include "World.h"
 #include "Forces/Gravity.h"
 #include "Circle.h"
+#include "Rect.h"
 #include <Blob.h>
 #include <BlobSpringForce.h>
 
@@ -13,6 +14,13 @@ World::World() {
     Blob *blob = new Blob();
     blob->addCircle();
     actors.emplace_back(blob);
+
+	// Add Floor
+	actors.emplace_back(new Rect(
+		Particle(Vector { 500, 700, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0, Vector { 0, 0, 0 }),
+		Vector { 1000, 0, 0 },
+		Vector { 0, 1, 0 }
+	));
 }
 
 void World::WorldCollisions() {

@@ -53,7 +53,12 @@ void ofApp::draw() {
 				break;
 			}
 			case RectShape: {
-				std::cout << "C'est un rectangle" << std::endl;
+				float a = dynamic_cast<Rect *>(actor)->halfA;
+				float b = dynamic_cast<Rect *>(actor)->halfB;
+				glm::vec3 p;
+				p.x = actor->centerParticle.pos.x - a; 
+				p.y = actor->centerParticle.pos.y - b;
+				ofDrawRectangle(p, a*2 , b*2);
 				break;
 			}
 			case BlobShape: {
