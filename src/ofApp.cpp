@@ -86,6 +86,10 @@ void ofApp::draw() {
 					ofSetColor(0, 245, 0); // Green
 					ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
 				}
+				for (const auto& c : blob->separatedCircles) {
+					ofSetColor(100, 100, 100); // Grey
+					ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+				}
 				break;
 			}
 			default: {
@@ -109,6 +113,12 @@ void ofApp::keyPressed(int key) {
 			break;
 		case 'r':
 			blob->removeCircle();
+			break;
+		case 's':
+			blob->separateCircle();
+			break;
+		case 'f':
+			blob->fusionCircle();
 			break;
 		// Left arrow to move left
 		case OF_KEY_LEFT:

@@ -7,6 +7,7 @@ class Blob : public Actor {
 public:
     Circle center;
     std::vector<Circle> circles;
+	std::vector<Circle> separatedCircles;
 
     explicit Blob(
         const Circle& center = Circle(Particle(Vector(400, 500, 0), Vector(0, 0, 0),
@@ -22,4 +23,6 @@ public:
 
     void addCircle();
     void removeCircle();
+	void separateCircle();
+    void fusionCircle();
 };

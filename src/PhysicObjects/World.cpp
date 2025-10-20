@@ -55,6 +55,9 @@ void World::WorldForces(float dt) {
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
             }
+            for (auto &c: blob->separatedCircles) {
+                Registry.add(&c.centerParticle, &grav);
+			}
         }
     }
 
@@ -70,6 +73,11 @@ void World::WorldForces(float dt) {
                 satelliteParticle.pos = satelliteParticle.integrate(dt);
                 satelliteParticle.clearAccum();
             }
+            for (auto &c: blob->separatedCircles) {
+                Particle &satelliteParticle = c.centerParticle;
+                satelliteParticle.pos = satelliteParticle.integrate(dt);
+                satelliteParticle.clearAccum();
+			}
         }
     }
     for (SpringForce *sf: blobForces) {

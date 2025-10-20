@@ -15,6 +15,22 @@ void Blob::removeCircle() {
     }
 }
 
+void Blob::separateCircle() {
+    if (!circles.empty()) {
+        Circle c = circles.back();
+        circles.pop_back();
+        separatedCircles.push_back(c);
+	}
+}
+
+void Blob::fusionCircle() {
+    if (!separatedCircles.empty()) {
+        Circle c = separatedCircles.back();
+        separatedCircles.pop_back();
+        circles.push_back(c);
+    }
+}
+
 CollisionResult Blob::_collidesWith(const Actor &other) {
     for (Circle &circle: circles) {
         if (const CollisionResult collision_result = circle._collidesWith(other); collision_result.collides) {
