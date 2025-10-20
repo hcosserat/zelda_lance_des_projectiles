@@ -8,7 +8,11 @@
 #include "PhysicObjects/Rect.h"
 #include "Blob.h"
 #include "PhysicObjects/World.h"
-#include <HUD.h>
+#include "HUD.h"
+#include "PhysicObjects/CollisionResolver.h"
+#include "Maths/VectorTest.h"
+#include "PhysicObjects/Particle.h"
+#include "Forces/Gravity.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -17,6 +21,7 @@ public:
     World world;
     Blob *blob;
     HUD hud;
+    CollisionResolver collisionResolver;
 
     void setup() override;
 

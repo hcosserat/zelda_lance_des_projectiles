@@ -1,7 +1,4 @@
 #include "ofApp.h"
-#include "Maths/VectorTest.h"
-#include "PhysicObjects/Particle.h"
-#include "Forces/Gravity.h"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -20,6 +17,9 @@ void ofApp::setup() {
 			break;
 		}
 	}
+
+	// Initialize Collision Resolver
+	collisionResolver = CollisionResolver();
 }
 
 //--------------------------------------------------------------
@@ -34,6 +34,8 @@ void ofApp::update() {
 	}
 	hud.setTargetValue(static_cast<float>(totalBlobParticles));
 	hud.update(dt);
+
+	collisionResolver.resolve(world.actors, dt);
 }
 
 //--------------------------------------------------------------
