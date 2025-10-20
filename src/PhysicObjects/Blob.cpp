@@ -14,3 +14,13 @@ void Blob::removeCircle() {
         circles.pop_back();
     }
 }
+
+CollisionResult Blob::_collidesWith(const Actor &other) {
+    for (Circle &circle: circles) {
+        if (const CollisionResult collision_result = circle._collidesWith(other); collision_result.collides) {
+            return collision_result;
+        }
+    }
+
+    return {false};
+}

@@ -18,9 +18,7 @@ public:
         return BlobShape;
 	}
 
-    CollisionResult _collidesWith(const Actor& other) override {
-        return center._collidesWith(other);
-    }
+    CollisionResult _collidesWith(const Actor& other) override;
 
     void addCircle();
     void removeCircle();
