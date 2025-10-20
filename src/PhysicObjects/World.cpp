@@ -29,7 +29,7 @@ void World::WorldCollisions() {
 void World::WorldForces(float dt) {
     ParticleGravity grav;
     Registry.clear();
-    std::vector<BlobSpringForce *> blobForces; // To manage memory
+    std::vector<SpringForce *> blobForces; // To manage memory
 
     for (auto *actor: actors) {
         // Apply gravity
@@ -40,10 +40,20 @@ void World::WorldForces(float dt) {
             Blob *blob = dynamic_cast<Blob *>(actor);
             for (auto &c: blob->circles) {
                 Registry.add(&c.centerParticle, &grav);
-                float restLength = (blob->center.radius + c.radius);
-                BlobSpringForce *bsf = new BlobSpringForce(&blob->centerParticle, 1500.0f, restLength, 1.0f);
-                blobForces.push_back(bsf);
-                Registry.add(&c.centerParticle, bsf);
+                SpringForce* psf;
+                if (&c == &blob->circles.back()) {
+                    psf = new SpringForce(&blob->circles.front().centerParticle, 1.0f,
+						100);
+				}
+                else {
+					psf = new SpringForce(&(*(std::next(&c))).centerParticle, 1.0f, 100);
+                }
+				blobForces.push_back(psf);
+				Registry.add(&c.centerParticle, psf);
+                float restLength = 10 * (blob->center.radius + c.radius);
+				SpringForce* sf = new SpringForce(&blob->centerParticle, 1.0f, restLength);
+                blobForces.push_back(sf);
+                Registry.add(&c.centerParticle, sf);
             }
         }
     }
@@ -62,8 +72,8 @@ void World::WorldForces(float dt) {
             }
         }
     }
-    for (BlobSpringForce *bsf: blobForces) {
-        delete bsf;
+    for (SpringForce *sf: blobForces) {
+        delete sf;
     }
     Registry.clear();
 }

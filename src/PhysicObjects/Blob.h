@@ -10,7 +10,7 @@ public:
 
     explicit Blob(
         const Circle& center = Circle(Particle(Vector(400, 500, 0), Vector(0, 0, 0),
-            Vector(0, 0, 0), 50), 20),
+            Vector(0, 0, 0), 100), 18),
         const std::vector<Circle>& circles = {}) : Actor(center), center(center), circles(circles) {
     }
 
