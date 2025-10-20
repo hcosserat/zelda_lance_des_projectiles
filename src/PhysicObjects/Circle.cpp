@@ -11,7 +11,9 @@ CollisionResult Circle::collidesWithCircle(const Circle &other) const {
     const auto radii_sum = radius + other.radius;
 
     if (dist_squared <= radii_sum * radii_sum) {
-        return {true, (other.centerParticle.pos - centerParticle.pos).normalized()};
+        const float dist = std::sqrt(dist_squared);
+        const float penetration = radii_sum - dist;
+        return {true, (other.centerParticle.pos - centerParticle.pos).normalized(), penetration};
     }
 
     return {false};
@@ -24,12 +26,8 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
     const float y = d.dot(rect.axisV);
 
     // Closest point on the rectangle in local coords
-    float cx = x;
-    if (cx < -rect.halfA) cx = -rect.halfA;
-    else if (cx > rect.halfA) cx = rect.halfA;
-    float cy = y;
-    if (cy < -rect.halfB) cy = -rect.halfB;
-    else if (cy > rect.halfB) cy = rect.halfB;
+    const float cx = std::clamp(x, -rect.halfA, rect.halfA);
+    const float cy = std::clamp(y, -rect.halfB, rect.halfB);
 
     // Closest point in world coords
     const Vector closest = rect.centerParticle.pos + cx * rect.axisU + cy * rect.axisV;
@@ -44,9 +42,13 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
 
     // Compute collision normal pointing from circle toward the rectangle
     Vector normal;
+    float penetration;
+
     if (dist2 > 0.0f) {
         // Outside : from circle center to closest point on rect
+        const float dist = std::sqrt(dist2);
         normal = (closest - centerParticle.pos).normalized();
+        penetration = radius - dist;
     } else {
         // Inside : push toward nearest side
         const float dx = rect.halfA - std::fabs(x);
@@ -54,13 +56,15 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
         if (dx < dy) {
             const float s = (x >= 0.0f) ? 1.0f : -1.0f;
             normal = s * rect.axisU;
+            penetration = radius + dx;
         } else {
             const float s = (y >= 0.0f) ? 1.0f : -1.0f;
             normal = s * rect.axisV;
+            penetration = radius + dy;
         }
     }
 
-    return {true, normal};
+    return {true, normal, penetration};
 }
 
 CollisionResult Circle::_collidesWith(const Actor &other) {
@@ -71,9 +75,7 @@ CollisionResult Circle::_collidesWith(const Actor &other) {
             return collidesWithRect(dynamic_cast<const Rect &>(other));
         default: {
             std::cout << "Collision non gérée dans Circle :( C'est quoi un " << other.getShape() << " ?" << std::endl;
-            return {
-                false
-            };
+            return {false};
         }
     }
 }

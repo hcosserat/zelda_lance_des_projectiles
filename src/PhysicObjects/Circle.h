@@ -9,7 +9,6 @@ class Rect;
 
 class Circle : public Actor {
 public:
-    Particle centerParticle;
     float radius;
 
     explicit Circle(const Particle &centerParticle, const float radius = 1) : Actor(centerParticle),

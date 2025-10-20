@@ -32,11 +32,6 @@ void Blob::fusionCircle() {
 }
 
 CollisionResult Blob::_collidesWith(const Actor &other) {
-    for (Circle &circle: circles) {
-        if (const CollisionResult collision_result = circle._collidesWith(other); collision_result.collides) {
-            return collision_result;
-        }
-    }
-
+    // this should never be called, check collisions with each circle instead
     return {false};
 }

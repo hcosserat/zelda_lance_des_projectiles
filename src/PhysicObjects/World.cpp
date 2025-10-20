@@ -17,9 +17,9 @@ World::World() {
 
 	// Add Floor
 	actors.emplace_back(new Rect(
-		Particle(Vector { 500, 700, 0 }, Vector { 0, 0, 0 }, Vector { 0, 0, 0 }, 0, Vector { 0, 0, 0 }),
-		Vector { 1000, 0, 0 },
-		Vector { 0, 1, 0 }
+        Particle(Vector{500, 700, 0}),
+        Vector { 1000, 0, 0},
+        Vector{0, 100, 0 }
 	));
 }
 

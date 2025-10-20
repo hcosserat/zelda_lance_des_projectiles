@@ -30,7 +30,6 @@ public:
      - halfA * axisU : from C to the midpoint of one side.
      - halfB * axisV : from C to the midpoint of the adjacent side.
     */
-    Particle centerParticle;
     Vector axisU;
     Vector axisV;
     float halfA;

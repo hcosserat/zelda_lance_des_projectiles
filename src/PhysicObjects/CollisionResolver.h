@@ -18,7 +18,6 @@ struct CollisionResolverParams {
     float restitution = 0.2f; // coefficient d'elasticité : 0 = pas de rebond | 1 = rebond parfait
     float slop = 0.01f; // marge anti-jitter sur la correction de position : petit monde = 0.005 | grand monde = 0.5
     float restEps = 0.05f; // seuil de "repos" sur la vitesse normale relative
-    int iterations = 2; // passes de résolution
 };
 
 class CollisionResolver {
@@ -29,29 +28,20 @@ public:
     }
 
     // Résout la pénétration + applique l'impulsion pour toutes les paires en collision
-    void resolve(std::vector<Actor *> &actors, const float frame_duration);
+    void resolve(const std::vector<Actor *> &actors, float frame_duration) const;
 
 private:
     Params params;
 
     // Construction de contact selon les types
-    static bool buildContact(Actor &a, Actor &b, Contact &out, const float frame_duration);
+    static bool buildContact(Actor &a, Actor &b, Contact &out, float frame_duration);
 
-    static bool buildC_C(Circle &A, Circle &B, Contact &c, const float frame_duration);
+    static bool buildC_C(Circle &A, Circle &B, Contact &c, float frame_duration);
 
-    static bool buildC_R(Circle &C, Rect &R, Contact &c, const float frame_duration);
+    static bool buildC_R(Circle &C, Rect &R, Contact &c, float frame_duration);
 
-    static bool buildR_R(Rect &A, Rect &B, Contact &c);
-
-    // Accès génériques au "corps" (via Particle)
-    static float invMassOf(Actor &x);
-
-    static Vector &posOf(Actor &x);
-
-    static Vector &velOf(Actor &x);
+    static bool buildR_R(Rect &A, Rect &B, Contact &c, float frame_duration);
 
     // Étapes de résolution
-    void positionalCorrection(Contact &c) const;
-
-    void applyImpulse(Contact &c) const;
+    void resolveContact(Contact &c) const;
 };

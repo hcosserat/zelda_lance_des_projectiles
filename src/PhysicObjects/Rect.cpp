@@ -42,22 +42,20 @@ CollisionResult Rect::collidesWithRect(const Rect &other) const {
         return {false};
     }
 
-    return {true, bestAxisRaw.normalized()};
+    return {true, bestAxisRaw.normalized(), minOverlap};
 }
 
 CollisionResult Rect::_collidesWith(const Actor &other) {
     switch (other.getShape()) {
         case CircleShape: {
             const CollisionResult collision_result = dynamic_cast<const Circle &>(other).collidesWithRect(*this);
-            return {collision_result.collides, -collision_result.normalVector};
+            return {collision_result.collides, -collision_result.normalVector, collision_result.penetration};
         }
         case RectShape:
             return collidesWithRect(dynamic_cast<const Rect &>(other));
         default: {
             std::cout << "Collision non gérée dans Rect :( C'est quoi un " << other.getShape() << " ?" << std::endl;
-            return {
-                false
-            };
+            return {false};
         }
     }
 }
