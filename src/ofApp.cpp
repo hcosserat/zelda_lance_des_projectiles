@@ -60,14 +60,29 @@ void ofApp::draw() {
 				glm::vec3 p;
 				p.x = actor->centerParticle.pos.x - a; 
 				p.y = actor->centerParticle.pos.y - b;
+				ofSetColor(100, 100, 100); // Grey
 				ofDrawRectangle(p, a*2 , b*2);
 				break;
 			}
 			case BlobShape: {
-				Blob *blob = dynamic_cast<Blob *>(actor);
+				Blob* blob = dynamic_cast<Blob*>(actor);
+				for (auto &c: blob->circles) {
+					ofSetColor(245, 0, 245); // Purple
+					ofDrawLine(blob->centerParticle.pos.x, blob->centerParticle.pos.y,
+								c.centerParticle.pos.x, c.centerParticle.pos.y);
+					if (&c != &blob->circles.back()) {
+						ofDrawLine(c.centerParticle.pos.x, c.centerParticle.pos.y,
+								   (*(std::next(&c))).centerParticle.pos.x,
+								   (*(std::next(&c))).centerParticle.pos.y);
+					} else {
+						ofDrawLine(c.centerParticle.pos.x, c.centerParticle.pos.y,
+								   blob->circles.front().centerParticle.pos.x,
+							blob->circles.front().centerParticle.pos.y);
+					}
+				}
 				ofSetColor(0, 0, 245); // Blue
 				ofDrawCircle(blob->centerParticle.pos.x, blob->centerParticle.pos.y, blob->center.radius);
-				for (const auto &c: blob->circles) {
+				for (const auto& c : blob->circles) {
 					ofSetColor(0, 245, 0); // Green
 					ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
 				}
