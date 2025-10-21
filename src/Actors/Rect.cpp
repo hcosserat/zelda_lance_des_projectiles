@@ -49,7 +49,7 @@ CollisionResult Rect::_collidesWith(const Actor &other) {
     switch (other.getShape()) {
         case CircleShape: {
             const CollisionResult collision_result = dynamic_cast<const Circle &>(other).collidesWithRect(*this);
-            return {collision_result.collides, -collision_result.normalVector, collision_result.penetration};
+            return collision_result;
         }
         case RectShape:
             return collidesWithRect(dynamic_cast<const Rect &>(other));

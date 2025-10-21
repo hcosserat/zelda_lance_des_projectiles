@@ -32,8 +32,8 @@ World::World() {
     ));
 
     // Add Walls
-    actors.emplace_back(new Rect(Particle(Vector{1014, 400, 0}), Vector{50, -600, 0}, Vector{30, 30, 0}));
-    actors.emplace_back(new Rect(Particle(Vector{10, 400, 0}), Vector{50, 600, 0}, Vector{30, 30, 0}));
+    actors.emplace_back(new Rect(Particle(Vector{10, 400, 0}), Vector{0, 600, 0}, Vector{20, 0, 0}));
+    actors.emplace_back(new Rect(Particle(Vector{1014, 400, 0}), Vector{0, -600, 0}, Vector{20, 0, 0}));
 }
 
 void World::applyForces(const float dt) {
@@ -53,9 +53,9 @@ void World::applyForces(const float dt) {
                 Registry.add(&c.centerParticle, &grav);
                 // Create spring forces between circles
                 SpringForce *psf;
-				float restLengthC = 4 * (c.radius);
+                float restLengthC = 4 * (c.radius);
                 if (&c == &blob->circles.back()) {
-					psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f, restLengthC);
+                    psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f, restLengthC);
                 } else {
                     psf = new SpringForce(&std::next(&c)->centerParticle, 100.0f, restLengthC);
                 }
@@ -127,24 +127,26 @@ void World::draw() const {
             }
             case RectShape: {
                 ofSetColor(100);
-
                 Rect *rect = dynamic_cast<Rect *>(actor);
 
-                ofPushMatrix();
+                // Calculate the four corners
+                Vector center = rect->centerParticle.pos;
+                Vector corner1 = center + rect->halfA * rect->axisU + rect->halfB * rect->axisV;
+                Vector corner2 = center - rect->halfA * rect->axisU + rect->halfB * rect->axisV;
+                Vector corner3 = center - rect->halfA * rect->axisU - rect->halfB * rect->axisV;
+                Vector corner4 = center + rect->halfA * rect->axisU - rect->halfB * rect->axisV;
 
-                // Translate to the center of the rectangle
-                ofTranslate(actor->centerParticle.pos.x, actor->centerParticle.pos.y);
+                // Draw the rectangle
+                ofBeginShape();
+                ofVertex(corner1.x, corner1.y);
+                ofVertex(corner2.x, corner2.y);
+                ofVertex(corner3.x, corner3.y);
+                ofVertex(corner4.x, corner4.y);
+                ofEndShape(true); // close the shape
 
-                // Calculate rotation angle from axisU
-                float angle = atan2(rect->axisU.y, rect->axisU.x) * 180.0f / PI;
-                ofRotateDeg(angle);
-
-                // Draw the rectangle centered at origin
-                ofDrawRectangle(-rect->halfA, -rect->halfB, rect->halfA * 2, rect->halfB * 2);
-
-                ofPopMatrix();
                 break;
             }
+
             case BlobShape: {
                 Blob *blob = dynamic_cast<Blob *>(actor);
                 Circle center = blob->getCenter();
