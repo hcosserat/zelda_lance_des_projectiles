@@ -53,16 +53,16 @@ void World::applyForces(const float dt) {
                 Registry.add(&c.centerParticle, &grav);
                 // Create spring forces between circles
                 SpringForce *psf;
+				float restLengthC = 4 * (c.radius);
                 if (&c == &blob->circles.back()) {
-                    psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f,
-                                          1);
+					psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f, restLengthC);
                 } else {
-                    psf = new SpringForce(&std::next(&c)->centerParticle, 100.0f, 1);
+                    psf = new SpringForce(&std::next(&c)->centerParticle, 100.0f, restLengthC);
                 }
                 blobForces.push_back(psf);
                 Registry.add(&c.centerParticle, psf);
                 // Create spring forces between circle and center
-                float restLength = 1 * (blob->centerRadius + c.radius);
+                float restLength = 4 * (blob->centerRadius + c.radius);
                 SpringForce *sf = new SpringForce(&blob->centerParticle, 100.0f, restLength);
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
