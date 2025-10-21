@@ -2,8 +2,9 @@
 #include "Forces/Gravity.h"
 #include "Circle.h"
 #include "Rect.h"
-#include <Blob.h>
-#include <BlobSpringForce.h>
+#include "Blob.h"
+#include "AnchorSpringForce.h"
+#include "BungeeForce.h"
 
 World::World() {
     // Add Blob
@@ -32,16 +33,66 @@ World::World() {
     ));
 
     // Add Walls
-    actors.emplace_back(new Rect(Particle(Vector{10, 400, 0}), Vector{0, 600, 0}, Vector{20, 0, 0}));
-    actors.emplace_back(new Rect(Particle(Vector{1014, 400, 0}), Vector{0, -600, 0}, Vector{20, 0, 0}));
+    actors.emplace_back(new Rect(
+        Particle(Vector{500, 700, 0}),
+        Vector{1000, 0, 0},
+        Vector{0, 100, 0}
+    ));
+
+	// Anchor spring on a rect
+    actors.emplace_back(new Rect(
+        Particle(Vector{200, 200, 0}),
+        Vector{60, 0, 0},
+        Vector{0, 10, 0}
+	));
+    circleAnchor = new Circle(
+        Particle(Vector{200, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+        20.0f
+	);
+	actors.push_back(circleAnchor);
+    
+	// Bungee spring on a rect
+    actors.emplace_back(new Rect(
+        Particle(Vector{800, 200, 0}),
+        Vector{120, 0, 0},
+        Vector{0, 10, 0}
+    ));
+    circleBungee1 = new Circle(
+        Particle(Vector{700, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+        20.0f
+	);
+    circleBungee2 = new Circle(
+        Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+        20.0f
+    );
+    actors.push_back(circleAnchor);
+	actors.push_back(circleBungee1);
+	actors.push_back(circleBungee2);
+
 }
 
 void World::applyForces(const float dt) {
     Registry.clear();
-    constraintRegistry.clear();
+	constraintRegistry.clear();
     std::vector<SpringForce *> blobForces;
 
     ParticleGravity grav;
+
+	// Anchor spring force
+    AnchorSpringForce *anchorSpring = new AnchorSpringForce(
+        Vector{200, 200, 0}, // Anchor point
+        20.0f,              // Spring constant
+        150.0f              // Rest length
+	);
+	Registry.add(&circleAnchor->centerParticle, anchorSpring);
+	// Bungee spring forces
+    BungeeForce *bungeeSpring = new BungeeForce(
+        &circleBungee1->centerParticle,
+        10.0f,              // Spring constant
+        150.0f              // Rest length
+	);
+	Registry.add(&circleBungee2->centerParticle, bungeeSpring);
+
 
     for (auto *actor: actors) {
         Registry.add(&actor->centerParticle, &grav);

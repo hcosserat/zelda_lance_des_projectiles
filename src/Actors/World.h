@@ -4,11 +4,16 @@
 #include "../Collisions/ConstraintRegistry.h"
 #include "Actor.h"
 
+class Circle;
+
 class World {
 public:
     std::vector<Actor *> actors;
     ParticleForceRegistry Registry;
     ConstraintRegistry constraintRegistry;
+    Circle* circleAnchor;
+    Circle* circleBungee1;
+	Circle* circleBungee2;
 
     explicit World();
 

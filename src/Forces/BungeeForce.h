@@ -11,5 +11,5 @@ public:
         : other(other), springConstant(springConstant), restLength(restLength) {
     }
 
-    void updateforce(Particle &particule, float duration);
+    void updateforce(Particle *particule, float duration);
 };

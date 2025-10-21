@@ -7,9 +7,7 @@ class AnchorSpringForce : public ParticleForceGenerator {
     float restLength; // length at rest L0
 
 public:
-    AnchorSpringForce(const Vector &anchorPoint, float springConstant, float restLength)
-        : anchorPoint(anchorPoint), springConstant(springConstant), restLength(restLength) {
-    }
+    AnchorSpringForce(const Vector& anchorPoint, float springConstant, float restLength);
 
-    void updateforce(Particle &particule, float duration);
+    void updateforce(Particle *particule, float duration);
 };
