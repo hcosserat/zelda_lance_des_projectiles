@@ -40,31 +40,11 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
         return {false};
     }
 
-    // Compute collision normal pointing from circle toward the rectangle
-    Vector normal;
-    float penetration;
-
-    if (dist2 > 0.0f) {
-        // Outside : from circle center to closest point on rect
-        const float dist = std::sqrt(dist2);
-        normal = (closest - centerParticle.pos).normalized();
-        penetration = radius - dist;
-    } else {
-        // Inside : push toward nearest side
-        const float dx = rect.halfA - std::fabs(x);
-        const float dy = rect.halfB - std::fabs(y);
-        if (dx < dy) {
-            const float s = (x >= 0.0f) ? 1.0f : -1.0f;
-            normal = s * rect.axisU;
-            penetration = radius + dx;
-        } else {
-            const float s = (y >= 0.0f) ? 1.0f : -1.0f;
-            normal = s * rect.axisV;
-            penetration = radius + dy;
-        }
-    }
-
-    return {true, normal, penetration};
+    return {
+        true,
+        (closest - centerParticle.pos).normalized(),
+        radius - std::sqrt(dist2)
+    };
 }
 
 CollisionResult Circle::_collidesWith(const Actor &other) {
