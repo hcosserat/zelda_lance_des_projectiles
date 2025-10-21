@@ -1,5 +1,4 @@
 #include "Actor.h"
-#include "ConstraintRegistry.h"
 
 CollisionResult Actor::collidesWith(const Actor &other, const float frame_length) {
     CollisionResult collisionResult = _collidesWith(other);

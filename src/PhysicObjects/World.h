@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "Forces/ParticleForceRegistry.h"
-#include "ConstraintRegistry.h"
+#include "../Collisions/ConstraintRegistry.h"
 #include "Actor.h"
 
 class World {

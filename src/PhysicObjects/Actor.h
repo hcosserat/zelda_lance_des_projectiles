@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Particle.h"
-#include "CollisionResult.h"
+#include "../Collisions/CollisionResult.h"
+#include "../Collisions/ConstraintRegistry.h"
 #include "Shape.h"
 
 class ConstraintRegistry;

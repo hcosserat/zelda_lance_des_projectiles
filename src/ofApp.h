@@ -9,7 +9,7 @@
 #include "Blob.h"
 #include "PhysicObjects/World.h"
 #include "HUD.h"
-#include "PhysicObjects/CollisionResolver.h"
+#include "Collisions/CollisionResolver.h"
 #include "Maths/VectorTest.h"
 #include "PhysicObjects/Particle.h"
 #include "Forces/Gravity.h"

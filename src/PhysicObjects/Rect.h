@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CollisionResult.h"
+#include "../Collisions/CollisionResult.h"
 #include "Particle.h"
 #include "Shape.h"
 #include "Actor.h"

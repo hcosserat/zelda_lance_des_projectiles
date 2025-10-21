@@ -2,7 +2,7 @@
 
 #include "Particle.h"
 #include "Actor.h"
-#include "CollisionResult.h"
+#include "../Collisions/CollisionResult.h"
 #include "Shape.h"
 
 class Rect;

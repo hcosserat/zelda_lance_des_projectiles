@@ -2,9 +2,9 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include "Actor.h"
-#include "Circle.h"
-#include "Rect.h"
+#include "../PhysicObjects/Actor.h"
+#include "../PhysicObjects/Circle.h"
+#include "../PhysicObjects/Rect.h"
 #include "ConstraintRegistry.h"
 #include "../Maths/Vector.h"
 
