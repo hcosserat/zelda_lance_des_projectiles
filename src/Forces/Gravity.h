@@ -2,7 +2,7 @@
 
 #include "ParticleForceGenerator.h"
 #include "../Maths/Vector.h"
-#include "../PhysicObjects/Particle.h"
+#include "../Actors/Particle.h"
 
 class Particle;
 

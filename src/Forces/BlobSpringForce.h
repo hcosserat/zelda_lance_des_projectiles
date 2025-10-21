@@ -1,7 +1,7 @@
 #pragma once
 #pragma once
 #include "ParticleForceGenerator.h"
-#include "PhysicObjects/Particle.h"
+#include "Actors/Particle.h"
 #include "Maths/Vector.h"
 
 class BlobSpringForce : public ParticleForceGenerator {

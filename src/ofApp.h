@@ -2,16 +2,16 @@
 
 #include "ofMain.h"
 #include "Maths/Vector.h"
-#include "PhysicObjects/Particle.h"
+#include "Actors/Particle.h"
 #include "Maths/VectorTest.h"
-#include "PhysicObjects/Circle.h"
-#include "PhysicObjects/Rect.h"
+#include "Actors/Circle.h"
+#include "Actors/Rect.h"
 #include "Blob.h"
-#include "PhysicObjects/World.h"
+#include "Actors/World.h"
 #include "HUD.h"
 #include "Collisions/CollisionResolver.h"
 #include "Maths/VectorTest.h"
-#include "PhysicObjects/Particle.h"
+#include "Actors/Particle.h"
 #include "Forces/Gravity.h"
 
 class ofApp : public ofBaseApp {

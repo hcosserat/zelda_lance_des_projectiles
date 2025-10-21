@@ -1,5 +1,5 @@
 #pragma once
-#include "../PhysicObjects/Particle.h"
+#include "../Actors/Particle.h"
 #include "ParticleForceGenerator.h"
 
 class ParticleForceRegistry {
