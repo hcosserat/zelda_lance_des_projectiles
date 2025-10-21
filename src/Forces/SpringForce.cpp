@@ -9,7 +9,7 @@ void SpringForce::updateforce(Particle *particule, float duration) {
     float magnitude = l.norm() - restLength; // Calculate the magnitude of the force
     magnitude *= springConstant; // Calculate the final magnitude of the force
 	Vector force = l.normalized(); // Calculate the final force direction
-    force *= -magnitude * springConstant; // Calculate the final force and apply it
+    force *= -magnitude; // Calculate the final force and apply it
     particule->addforce(force);
     other->addforce(-force);
 }
