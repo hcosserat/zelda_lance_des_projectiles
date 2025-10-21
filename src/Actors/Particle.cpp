@@ -15,6 +15,7 @@ Vector Particle::integrate(const float dt) {
     }
 
     acc = accumForce * inverseMass;
+	std::cout << "The acc is: " << acc << std::endl;
     vel += dt * acc;
     pos += dt * vel;
     return pos;

@@ -5,7 +5,7 @@ void Blob::addCircle() {
         Particle(
             center.centerParticle.pos + Vector(ofRandom(-1, 1), ofRandom(-1, 1), 0).normalized() * (
                 0.1 * center.radius),
-            Vector(0, 0, 0), Vector(0, 0, 0), 80), 15);
+            Vector(0, 0, 0), Vector(0, 0, 0), 0.5), 15);
     circles.push_back(c);
 }
 
