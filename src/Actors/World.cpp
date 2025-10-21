@@ -47,15 +47,15 @@ void World::applyForces(const float dt) {
                 Registry.add(&c.centerParticle, &grav);
                 SpringForce *psf;
                 if (&c == &blob->circles.back()) {
-                    psf = new SpringForce(&blob->circles.front().centerParticle, 1.0f,
-                                          100);
+                    psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f,
+                                          1);
                 } else {
-                    psf = new SpringForce(&std::next(&c)->centerParticle, 1.0f, 100);
+                    psf = new SpringForce(&std::next(&c)->centerParticle, 100.0f, 1);
                 }
                 blobForces.push_back(psf);
                 Registry.add(&c.centerParticle, psf);
-                float restLength = 10 * (blob->centerRadius + c.radius);
-                SpringForce *sf = new SpringForce(&blob->centerParticle, 1.0f, restLength);
+                float restLength = 1 * (blob->centerRadius + c.radius);
+                SpringForce *sf = new SpringForce(&blob->centerParticle, 100.0f, restLength);
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
             }
