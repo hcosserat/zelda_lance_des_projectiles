@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "Vector.h"
 
 
@@ -119,4 +117,9 @@ float Vector::distanceSquared(const Vector &other) const {
 
 Vector operator*(const float alpha, const Vector &vec) {
     return Vector(alpha * vec.x, alpha * vec.y, alpha * vec.z);
+}
+
+std::ostream &operator<<(std::ostream &os, const Vector &vec) {
+    os << "Vector(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+    return os;
 }

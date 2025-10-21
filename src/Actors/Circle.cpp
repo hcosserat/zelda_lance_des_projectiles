@@ -42,7 +42,7 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
 
     return {
         true,
-        (closest - centerParticle.pos).normalized(),
+        (centerParticle.pos - closest).normalized(),
         radius - std::sqrt(dist2)
     };
 }

@@ -9,7 +9,20 @@ World::World() {
     // Add Blob
     Blob *blob = new Blob();
     blob->addCircle();
-    // actors.emplace_back(blob);
+    actors.emplace_back(blob);
+
+    // Create a pendulum
+    // Circle *anchor = new Circle(
+    //     Particle(Vector{400, 100, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f),
+    //     5.0f
+    // );
+    // Circle *ball = new Circle(
+    //     Particle(Vector{400, 300, 0}, Vector{50, 0, 0}, Vector{0, 0, 0}, 0.1f),
+    //     20.0f
+    // );
+    // actors.push_back(anchor);
+    // actors.push_back(ball);
+    // constraintRegistry.addRod(anchor, ball, 200.0f);
 
     // Add Floor
     actors.emplace_back(new Rect(
@@ -17,24 +30,6 @@ World::World() {
         Vector{1000, 0, 0},
         Vector{0, 100, 0}
     ));
-
-    // Create a fixed anchor point (infinite mass)
-    Circle *anchor = new Circle(
-        Particle(Vector{400, 100, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f), // inverseMass = 0 = infinite mass
-        5.0f // small radius
-    );
-
-    // Create a ball that swings
-    Circle *ball = new Circle(
-        Particle(Vector{400, 300, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.1f), // give it initial velocity
-        20.0f
-    );
-
-    // actors.push_back(anchor);
-    actors.push_back(ball);
-
-    // Add a rod constraint (fixed distance of 200 units)
-    // constraintRegistry.addRod(anchor, ball, 200.0f);
 }
 
 void World::WorldCollisions() {
@@ -105,11 +100,14 @@ void World::draw() const {
     for (Actor *actor: actors) {
         switch (actor->getShape()) {
             case CircleShape: {
+                ofSetColor(170);
                 ofDrawCircle(actor->centerParticle.pos.x, actor->centerParticle.pos.y,
                              dynamic_cast<Circle *>(actor)->radius);
                 break;
             }
             case RectShape: {
+                ofSetColor(100);
+
                 Rect *rect = dynamic_cast<Rect *>(actor);
 
                 ofPushMatrix();
@@ -122,7 +120,6 @@ void World::draw() const {
                 ofRotateDeg(angle);
 
                 // Draw the rectangle centered at origin
-                ofSetColor(100, 100, 100);
                 ofDrawRectangle(-rect->halfA, -rect->halfB, rect->halfA * 2, rect->halfB * 2);
 
                 ofPopMatrix();

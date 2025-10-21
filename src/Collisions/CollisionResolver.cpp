@@ -63,7 +63,7 @@ bool CollisionResolver::buildContact(Actor &a, Actor &b, Contact &out, const flo
 
 void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, const ConstraintRegistry *registry) {
     for (const Constraint constraint: registry->getConstraints()) {
-        const Vector d = constraint.a->centerParticle.pos - constraint.a->centerParticle.pos;
+        const Vector d = constraint.b->centerParticle.pos - constraint.a->centerParticle.pos;
         const float currentLength = d.norm();
 
         constexpr float epsilon = 1e-6f;
@@ -80,6 +80,7 @@ void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, 
                 contacts.push_back(Contact{
                     constraint.a, constraint.b, d.normalized(), diff, RodConstraint
                 });
+                break;
             }
             case Cable: {
                 const float diff = currentLength - constraint.length;
@@ -87,6 +88,7 @@ void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, 
                 contacts.push_back(Contact{
                     constraint.a, constraint.b, d.normalized(), diff, CableConstraint
                 });
+                break;
             }
         }
     }
@@ -180,11 +182,6 @@ void CollisionResolver::resolveRestingContact(Contact &c) const {
     const float invMassB = c.b->centerParticle.inverseMass;
     const float sumInverseMasses = invMassA + invMassB;
 
-    std::cout << "Resolving resting contact: invMassA=" << invMassA
-            << ", invMassB=" << invMassB
-            << ", penetration=" << c.penetration
-            << ", n=(" << c.n.x << ", " << c.n.y << ")" << std::endl;
-
     // Position correction
     const Vector correction = c.penetration * c.n;
     c.a->centerParticle.pos += (invMassA / sumInverseMasses) * correction;
@@ -195,8 +192,6 @@ void CollisionResolver::resolveRestingContact(Contact &c) const {
     const float vrn = vRel.dot(c.n);
     const float j = -vrn / sumInverseMasses;
     const Vector impulse = j * c.n;
-
-    std::cout << "  vrn=" << vrn << ", j=" << j << std::endl;
 
     c.a->centerParticle.vel += invMassA * impulse;
     c.b->centerParticle.vel -= invMassB * impulse;
@@ -272,12 +267,12 @@ void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float 
     std::vector<Contact> contacts;
     contacts.reserve(allActors.size() * 2);
 
-    // First check for constraints
+    // Check for constraints
     if (constraintRegistry) {
         buildConstraintContacts(contacts, constraintRegistry);
     }
 
-    // Then check for regular collisions
+    // Check for regular collisions
     for (size_t i = 0; i < allActors.size(); ++i) {
         for (size_t j = i + 1; j < allActors.size(); ++j) {
             Contact c;

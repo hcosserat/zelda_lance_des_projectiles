@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../ofMain.h"
+#include <ostream>
+#include <cmath>
 
 
 class Vector {
@@ -55,6 +57,10 @@ public:
     float distance(const Vector &other) const;
 
     float distanceSquared(const Vector &other) const;
+
+    friend std::ostream &operator<<(std::ostream &os, const Vector &vec);
 };
 
 Vector operator*(float alpha, const Vector &vec);
+
+std::ostream &operator<<(std::ostream &os, const Vector &vec);
