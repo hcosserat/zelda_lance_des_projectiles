@@ -29,10 +29,38 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
     const float cx = std::clamp(x, -rect.halfA, rect.halfA);
     const float cy = std::clamp(y, -rect.halfB, rect.halfB);
 
-    // Closest point in world coords
-    const Vector closest = rect.centerParticle.pos + cx * rect.axisU + cy * rect.axisV;
+    // Check if circle center is inside rectangle
+    const bool insideX = (x >= -rect.halfA && x <= rect.halfA);
+    const bool insideY = (y >= -rect.halfB && y <= rect.halfB);
+    const bool centerInside = insideX && insideY;
 
-    // Vector from closest point to circle center
+    if (centerInside) {
+        // Find shortest distance to each edge
+        const float distToRight = rect.halfA - x;
+        const float distToLeft = rect.halfA + x;
+        const float distToTop = rect.halfB - y;
+        const float distToBottom = rect.halfB + y;
+
+        const float minDist = std::min({distToRight, distToLeft, distToTop, distToBottom});
+        const float penetration = radius + minDist;
+
+        // Determine normal based on closest edge
+        Vector normal;
+        if (minDist == distToRight) {
+            normal = rect.axisU;
+        } else if (minDist == distToLeft) {
+            normal = -rect.axisU;
+        } else if (minDist == distToTop) {
+            normal = rect.axisV;
+        } else {
+            normal = -rect.axisV;
+        }
+
+        return {true, normal, penetration};
+    }
+
+    // Circle center outside: use closest point approach
+    const Vector closest = rect.centerParticle.pos + cx * rect.axisU + cy * rect.axisV;
     const Vector delta = centerParticle.pos - closest;
     const float dist2 = delta.normSquared();
 
@@ -42,10 +70,11 @@ CollisionResult Circle::collidesWithRect(const Rect &rect) const {
 
     return {
         true,
-        (centerParticle.pos - closest).normalized(),
+        delta.normalized(),
         radius - std::sqrt(dist2)
     };
 }
+
 
 CollisionResult Circle::_collidesWith(const Actor &other) {
     switch (other.getShape()) {

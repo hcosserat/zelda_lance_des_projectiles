@@ -30,6 +30,13 @@ World::World() {
         Vector{1000, 0, 0},
         Vector{0, 100, 0}
     ));
+
+    // Add Walls
+    actors.emplace_back(new Rect(
+        Particle(Vector{500, 700, 0}),
+        Vector{1000, 0, 0},
+        Vector{0, 100, 0}
+    ));
 }
 
 void World::applyForces(const float dt) {
