@@ -17,7 +17,6 @@
 class ofApp : public ofBaseApp {
 public:
     float dt;
-    Particle test;
     World world;
     Blob *blob;
     HUD hud;

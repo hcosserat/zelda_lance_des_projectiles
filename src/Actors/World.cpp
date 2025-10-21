@@ -26,15 +26,15 @@ World::World() {
 
     // Create a ball that swings
     Circle *ball = new Circle(
-        Particle(Vector{400, 300, 0}, Vector{50, 0, 0}, Vector{0, 0, 0}, 0.1f), // give it initial velocity
+        Particle(Vector{400, 300, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.1f), // give it initial velocity
         20.0f
     );
 
-    actors.push_back(anchor);
+    // actors.push_back(anchor);
     actors.push_back(ball);
 
     // Add a rod constraint (fixed distance of 200 units)
-    constraintRegistry.addRod(anchor, ball, 200.0f);
+    // constraintRegistry.addRod(anchor, ball, 200.0f);
 }
 
 void World::WorldCollisions() {

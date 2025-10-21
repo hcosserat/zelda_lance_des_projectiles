@@ -180,6 +180,11 @@ void CollisionResolver::resolveRestingContact(Contact &c) const {
     const float invMassB = c.b->centerParticle.inverseMass;
     const float sumInverseMasses = invMassA + invMassB;
 
+    std::cout << "Resolving resting contact: invMassA=" << invMassA
+            << ", invMassB=" << invMassB
+            << ", penetration=" << c.penetration
+            << ", n=(" << c.n.x << ", " << c.n.y << ")" << std::endl;
+
     // Position correction
     const Vector correction = c.penetration * c.n;
     c.a->centerParticle.pos += (invMassA / sumInverseMasses) * correction;
@@ -190,6 +195,8 @@ void CollisionResolver::resolveRestingContact(Contact &c) const {
     const float vrn = vRel.dot(c.n);
     const float j = -vrn / sumInverseMasses;
     const Vector impulse = j * c.n;
+
+    std::cout << "  vrn=" << vrn << ", j=" << j << std::endl;
 
     c.a->centerParticle.vel += invMassA * impulse;
     c.b->centerParticle.vel -= invMassB * impulse;

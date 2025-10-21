@@ -22,6 +22,4 @@ public:
     virtual CollisionResult _collidesWith(const Actor &other) = 0;
 
     CollisionResult collidesWith(const Actor &other, float frame_length);
-
-    CollisionResult checkConstraint(const Actor &other, ConstraintRegistry *registry) const;
 };
