@@ -77,8 +77,14 @@ void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, 
             case Rod: {
                 const float diff = fabs(currentLength - constraint.length);
                 if (diff < epsilon) continue;
+
+                Vector normal = d.normalized();
+                if (currentLength < constraint.length) {
+                    normal = -normal;
+                }
+
                 contacts.push_back(Contact{
-                    constraint.a, constraint.b, d.normalized(), diff, RodConstraint
+                    constraint.a, constraint.b, normal, diff, RodConstraint
                 });
                 break;
             }
@@ -163,8 +169,8 @@ void CollisionResolver::resolveInterpenetration(Contact &c) const {
     const float inverseSumMasses = 1 / (aMass + bMass);
     const auto inverseSumMassesMultDMultN = inverseSumMasses * c.penetration * c.n;
 
-    c.a->centerParticle.pos += bMass * inverseSumMassesMultDMultN;
-    c.b->centerParticle.pos -= aMass * inverseSumMassesMultDMultN;
+    c.a->centerParticle.pos -= bMass * inverseSumMassesMultDMultN;
+    c.b->centerParticle.pos += aMass * inverseSumMassesMultDMultN;
 
     // 2) Impluses
     const auto vRel = c.a->centerParticle.vel - c.b->centerParticle.vel;
