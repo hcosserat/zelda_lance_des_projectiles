@@ -38,13 +38,13 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+    // Actors
+    world.draw();
     // Delta Time
     ofSetColor(255);
     ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
     // HUD
     hud.draw(10, 40);
-    // Particles
-    world.draw();
 }
 
 //--------------------------------------------------------------

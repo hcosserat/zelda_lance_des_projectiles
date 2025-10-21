@@ -26,22 +26,19 @@ World::World() {
 
     // Add Floor
     actors.emplace_back(new Rect(
-        Particle(Vector{500, 700, 0}),
-        Vector{1000, 0, 0},
-        Vector{0, 100, 0}
+        Particle(Vector{500, 800, 0}),
+        Vector{3000, 0, 0},
+        Vector{0, 200, 0}
     ));
 
     // Add Walls
-    actors.emplace_back(new Rect(
-        Particle(Vector{500, 700, 0}),
-        Vector{1000, 0, 0},
-        Vector{0, 100, 0}
-    ));
+    actors.emplace_back(new Rect(Particle(Vector{1014, 400, 0}), Vector{50, -600, 0}, Vector{30, 30, 0}));
+    actors.emplace_back(new Rect(Particle(Vector{10, 400, 0}), Vector{50, 600, 0}, Vector{30, 30, 0}));
 }
 
 void World::applyForces(const float dt) {
     Registry.clear();
-	constraintRegistry.clear();
+    constraintRegistry.clear();
     std::vector<SpringForce *> blobForces;
 
     ParticleGravity grav;
@@ -52,9 +49,9 @@ void World::applyForces(const float dt) {
         if (actor->getShape() == BlobShape) {
             Blob *blob = dynamic_cast<Blob *>(actor);
             for (auto &c: blob->circles) {
-				// Apply gravity to each circle
+                // Apply gravity to each circle
                 Registry.add(&c.centerParticle, &grav);
-				// Create spring forces between circles
+                // Create spring forces between circles
                 SpringForce *psf;
                 if (&c == &blob->circles.back()) {
                     psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f,
@@ -64,18 +61,18 @@ void World::applyForces(const float dt) {
                 }
                 blobForces.push_back(psf);
                 Registry.add(&c.centerParticle, psf);
-				// Create spring forces between circle and center
+                // Create spring forces between circle and center
                 float restLength = 1 * (blob->centerRadius + c.radius);
                 SpringForce *sf = new SpringForce(&blob->centerParticle, 100.0f, restLength);
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
                 // Create elasticity limits between circles and center
-				const float elasticityFactor = 5.0f;
-				float currentLength = (blob->centerParticle.pos - c.centerParticle.pos).norm();
+                const float elasticityFactor = 5.0f;
+                float currentLength = (blob->centerParticle.pos - c.centerParticle.pos).norm();
                 if (currentLength > restLength * elasticityFactor) {
                     constraintRegistry.addCable(blob, &c,
-                                               restLength * elasticityFactor);
-				}
+                                                restLength * elasticityFactor);
+                }
             }
             for (auto &c: blob->separatedCircles) {
                 Registry.add(&c.centerParticle, &grav);
