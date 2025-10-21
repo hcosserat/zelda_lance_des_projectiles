@@ -8,7 +8,7 @@
 World::World() {
     // Add Blob
     Blob *blob = new Blob();
-    // blob->addCircle();
+    blob->addCircle();
     actors.emplace_back(blob);
 
     // Create a pendulum
