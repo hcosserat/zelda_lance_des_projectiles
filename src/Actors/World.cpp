@@ -41,6 +41,7 @@ World::World() {
 
 void World::applyForces(const float dt) {
     Registry.clear();
+	constraintRegistry.clear();
     std::vector<SpringForce *> blobForces;
 
     ParticleGravity grav;
@@ -51,7 +52,9 @@ void World::applyForces(const float dt) {
         if (actor->getShape() == BlobShape) {
             Blob *blob = dynamic_cast<Blob *>(actor);
             for (auto &c: blob->circles) {
+				// Apply gravity to each circle
                 Registry.add(&c.centerParticle, &grav);
+				// Create spring forces between circles
                 SpringForce *psf;
                 if (&c == &blob->circles.back()) {
                     psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f,
@@ -61,10 +64,18 @@ void World::applyForces(const float dt) {
                 }
                 blobForces.push_back(psf);
                 Registry.add(&c.centerParticle, psf);
+				// Create spring forces between circle and center
                 float restLength = 1 * (blob->centerRadius + c.radius);
                 SpringForce *sf = new SpringForce(&blob->centerParticle, 100.0f, restLength);
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
+                // Create elasticity limits between circles and center
+				const float elasticityFactor = 5.0f;
+				float currentLength = (blob->centerParticle.pos - c.centerParticle.pos).norm();
+                if (currentLength > restLength * elasticityFactor) {
+                    constraintRegistry.addCable(blob, &c,
+                                               restLength * elasticityFactor);
+				}
             }
             for (auto &c: blob->separatedCircles) {
                 Registry.add(&c.centerParticle, &grav);
