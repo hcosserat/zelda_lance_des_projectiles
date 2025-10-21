@@ -318,7 +318,7 @@ void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float 
             for (Circle &circle: blob.circles) {
                 allActors.push_back(&circle);
             }
-            allActors.push_back(&blob);  // pour gérer le cercle central
+            allActors.push_back(&blob); // pour gérer le cercle central
         } else {
             allActors.push_back(actor);
         }
