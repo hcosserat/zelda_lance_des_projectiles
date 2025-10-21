@@ -53,6 +53,8 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+    if (!blob) return;
+
     switch (key) {
     case 'a':
         blob->addCircle();

@@ -33,11 +33,8 @@ World::World() {
     ));
 
     // Add Walls
-    actors.emplace_back(new Rect(
-        Particle(Vector{500, 700, 0}),
-        Vector{1000, 0, 0},
-        Vector{0, 100, 0}
-    ));
+    actors.emplace_back(new Rect(Particle(Vector{10, 400, 0}), Vector{0, 600, 0}, Vector{20, 0, 0}));
+    actors.emplace_back(new Rect(Particle(Vector{1014, 400, 0}), Vector{0, -600, 0}, Vector{20, 0, 0}));
 
 	// Anchor spring on a rect
     actors.emplace_back(new Rect(
@@ -50,7 +47,7 @@ World::World() {
         20.0f
 	);
 	actors.push_back(circleAnchor);
-    
+
 	// Bungee spring on a rect
     actors.emplace_back(new Rect(
         Particle(Vector{800, 200, 0}),
@@ -74,7 +71,7 @@ World::World() {
 void World::applyForces(const float dt) {
     Registry.clear();
 	constraintRegistry.clear();
-    std::vector<SpringForce *> blobForces;
+    std::vector<SpringForce *> blobForces;  // todo : memory leak!!!!
 
     ParticleGravity grav;
 
@@ -102,9 +99,10 @@ void World::applyForces(const float dt) {
             for (auto &c: blob->circles) {
                 // Apply gravity to each circle
                 Registry.add(&c.centerParticle, &grav);
+
                 // Create spring forces between circles
                 SpringForce *psf;
-                float restLengthC = 4 * (c.radius);
+                float restLengthC = 4 * c.radius;
                 if (&c == &blob->circles.back()) {
                     psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f, restLengthC);
                 } else {

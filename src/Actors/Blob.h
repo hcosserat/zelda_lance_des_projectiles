@@ -3,6 +3,8 @@
 #include "../Forces/SpringForce.h"
 #include "../Forces/ParticleForceRegistry.h"
 
+class Rect; // Forward declaration
+
 class Blob : public Actor {
 public:
     float centerRadius;
@@ -26,6 +28,10 @@ public:
     }
 
     CollisionResult _collidesWith(const Actor &other) override;
+
+    CollisionResult collidesWithCircle(const Circle &other) const;
+
+    CollisionResult collidesWithRect(const Rect &rect) const;
 
     void addCircle();
 

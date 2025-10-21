@@ -1,4 +1,5 @@
 #include "Blob.h"
+#include "Rect.h"
 
 void Blob::addCircle() {
     Circle c = Circle(
@@ -30,7 +31,30 @@ void Blob::fusionCircle() {
     }
 }
 
+CollisionResult Blob::collidesWithCircle(const Circle &other) const {
+    Circle blobCenter = getCenter();
+    return blobCenter.collidesWithCircle(other);
+}
+
+CollisionResult Blob::collidesWithRect(const Rect &rect) const {
+    Circle blobCenter = getCenter();
+    return blobCenter.collidesWithRect(rect);
+}
+
 CollisionResult Blob::_collidesWith(const Actor &other) {
-    // this should never be called, check collisions with each circle instead
-    return {false};
+    // Handle collisions using the center circle only
+    switch (other.getShape()) {
+        case CircleShape:
+            return collidesWithCircle(dynamic_cast<const Circle &>(other));
+        case RectShape:
+            return collidesWithRect(dynamic_cast<const Rect &>(other));
+        case BlobShape: {
+            const Blob &otherBlob = dynamic_cast<const Blob &>(other);
+            Circle blobCenter = getCenter();
+            Circle otherBlobCenter = otherBlob.getCenter();
+            return blobCenter.collidesWithCircle(otherBlobCenter);
+        }
+        default:
+            return {false};
+    }
 }

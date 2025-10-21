@@ -59,55 +59,17 @@ bool CollisionResolver::buildContact(Actor &a, Actor &b, Contact &out, const flo
     if (sa == RectShape && sb == RectShape)
         return buildR_R(dynamic_cast<Rect &>(a), dynamic_cast<Rect &>(b), out, frame_duration);
 
-    // Handle Blob collisions with its center circle
-    if (sa == BlobShape && sb == CircleShape) {
-        Blob &blob = dynamic_cast<Blob &>(a);
-        Circle &circle = dynamic_cast<Circle &>(b);
-        Circle blobCenter = blob.getCenter();
-        const CollisionResult res = blobCenter.collidesWith(circle, frame_duration);
+    if (sa == BlobShape) {
+        const CollisionResult res = a.collidesWith(b, frame_duration);
         if (!res.collides) return false;
-        out = {&blob, &circle, res.normalVector, res.penetration, res.collisionType};
+        out = {&a, &b, res.normalVector, res.penetration, res.collisionType};
         return true;
     }
 
-    if (sa == CircleShape && sb == BlobShape) {
-        Circle &circle = dynamic_cast<Circle &>(a);
-        Blob &blob = dynamic_cast<Blob &>(b);
-        Circle blobCenter = blob.getCenter();
-        const CollisionResult res = circle.collidesWith(blobCenter, frame_duration);
+    if (sb == BlobShape) {
+        const CollisionResult res = b.collidesWith(a, frame_duration);
         if (!res.collides) return false;
-        out = {&circle, &blob, res.normalVector, res.penetration, res.collisionType};
-        return true;
-    }
-
-    if (sa == BlobShape && sb == RectShape) {
-        Blob &blob = dynamic_cast<Blob &>(a);
-        Rect &rect = dynamic_cast<Rect &>(b);
-        Circle blobCenter = blob.getCenter();
-        const CollisionResult res = blobCenter.collidesWith(rect, frame_duration);
-        if (!res.collides) return false;
-        out = {&blob, &rect, res.normalVector, res.penetration, res.collisionType};
-        return true;
-    }
-
-    if (sa == RectShape && sb == BlobShape) {
-        Rect &rect = dynamic_cast<Rect &>(a);
-        Blob &blob = dynamic_cast<Blob &>(b);
-        Circle blobCenter = blob.getCenter();
-        const CollisionResult res = blobCenter.collidesWith(rect, frame_duration);
-        if (!res.collides) return false;
-        out = {&rect, &blob, -res.normalVector, res.penetration, res.collisionType};
-        return true;
-    }
-
-    if (sa == BlobShape && sb == BlobShape) {
-        Blob &blobA = dynamic_cast<Blob &>(a);
-        Blob &blobB = dynamic_cast<Blob &>(b);
-        Circle centerA = blobA.getCenter();
-        Circle centerB = blobB.getCenter();
-        const CollisionResult res = centerA.collidesWith(centerB, frame_duration);
-        if (!res.collides) return false;
-        out = {&blobA, &blobB, res.normalVector, res.penetration, res.collisionType};
+        out = {&a, &b, -res.normalVector, res.penetration, res.collisionType};
         return true;
     }
 
