@@ -21,13 +21,13 @@ CollisionResult Actor::collidesWith(const Actor &other, const float frame_length
     }
 
     // Un objet statique et un objet dynamique
-    const Vector relative_acc = other.centerParticle.acc - centerParticle.acc;
+    const Vector relative_vel = other.centerParticle.vel - centerParticle.vel;
     const Vector gravity_acc = Vector{0, 9.8, 0};
 
-    const float relative_acc_squared = relative_acc.normSquared();
-    const float gravity_acc_squared = gravity_acc.normSquared();
+    const float relative_vel_squared = relative_vel.normSquared();
+    const float gravity_vel_squared = (frame_length * gravity_acc).normSquared();
 
-    if (fabs(relative_acc_squared - gravity_acc_squared) <= 1e-6) {
+    if (relative_vel_squared <= gravity_vel_squared + 1e-6) {
         // La vitesse relative est inférieure ou égale à la vitesse gravitationnelle
         collisionResult.collisionType = RestingContactsCollision;
     } else {

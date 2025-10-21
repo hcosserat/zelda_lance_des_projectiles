@@ -32,19 +32,15 @@ World::World() {
     ));
 }
 
-void World::WorldCollisions() {
-}
-
-void World::WorldForces(float dt) {
-    ParticleGravity grav;
+void World::applyForces(const float dt) {
     Registry.clear();
-    std::vector<SpringForce *> blobForces; // To manage memory
+    std::vector<SpringForce *> blobForces;
+
+    ParticleGravity grav;
 
     for (auto *actor: actors) {
-        // Apply gravity
-        Particle &particle = actor->centerParticle;
-        Registry.add(&particle, &grav);
-        // Apply Spring forces if Blob
+        Registry.add(&actor->centerParticle, &grav);
+
         if (actor->getShape() == BlobShape) {
             Blob *blob = dynamic_cast<Blob *>(actor);
             for (auto &c: blob->circles) {
@@ -54,7 +50,7 @@ void World::WorldForces(float dt) {
                     psf = new SpringForce(&blob->circles.front().centerParticle, 1.0f,
                                           100);
                 } else {
-                    psf = new SpringForce(&(*(std::next(&c))).centerParticle, 1.0f, 100);
+                    psf = new SpringForce(&std::next(&c)->centerParticle, 1.0f, 100);
                 }
                 blobForces.push_back(psf);
                 Registry.add(&c.centerParticle, psf);
@@ -70,28 +66,37 @@ void World::WorldForces(float dt) {
     }
 
     Registry.updateForces(dt);
+}
 
+void World::updateVelocities(const float dt) {
     for (auto *actor: actors) {
-        Particle &particle = actor->centerParticle;
-        particle.pos = particle.integrate(dt);
-        particle.clearAccum();
+        actor->centerParticle.integrateVelocity(dt);
         if (Blob *blob = dynamic_cast<Blob *>(actor)) {
             for (auto &c: blob->circles) {
-                Particle &satelliteParticle = c.centerParticle;
-                satelliteParticle.pos = satelliteParticle.integrate(dt);
-                satelliteParticle.clearAccum();
+                c.centerParticle.integrateVelocity(dt);
             }
             for (auto &c: blob->separatedCircles) {
-                Particle &satelliteParticle = c.centerParticle;
-                satelliteParticle.pos = satelliteParticle.integrate(dt);
-                satelliteParticle.clearAccum();
+                c.centerParticle.integrateVelocity(dt);
             }
         }
     }
-    for (SpringForce *sf: blobForces) {
-        delete sf;
+}
+
+void World::updatePositions(const float dt) {
+    for (auto *actor: actors) {
+        actor->centerParticle.integratePosition(dt);
+        actor->centerParticle.clearAccum();
+        if (Blob *blob = dynamic_cast<Blob *>(actor)) {
+            for (auto &c: blob->circles) {
+                c.centerParticle.integratePosition(dt);
+                c.centerParticle.clearAccum();
+            }
+            for (auto &c: blob->separatedCircles) {
+                c.centerParticle.integratePosition(dt);
+                c.centerParticle.clearAccum();
+            }
+        }
     }
-    Registry.clear();
 }
 
 void World::draw() const {

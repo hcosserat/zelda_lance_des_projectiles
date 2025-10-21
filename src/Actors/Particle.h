@@ -19,7 +19,9 @@ public:
     );
 
     // Euler method, returns new position
-    Vector integrate(float dt);
+    Vector integrateVelocity(float dt);
+
+    Vector integratePosition(float dt);
 
     void addforce(const Vector &force);
 

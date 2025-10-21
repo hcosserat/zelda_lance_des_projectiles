@@ -8,14 +8,23 @@ Particle::Particle(const Vector pos, const Vector vel, const Vector acc, const f
       , inverseMass(mass != 0.f ? 1.f / mass : 0.f) {
 }
 
-Vector Particle::integrate(const float dt) {
+Vector Particle::integrateVelocity(const float dt) {
+    if (inverseMass == 0.0f) {
+        // Infinite mass, no movement
+        return vel;
+    }
+
+    acc = accumForce * inverseMass;
+    vel += dt * acc;
+    return vel;
+}
+
+Vector Particle::integratePosition(const float dt) {
     if (inverseMass == 0.0f) {
         // Infinite mass, no movement
         return pos;
     }
 
-    acc = accumForce * inverseMass;
-    vel += dt * acc;
     pos += dt * vel;
     return pos;
 }

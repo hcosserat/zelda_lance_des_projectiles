@@ -21,8 +21,10 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
     dt = ofGetLastFrameTime();
-    world.WorldForces(dt);
+    world.applyForces(dt);
+    world.updateVelocities(dt);
     collisionResolver.resolve(world.actors, dt, &world.constraintRegistry);
+    world.updatePositions(dt);
 
     // Update display value in HUD
     int totalBlobParticles = 0;
@@ -32,6 +34,7 @@ void ofApp::update() {
     hud.setTargetValue(static_cast<float>(totalBlobParticles));
     hud.update(dt);
 }
+
 
 //--------------------------------------------------------------
 void ofApp::draw() {

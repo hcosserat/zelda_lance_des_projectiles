@@ -12,9 +12,11 @@ public:
 
     explicit World();
 
-    void WorldCollisions();
+    void applyForces(float dt);
 
-    void WorldForces(float dt);
+    void updateVelocities(float dt);
+
+    void updatePositions(float dt);
 
     void draw() const;
 };
