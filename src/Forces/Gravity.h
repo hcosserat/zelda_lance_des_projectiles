@@ -4,6 +4,8 @@
 #include "../Maths/Vector.h"
 #include "../Actors/Particle.h"
 
+#define GRAVITY Vector { 0, 980.0, 0 }
+
 class Particle;
 
 // G�n�rateur de force de gravit�
@@ -13,7 +15,7 @@ public:
 
     // Initialise la gravit�
     explicit ParticleGravity(
-        Vector g = Vector{0, 9.8, 0}
+        Vector g = GRAVITY
     );
 
     // Modifie la gravit�

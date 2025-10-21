@@ -1,4 +1,5 @@
 #include "Actor.h"
+#include "Forces/Gravity.h"
 
 CollisionResult Actor::collidesWith(const Actor &other, const float frame_length) {
     CollisionResult collisionResult = _collidesWith(other);
@@ -22,7 +23,7 @@ CollisionResult Actor::collidesWith(const Actor &other, const float frame_length
 
     // Un objet statique et un objet dynamique
     const Vector relative_acc = other.centerParticle.acc - centerParticle.acc;
-    const Vector gravity_acc = Vector{0, 9.8, 0};
+    const Vector gravity_acc = GRAVITY;
 
     const float relative_acc_squared = relative_acc.normSquared();
     const float gravity_acc_squared = gravity_acc.normSquared();
