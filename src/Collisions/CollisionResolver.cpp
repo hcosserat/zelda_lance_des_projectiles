@@ -45,8 +45,9 @@ bool CollisionResolver::buildContact(Actor &a, Actor &b, Contact &out, const flo
     if (sa == CircleShape && sb == CircleShape)
         return buildC_C(dynamic_cast<Circle &>(a), dynamic_cast<Circle &>(b), out, frame_duration);
 
-    if (sa == CircleShape && sb == RectShape)
+    if (sa == CircleShape && sb == RectShape) {
         return buildC_R(dynamic_cast<Circle &>(a), dynamic_cast<Rect &>(b), out, frame_duration);
+    }
 
     if (sa == RectShape && sb == CircleShape) {
         Contact tmp;
@@ -264,6 +265,8 @@ void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float 
             for (Circle &circle: blob.circles) {
                 allActors.push_back(&circle);
             }
+            Circle *center = new Circle(blob.getCenter());
+            allActors.push_back(center);
         } else {
             allActors.push_back(actor);
         }

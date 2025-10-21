@@ -8,7 +8,7 @@
 World::World() {
     // Add Blob
     Blob *blob = new Blob();
-    blob->addCircle();
+    // blob->addCircle();
     actors.emplace_back(blob);
 
     // Create a pendulum
@@ -58,7 +58,7 @@ void World::WorldForces(float dt) {
                 }
                 blobForces.push_back(psf);
                 Registry.add(&c.centerParticle, psf);
-                float restLength = 10 * (blob->center.radius + c.radius);
+                float restLength = 10 * (blob->centerRadius + c.radius);
                 SpringForce *sf = new SpringForce(&blob->centerParticle, 1.0f, restLength);
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
@@ -127,9 +127,10 @@ void World::draw() const {
             }
             case BlobShape: {
                 Blob *blob = dynamic_cast<Blob *>(actor);
+                Circle center = blob->getCenter();
                 for (auto &c: blob->circles) {
                     ofSetColor(245, 0, 245); // Purple
-                    ofDrawLine(blob->centerParticle.pos.x, blob->centerParticle.pos.y,
+                    ofDrawLine(center.centerParticle.pos.x, center.centerParticle.pos.y,
                                c.centerParticle.pos.x, c.centerParticle.pos.y);
                     if (&c != &blob->circles.back()) {
                         ofDrawLine(c.centerParticle.pos.x, c.centerParticle.pos.y,
@@ -142,7 +143,7 @@ void World::draw() const {
                     }
                 }
                 ofSetColor(0, 0, 245); // Blue
-                ofDrawCircle(blob->centerParticle.pos.x, blob->centerParticle.pos.y, blob->center.radius);
+                ofDrawCircle(center.centerParticle.pos.x, center.centerParticle.pos.y, center.radius);
                 for (const auto &c: blob->circles) {
                     ofSetColor(0, 245, 0); // Green
                     ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
