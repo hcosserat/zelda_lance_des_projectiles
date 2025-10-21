@@ -15,12 +15,30 @@ World::World() {
     blob->addCircle();
     actors.emplace_back(blob);
 
-	// Add Floor
-	actors.emplace_back(new Rect(
+    // Add Floor
+    actors.emplace_back(new Rect(
         Particle(Vector{500, 700, 0}),
-        Vector { 1000, 0, 0},
-        Vector{0, 100, 0 }
-	));
+        Vector{1000, 0, 0},
+        Vector{0, 100, 0}
+    ));
+
+    // Create a fixed anchor point (infinite mass)
+    Circle *anchor = new Circle(
+        Particle(Vector{400, 100, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f), // inverseMass = 0 = infinite mass
+        5.0f // small radius
+    );
+
+    // Create a ball that swings
+    Circle *ball = new Circle(
+        Particle(Vector{400, 300, 0}, Vector{50, 0, 0}, Vector{0, 0, 0}, 0.1f), // give it initial velocity
+        20.0f
+    );
+
+    actors.push_back(anchor);
+    actors.push_back(ball);
+
+    // Add a rod constraint (fixed distance of 200 units)
+    constraintRegistry.addRod(anchor, ball, 200.0f);
 }
 
 void World::WorldCollisions() {
@@ -40,24 +58,23 @@ void World::WorldForces(float dt) {
             Blob *blob = dynamic_cast<Blob *>(actor);
             for (auto &c: blob->circles) {
                 Registry.add(&c.centerParticle, &grav);
-                SpringForce* psf;
+                SpringForce *psf;
                 if (&c == &blob->circles.back()) {
                     psf = new SpringForce(&blob->circles.front().centerParticle, 1.0f,
-						100);
-				}
-                else {
-					psf = new SpringForce(&(*(std::next(&c))).centerParticle, 1.0f, 100);
+                                          100);
+                } else {
+                    psf = new SpringForce(&(*(std::next(&c))).centerParticle, 1.0f, 100);
                 }
-				blobForces.push_back(psf);
-				Registry.add(&c.centerParticle, psf);
+                blobForces.push_back(psf);
+                Registry.add(&c.centerParticle, psf);
                 float restLength = 10 * (blob->center.radius + c.radius);
-				SpringForce* sf = new SpringForce(&blob->centerParticle, 1.0f, restLength);
+                SpringForce *sf = new SpringForce(&blob->centerParticle, 1.0f, restLength);
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
             }
             for (auto &c: blob->separatedCircles) {
                 Registry.add(&c.centerParticle, &grav);
-			}
+            }
         }
     }
 
@@ -77,7 +94,7 @@ void World::WorldForces(float dt) {
                 Particle &satelliteParticle = c.centerParticle;
                 satelliteParticle.pos = satelliteParticle.integrate(dt);
                 satelliteParticle.clearAccum();
-			}
+            }
         }
     }
     for (SpringForce *sf: blobForces) {

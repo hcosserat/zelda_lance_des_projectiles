@@ -11,6 +11,7 @@ bool CollisionResolver::buildC_C(Circle &A, Circle &B, Contact &c, const float f
     c.b = &B;
     c.n = res.normalVector;
     c.penetration = res.penetration;
+    c.type = res.collisionType;
     return true;
 }
 
@@ -22,6 +23,7 @@ bool CollisionResolver::buildC_R(Circle &C, Rect &R, Contact &c, const float fra
     c.b = &R;
     c.n = res.normalVector;
     c.penetration = res.penetration;
+    c.type = res.collisionType;
     return c.penetration > 0.0f;
 }
 
@@ -33,6 +35,7 @@ bool CollisionResolver::buildR_R(Rect &A, Rect &B, Contact &c, const float frame
     c.b = &B;
     c.n = res.normalVector;
     c.penetration = res.penetration;
+    c.type = res.collisionType;
     return true;
 }
 
@@ -49,7 +52,7 @@ bool CollisionResolver::buildContact(Actor &a, Actor &b, Contact &out, const flo
     if (sa == RectShape && sb == CircleShape) {
         Contact tmp;
         if (!buildC_R(dynamic_cast<Circle &>(b), dynamic_cast<Rect &>(a), tmp, frame_duration)) return false;
-        out = {&a, &b, -tmp.n, tmp.penetration};
+        out = {&a, &b, -tmp.n, tmp.penetration, tmp.type};
         return true;
     }
 
@@ -59,11 +62,56 @@ bool CollisionResolver::buildContact(Actor &a, Actor &b, Contact &out, const flo
     return false;
 }
 
-void CollisionResolver::resolveContact(Contact &c) const {
-    // std::cout << "=== Resolving Contact ===" << std::endl;
-    // std::cout << "Initial penetration: " << c.penetration << std::endl;
-    // std::cout << "Normal vector: (" << c.n.x << ", " << c.n.y << ")" << std::endl;
+void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, const ConstraintRegistry *registry) {
+    for (const Constraint constraint: registry->getConstraints()) {
+        const Vector d = constraint.a->centerParticle.pos - constraint.a->centerParticle.pos;
+        const float currentLength = d.norm();
 
+        constexpr float epsilon = 1e-6f;
+
+        if (currentLength < epsilon) {
+            // Actors are at same position
+            continue;
+        }
+
+        switch (constraint.type) {
+            case Rod: {
+                const float diff = fabs(currentLength - constraint.length);
+                if (diff < epsilon) continue;
+                contacts.push_back(Contact{
+                    constraint.a, constraint.b, d.normalized(), diff, RodConstraint
+                });
+            }
+            case Cable: {
+                const float diff = currentLength - constraint.length;
+                if (diff < epsilon) continue;
+                contacts.push_back(Contact{
+                    constraint.a, constraint.b, d.normalized(), diff, CableConstraint
+                });
+            }
+        }
+    }
+}
+
+void CollisionResolver::resolveContact(Contact &c) const {
+    switch (c.type) {
+        case RestingContactsCollision:
+            resolveRestingContact(c);
+            break;
+        case RodConstraint:
+            resolveRodConstraint(c);
+            break;
+        case CableConstraint:
+            resolveCableConstraint(c);
+            break;
+        case InterpenetrationCollision:
+        default:
+            resolveInterpenetration(c);
+            break;
+    }
+}
+
+void CollisionResolver::resolveInterpenetration(Contact &c) const {
     const float invMassA = c.a->centerParticle.inverseMass;
     const float invMassB = c.b->centerParticle.inverseMass;
 
@@ -73,13 +121,11 @@ void CollisionResolver::resolveContact(Contact &c) const {
 
     // Case: Both objects have infinite mass
     if (aIsInfinite && bIsInfinite) {
-        // std::cout << "Both objects have infinite mass - no resolution" << std::endl;
         return;
     }
 
     // Case: Only A has infinite mass
     if (aIsInfinite) {
-        // std::cout << "Object A has infinite mass" << std::endl;
         // Only move B
         c.b->centerParticle.pos -= c.penetration * c.n;
 
@@ -95,7 +141,6 @@ void CollisionResolver::resolveContact(Contact &c) const {
 
     // Case: Only B has infinite mass
     if (bIsInfinite) {
-        // std::cout << "Object B has infinite mass" << std::endl;
         // Only move A
         c.a->centerParticle.pos += c.penetration * c.n;
 
@@ -110,37 +155,99 @@ void CollisionResolver::resolveContact(Contact &c) const {
     }
 
     // Case: Both objects have finite mass
-    // 1) Correction de position
+    // 1) Position correction
     const float aMass = 1 / c.a->centerParticle.inverseMass;
     const float bMass = 1 / c.b->centerParticle.inverseMass;
-    // std::cout << "Mass A: " << aMass << ", Mass B: " << bMass << std::endl;
 
     const float inverseSumMasses = 1 / (aMass + bMass);
     const auto inverseSumMassesMultDMultN = inverseSumMasses * c.penetration * c.n;
 
-    // std::cout << "Position correction A: (" << (bMass * inverseSumMassesMultDMultN).x << ", "
-    //        << (bMass * inverseSumMassesMultDMultN).y << ")" << std::endl;
     c.a->centerParticle.pos += bMass * inverseSumMassesMultDMultN;
     c.b->centerParticle.pos -= aMass * inverseSumMassesMultDMultN;
 
-    // 2) Application des impulsions
+    // 2) Impluses
     const auto vRel = c.a->centerParticle.vel - c.b->centerParticle.vel;
-    // std::cout << "Relative velocity: (" << vRel.x << ", " << vRel.y << ")" << std::endl;
 
     const auto sumInverseMasses = c.a->centerParticle.inverseMass + c.b->centerParticle.inverseMass;
     const auto k = vRel.dot(c.n) * (params.restitution + 1) / sumInverseMasses;
-    // std::cout << "Impulse magnitude k: " << k << std::endl;
 
     c.a->centerParticle.vel -= k * c.n * c.a->centerParticle.inverseMass;
     c.b->centerParticle.vel += k * c.n * c.b->centerParticle.inverseMass;
-
-    // std::cout << "Final velocity A: (" << c.a->centerParticle.vel.x << ", " << c.a->centerParticle.vel.y << ")" <<
-    //        std::endl;
-    // std::cout << "Final velocity B: (" << c.b->centerParticle.vel.x << ", " << c.b->centerParticle.vel.y << ")" <<
-    //        std::endl;
 }
 
-void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float frame_duration) const {
+void CollisionResolver::resolveRestingContact(Contact &c) const {
+    // For resting contacts, we do position correction and no bounce
+    const float invMassA = c.a->centerParticle.inverseMass;
+    const float invMassB = c.b->centerParticle.inverseMass;
+    const float sumInverseMasses = invMassA + invMassB;
+
+    // Position correction
+    const Vector correction = c.penetration * c.n;
+    c.a->centerParticle.pos += (invMassA / sumInverseMasses) * correction;
+    c.b->centerParticle.pos -= (invMassB / sumInverseMasses) * correction;
+
+    // Cancel velocity along the normal
+    const Vector vRel = c.a->centerParticle.vel - c.b->centerParticle.vel;
+    const float vrn = vRel.dot(c.n);
+    const float j = -vrn / sumInverseMasses;
+    const Vector impulse = j * c.n;
+
+    c.a->centerParticle.vel += invMassA * impulse;
+    c.b->centerParticle.vel -= invMassB * impulse;
+}
+
+void CollisionResolver::resolveRodConstraint(Contact &c) const {
+    const float invMassA = c.a->centerParticle.inverseMass;
+    const float invMassB = c.b->centerParticle.inverseMass;
+    const float sumInverseMasses = invMassA + invMassB;
+
+    if (sumInverseMasses <= 0.0f) return;
+
+    // Position correction
+    const Vector correction = c.penetration * c.n;
+    c.a->centerParticle.pos += (invMassA / sumInverseMasses) * correction;
+    c.b->centerParticle.pos -= (invMassB / sumInverseMasses) * correction;
+
+    // Velocity correction
+    const Vector vRel = c.a->centerParticle.vel - c.b->centerParticle.vel;
+    const float vrn = vRel.dot(c.n);
+
+    // Remove all relative velocity along the rod (no bouncing)
+    const float j = -vrn / sumInverseMasses;
+    const Vector impulse = j * c.n;
+
+    c.a->centerParticle.vel += invMassA * impulse;
+    c.b->centerParticle.vel -= invMassB * impulse;
+}
+
+void CollisionResolver::resolveCableConstraint(Contact &c) const {
+    const float invMassA = c.a->centerParticle.inverseMass;
+    const float invMassB = c.b->centerParticle.inverseMass;
+    const float sumInverseMasses = invMassA + invMassB;
+
+    if (sumInverseMasses <= 0.0f) return;
+
+    // Position correction
+    const Vector correction = c.penetration * c.n;
+    c.a->centerParticle.pos += (invMassA / sumInverseMasses) * correction;
+    c.b->centerParticle.pos -= (invMassB / sumInverseMasses) * correction;
+
+    // Velocity correction
+    const Vector vRel = c.a->centerParticle.vel - c.b->centerParticle.vel;
+    const float vrn = vRel.dot(c.n);
+
+    if (vrn < 0.0f) {
+        // Objects moving apart - stop the separation (with some elasticity)
+        const float j = -(1.0f + params.restitution * 0.5f) * vrn / sumInverseMasses; // Less bouncy than collisions
+        const Vector impulse = j * c.n;
+
+        c.a->centerParticle.vel += invMassA * impulse;
+        c.b->centerParticle.vel -= invMassB * impulse;
+    }
+}
+
+void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float frame_duration,
+                                const ConstraintRegistry *constraintRegistry) const {
     // Get all basic shapes of world
     std::vector<Actor *> allActors;
 
@@ -159,6 +266,12 @@ void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float 
     std::vector<Contact> contacts;
     contacts.reserve(allActors.size() * 2);
 
+    // First check for constraints
+    if (constraintRegistry) {
+        buildConstraintContacts(contacts, constraintRegistry);
+    }
+
+    // Then check for regular collisions
     for (size_t i = 0; i < allActors.size(); ++i) {
         for (size_t j = i + 1; j < allActors.size(); ++j) {
             Contact c;

@@ -1,4 +1,5 @@
 #include "Actor.h"
+#include "ConstraintRegistry.h"
 
 CollisionResult Actor::collidesWith(const Actor &other, const float frame_length) {
     CollisionResult collisionResult = _collidesWith(other);
@@ -33,4 +34,40 @@ CollisionResult Actor::collidesWith(const Actor &other, const float frame_length
     }
 
     return collisionResult;
+}
+
+CollisionResult Actor::checkConstraint(const Actor &other, ConstraintRegistry *registry) const {
+    if (!registry) return {false};
+
+    for (auto &constraint: registry->constraints) {
+        if ((constraint.a == this && constraint.b == &other) ||
+            (constraint.a == &other && constraint.b == this)) {
+            const Vector d = other.centerParticle.pos - centerParticle.pos;
+            const float currentLength = d.norm();
+
+            constexpr float epsilon = 1e-6f;
+
+            if (currentLength < epsilon) {
+                // Actors are at same position
+                return {false};
+            }
+
+            switch (constraint.type) {
+                case Rod: {
+                    const float diff = fabs(currentLength - constraint.length);
+                    if (diff < epsilon) return {false};
+                    return {true, d.normalized(), diff, RodConstraint, &constraint};
+                }
+                case Cable: {
+                    const float diff = currentLength - constraint.length;
+                    if (diff < epsilon) return {false};
+                    return {true, d.normalized(), diff, CableConstraint, &constraint};
+                }
+                default:
+                    return {false};
+            }
+        }
+    }
+
+    return {false};
 }

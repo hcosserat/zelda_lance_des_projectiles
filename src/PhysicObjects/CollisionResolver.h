@@ -5,6 +5,7 @@
 #include "Actor.h"
 #include "Circle.h"
 #include "Rect.h"
+#include "ConstraintRegistry.h"
 #include "../Maths/Vector.h"
 
 struct Contact {
@@ -12,6 +13,7 @@ struct Contact {
     Actor *b;
     Vector n; // normale unitaire
     float penetration; // > 0 si interpénétration
+    CollisionType type = InterpenetrationCollision; // Type of collision
 };
 
 struct CollisionResolverParams {
@@ -28,7 +30,8 @@ public:
     }
 
     // Résout la pénétration + applique l'impulsion pour toutes les paires en collision
-    void resolve(const std::vector<Actor *> &actors, float frame_duration) const;
+    void resolve(const std::vector<Actor *> &actors, float frame_duration,
+                 const ConstraintRegistry *constraintRegistry = nullptr) const;
 
 private:
     Params params;
@@ -42,6 +45,16 @@ private:
 
     static bool buildR_R(Rect &A, Rect &B, Contact &c, float frame_duration);
 
-    // Étapes de résolution
+    static void buildConstraintContacts(std::vector<Contact> &contacts, const ConstraintRegistry *registry);
+
+    // Étapes de résolution selon le type
     void resolveContact(Contact &c) const;
+
+    void resolveInterpenetration(Contact &c) const;
+
+    void resolveRestingContact(Contact &c) const;
+
+    void resolveRodConstraint(Contact &c) const;
+
+    void resolveCableConstraint(Contact &c) const;
 };

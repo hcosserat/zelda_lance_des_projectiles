@@ -20,7 +20,7 @@ void Blob::separateCircle() {
         Circle c = circles.back();
         circles.pop_back();
         separatedCircles.push_back(c);
-	}
+    }
 }
 
 void Blob::fusionCircle() {

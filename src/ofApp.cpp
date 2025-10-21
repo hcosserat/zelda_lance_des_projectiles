@@ -31,7 +31,7 @@ void ofApp::update() {
     hud.setTargetValue(static_cast<float>(totalBlobParticles));
     hud.update(dt);
 
-    collisionResolver.resolve(world.actors, dt);
+    collisionResolver.resolve(world.actors, dt, &world.constraintRegistry);
 }
 
 //--------------------------------------------------------------
