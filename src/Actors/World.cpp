@@ -6,14 +6,10 @@
 #include <BlobSpringForce.h>
 
 World::World() {
-    actors.emplace_back(new Circle(
-        Particle(Vector{100, 200, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.1, Vector{0, 0, 0})
-    ));
-
     // Add Blob
     Blob *blob = new Blob();
     blob->addCircle();
-    actors.emplace_back(blob);
+    // actors.emplace_back(blob);
 
     // Add Floor
     actors.emplace_back(new Rect(
@@ -101,4 +97,69 @@ void World::WorldForces(float dt) {
         delete sf;
     }
     Registry.clear();
+}
+
+void World::draw() const {
+    ofSetColor(245, 0, 0);
+
+    for (Actor *actor: actors) {
+        switch (actor->getShape()) {
+            case CircleShape: {
+                ofDrawCircle(actor->centerParticle.pos.x, actor->centerParticle.pos.y,
+                             dynamic_cast<Circle *>(actor)->radius);
+                break;
+            }
+            case RectShape: {
+                Rect *rect = dynamic_cast<Rect *>(actor);
+
+                ofPushMatrix();
+
+                // Translate to the center of the rectangle
+                ofTranslate(actor->centerParticle.pos.x, actor->centerParticle.pos.y);
+
+                // Calculate rotation angle from axisU
+                float angle = atan2(rect->axisU.y, rect->axisU.x) * 180.0f / PI;
+                ofRotateDeg(angle);
+
+                // Draw the rectangle centered at origin
+                ofSetColor(100, 100, 100);
+                ofDrawRectangle(-rect->halfA, -rect->halfB, rect->halfA * 2, rect->halfB * 2);
+
+                ofPopMatrix();
+                break;
+            }
+            case BlobShape: {
+                Blob *blob = dynamic_cast<Blob *>(actor);
+                for (auto &c: blob->circles) {
+                    ofSetColor(245, 0, 245); // Purple
+                    ofDrawLine(blob->centerParticle.pos.x, blob->centerParticle.pos.y,
+                               c.centerParticle.pos.x, c.centerParticle.pos.y);
+                    if (&c != &blob->circles.back()) {
+                        ofDrawLine(c.centerParticle.pos.x, c.centerParticle.pos.y,
+                                   std::next(&c)->centerParticle.pos.x,
+                                   std::next(&c)->centerParticle.pos.y);
+                    } else {
+                        ofDrawLine(c.centerParticle.pos.x, c.centerParticle.pos.y,
+                                   blob->circles.front().centerParticle.pos.x,
+                                   blob->circles.front().centerParticle.pos.y);
+                    }
+                }
+                ofSetColor(0, 0, 245); // Blue
+                ofDrawCircle(blob->centerParticle.pos.x, blob->centerParticle.pos.y, blob->center.radius);
+                for (const auto &c: blob->circles) {
+                    ofSetColor(0, 245, 0); // Green
+                    ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+                }
+                for (const auto &c: blob->separatedCircles) {
+                    ofSetColor(100, 100, 100); // Grey
+                    ofDrawCircle(c.centerParticle.pos.x, c.centerParticle.pos.y, c.radius);
+                }
+                break;
+            }
+            default: {
+                std::cout << "Forme inconnue dans World::draw()" << std::endl;
+                break;
+            }
+        }
+    }
 }

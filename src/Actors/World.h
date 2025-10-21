@@ -15,4 +15,6 @@ public:
     void WorldCollisions();
 
     void WorldForces(float dt);
+
+    void draw() const;
 };
