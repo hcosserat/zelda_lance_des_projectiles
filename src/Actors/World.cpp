@@ -7,71 +7,41 @@
 #include "BungeeForce.h"
 
 
-#define DEMO_CONSTRAINT false
-
 World::World() {
-    if constexpr (DEMO_CONSTRAINT) {
-        const float initial_vel = 900;
+    // Add Blob
+    Blob *blob = new Blob();
+    blob->addCircle();
+    actors.emplace_back(blob);
 
-        // Double rod pendulum
-        Circle *anchorRod1 = new Circle(Particle(Vector{300, 300, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f), 5.0f);
-        Circle *ballRod1 = new Circle(Particle(Vector{300, 550, 0}, Vector{initial_vel, 0, 0}, Vector{0, 0, 0}, 0.1f),
-                                      15.0f);
-        Circle *ballRod2 = new Circle(Particle(Vector{300, 650, 0}, Vector{initial_vel * 2, 0, 0}, Vector{0, 0, 0},
-                                               0.1f), 20.0f);
-        actors.push_back(anchorRod1);
-        actors.push_back(ballRod1);
-        actors.push_back(ballRod2);
-        constraintRegistry.addRod(anchorRod1, ballRod1, 150.0f);
-        constraintRegistry.addRod(ballRod1, ballRod2, 100.0f);
+    // Anchor spring on a rect
+    actors.emplace_back(new Rect(
+        Particle(Vector{200, 200, 0}),
+        Vector{60, 0, 0},
+        Vector{0, 10, 0}
+    ));
+    circleAnchor = new Circle(
+        Particle(Vector{200, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+        20.0f
+    );
+    actors.push_back(circleAnchor);
 
-        // Doube cable pendulum
-        Circle *anchorCable1 = new Circle(Particle(Vector{724, 300, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f), 5.0f);
-        Circle *ballCable1 = new Circle(Particle(Vector{724, 550, 0}, Vector{initial_vel, 0, 0}, Vector{0, 0, 0}, 0.1f),
-                                        15.0f);
-        Circle *ballCable2 = new Circle(Particle(Vector{724, 650, 0}, Vector{initial_vel * 2, 0, 0}, Vector{0, 0, 0},
-                                                 0.1f), 20.0f);
-        actors.push_back(anchorCable1);
-        actors.push_back(ballCable1);
-        actors.push_back(ballCable2);
-        constraintRegistry.addCable(anchorCable1, ballCable1, 150.0f);
-        constraintRegistry.addCable(ballCable1, ballCable2, 100.0f);
-    } else {
-        // Add Blob
-        Blob *blob = new Blob();
-        blob->addCircle();
-        actors.emplace_back(blob);
-
-        // Anchor spring on a rect
-        actors.emplace_back(new Rect(
-            Particle(Vector{200, 200, 0}),
-            Vector{60, 0, 0},
-            Vector{0, 10, 0}
-        ));
-        circleAnchor = new Circle(
-            Particle(Vector{200, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
-            20.0f
-        );
-        actors.push_back(circleAnchor);
-
-        // Bungee spring on a rect
-        actors.emplace_back(new Rect(
-            Particle(Vector{800, 200, 0}),
-            Vector{120, 0, 0},
-            Vector{0, 10, 0}
-        ));
-        circleBungee1 = new Circle(
-            Particle(Vector{700, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
-            20.0f
-        );
-        circleBungee2 = new Circle(
-            Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
-            20.0f
-        );
-        actors.push_back(circleAnchor);
-        actors.push_back(circleBungee1);
-        actors.push_back(circleBungee2);
-    }
+    // Bungee spring on a rect
+    actors.emplace_back(new Rect(
+        Particle(Vector{800, 200, 0}),
+        Vector{120, 0, 0},
+        Vector{0, 10, 0}
+    ));
+    circleBungee1 = new Circle(
+        Particle(Vector{700, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+        20.0f
+    );
+    circleBungee2 = new Circle(
+        Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+        20.0f
+    );
+    actors.push_back(circleAnchor);
+    actors.push_back(circleBungee1);
+    actors.push_back(circleBungee2);
 
     // Add Floor
     actors.emplace_back(new Rect(
@@ -90,25 +60,22 @@ void World::applyForces(const float dt) {
     std::vector<SpringForce *> blobForces; // fixme : memory leak!!!!
 
     ParticleGravity grav;
+    constraintRegistry.clear();  // todo: gérer les cables du blob autrement
 
-    if constexpr (!DEMO_CONSTRAINT) {
-        constraintRegistry.clear();
-
-        // Anchor spring force
-        AnchorSpringForce *anchorSpring = new AnchorSpringForce(
-            Vector{200, 200, 0}, // Anchor point
-            20.0f, // Spring constant
-            150.0f // Rest length
-        );
-        Registry.add(&circleAnchor->centerParticle, anchorSpring);
-        // Bungee spring forces
-        BungeeForce *bungeeSpring = new BungeeForce(
-            &circleBungee1->centerParticle,
-            10.0f, // Spring constant
-            150.0f // Rest length
-        );
-        Registry.add(&circleBungee2->centerParticle, bungeeSpring);
-    }
+    // Anchor spring force
+    AnchorSpringForce *anchorSpring = new AnchorSpringForce(  // todo: créer un registre qui gère les ressorts
+        Vector{200, 200, 0}, // Anchor point
+        20.0f, // Spring constant
+        150.0f // Rest length
+    );
+    Registry.add(&circleAnchor->centerParticle, anchorSpring);
+    // Bungee spring forces
+    BungeeForce *bungeeSpring = new BungeeForce(
+        &circleBungee1->centerParticle,
+        10.0f, // Spring constant
+        150.0f // Rest length
+    );
+    Registry.add(&circleBungee2->centerParticle, bungeeSpring);
 
     for (auto *actor: actors) {
         Registry.add(&actor->centerParticle, &grav);
