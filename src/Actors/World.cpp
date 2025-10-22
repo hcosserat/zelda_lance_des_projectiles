@@ -6,24 +6,72 @@
 #include "AnchorSpringForce.h"
 #include "BungeeForce.h"
 
-World::World() {
-    // Add Blob
-    Blob *blob = new Blob();
-    blob->addCircle();
-    actors.emplace_back(blob);
 
-    // Create a pendulum
-    // Circle *anchor = new Circle(
-    //     Particle(Vector{400, 100, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f),
-    //     5.0f
-    // );
-    // Circle *ball = new Circle(
-    //     Particle(Vector{400, 300, 0}, Vector{50, 0, 0}, Vector{0, 0, 0}, 0.1f),
-    //     20.0f
-    // );
-    // actors.push_back(anchor);
-    // actors.push_back(ball);
-    // constraintRegistry.addRod(anchor, ball, 200.0f);
+#define DEMO_CONSTRAINT false
+
+World::World() {
+    if constexpr (DEMO_CONSTRAINT) {
+        const float initial_vel = 900;
+
+        // Double rod pendulum
+        Circle *anchorRod1 = new Circle(Particle(Vector{300, 300, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f), 5.0f);
+        Circle *ballRod1 = new Circle(Particle(Vector{300, 550, 0}, Vector{initial_vel, 0, 0}, Vector{0, 0, 0}, 0.1f),
+                                      15.0f);
+        Circle *ballRod2 = new Circle(Particle(Vector{300, 650, 0}, Vector{initial_vel * 2, 0, 0}, Vector{0, 0, 0},
+                                               0.1f), 20.0f);
+        actors.push_back(anchorRod1);
+        actors.push_back(ballRod1);
+        actors.push_back(ballRod2);
+        constraintRegistry.addRod(anchorRod1, ballRod1, 150.0f);
+        constraintRegistry.addRod(ballRod1, ballRod2, 100.0f);
+
+        // Doube cable pendulum
+        Circle *anchorCable1 = new Circle(Particle(Vector{724, 300, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.0f), 5.0f);
+        Circle *ballCable1 = new Circle(Particle(Vector{724, 550, 0}, Vector{initial_vel, 0, 0}, Vector{0, 0, 0}, 0.1f),
+                                        15.0f);
+        Circle *ballCable2 = new Circle(Particle(Vector{724, 650, 0}, Vector{initial_vel * 2, 0, 0}, Vector{0, 0, 0},
+                                                 0.1f), 20.0f);
+        actors.push_back(anchorCable1);
+        actors.push_back(ballCable1);
+        actors.push_back(ballCable2);
+        constraintRegistry.addCable(anchorCable1, ballCable1, 150.0f);
+        constraintRegistry.addCable(ballCable1, ballCable2, 100.0f);
+    } else {
+        // Add Blob
+        Blob *blob = new Blob();
+        blob->addCircle();
+        actors.emplace_back(blob);
+
+        // Anchor spring on a rect
+        actors.emplace_back(new Rect(
+            Particle(Vector{200, 200, 0}),
+            Vector{60, 0, 0},
+            Vector{0, 10, 0}
+        ));
+        circleAnchor = new Circle(
+            Particle(Vector{200, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+            20.0f
+        );
+        actors.push_back(circleAnchor);
+
+        // Bungee spring on a rect
+        actors.emplace_back(new Rect(
+            Particle(Vector{800, 200, 0}),
+            Vector{120, 0, 0},
+            Vector{0, 10, 0}
+        ));
+        circleBungee1 = new Circle(
+            Particle(Vector{700, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+            20.0f
+        );
+        circleBungee2 = new Circle(
+            Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
+            20.0f
+        );
+        actors.push_back(circleAnchor);
+        actors.push_back(circleBungee1);
+        actors.push_back(circleBungee2);
+    }
 
     // Add Floor
     actors.emplace_back(new Rect(
@@ -35,61 +83,32 @@ World::World() {
     // Add Walls
     actors.emplace_back(new Rect(Particle(Vector{10, 400, 0}), Vector{0, 600, 0}, Vector{20, 0, 0}));
     actors.emplace_back(new Rect(Particle(Vector{1014, 400, 0}), Vector{0, -600, 0}, Vector{20, 0, 0}));
-
-	// Anchor spring on a rect
-    actors.emplace_back(new Rect(
-        Particle(Vector{200, 200, 0}),
-        Vector{60, 0, 0},
-        Vector{0, 10, 0}
-	));
-    circleAnchor = new Circle(
-        Particle(Vector{200, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
-        20.0f
-	);
-	actors.push_back(circleAnchor);
-
-	// Bungee spring on a rect
-    actors.emplace_back(new Rect(
-        Particle(Vector{800, 200, 0}),
-        Vector{120, 0, 0},
-        Vector{0, 10, 0}
-    ));
-    circleBungee1 = new Circle(
-        Particle(Vector{700, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
-        20.0f
-	);
-    circleBungee2 = new Circle(
-        Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
-        20.0f
-    );
-    actors.push_back(circleAnchor);
-	actors.push_back(circleBungee1);
-	actors.push_back(circleBungee2);
-
 }
 
 void World::applyForces(const float dt) {
     Registry.clear();
-	constraintRegistry.clear();
-    std::vector<SpringForce *> blobForces;  // todo : memory leak!!!!
+    std::vector<SpringForce *> blobForces; // fixme : memory leak!!!!
 
     ParticleGravity grav;
 
-	// Anchor spring force
-    AnchorSpringForce *anchorSpring = new AnchorSpringForce(
-        Vector{200, 200, 0}, // Anchor point
-        20.0f,              // Spring constant
-        150.0f              // Rest length
-	);
-	Registry.add(&circleAnchor->centerParticle, anchorSpring);
-	// Bungee spring forces
-    BungeeForce *bungeeSpring = new BungeeForce(
-        &circleBungee1->centerParticle,
-        10.0f,              // Spring constant
-        150.0f              // Rest length
-	);
-	Registry.add(&circleBungee2->centerParticle, bungeeSpring);
+    if constexpr (!DEMO_CONSTRAINT) {
+        constraintRegistry.clear();
 
+        // Anchor spring force
+        AnchorSpringForce *anchorSpring = new AnchorSpringForce(
+            Vector{200, 200, 0}, // Anchor point
+            20.0f, // Spring constant
+            150.0f // Rest length
+        );
+        Registry.add(&circleAnchor->centerParticle, anchorSpring);
+        // Bungee spring forces
+        BungeeForce *bungeeSpring = new BungeeForce(
+            &circleBungee1->centerParticle,
+            10.0f, // Spring constant
+            150.0f // Rest length
+        );
+        Registry.add(&circleBungee2->centerParticle, bungeeSpring);
+    }
 
     for (auto *actor: actors) {
         Registry.add(&actor->centerParticle, &grav);
@@ -116,12 +135,7 @@ void World::applyForces(const float dt) {
                 blobForces.push_back(sf);
                 Registry.add(&c.centerParticle, sf);
                 // Create elasticity limits between circles and center
-                const float elasticityFactor = 5.0f;
-                float currentLength = (blob->centerParticle.pos - c.centerParticle.pos).norm();
-                if (currentLength > restLength * elasticityFactor) {
-                    constraintRegistry.addCable(blob, &c,
-                                                restLength * elasticityFactor);
-                }
+                constraintRegistry.addCable(blob, &c, 200);
             }
             for (auto &c: blob->separatedCircles) {
                 Registry.add(&c.centerParticle, &grav);
@@ -165,6 +179,48 @@ void World::updatePositions(const float dt) {
 
 void World::draw() const {
     ofSetColor(245, 0, 0);
+
+    // Draw constraint lines
+    for (const auto &constraint: constraintRegistry.getConstraints()) {
+        // Skip constraints that involve blob circles (they're internal to the blob)
+        bool isInternalBlobConstraint = false;
+
+        // Check if either actor is a Circle that's part of a blob
+        for (const auto *actor: actors) {
+            if (actor->getShape() == BlobShape) {
+                const Blob *blob = dynamic_cast<const Blob *>(actor);
+
+                // Check if constraint.a or constraint.b is one of the blob's circles
+                for (const auto &c: blob->circles) {
+                    if (constraint.a == &c || constraint.b == &c) {
+                        isInternalBlobConstraint = true;
+                        break;
+                    }
+                }
+                if (isInternalBlobConstraint) break;
+            }
+        }
+
+        if (isInternalBlobConstraint) continue;
+
+        // Draw the constraint line
+        const Vector posA = constraint.a->centerParticle.pos;
+        const Vector posB = constraint.b->centerParticle.pos;
+
+        if (constraint.type == Rod) {
+            ofSetColor(255, 0, 0); // Red for rod constraints
+            ofSetLineWidth(2);
+        } else {
+            // Cable
+            ofSetColor(0, 100, 255); // Blue for cable constraints
+            ofSetLineWidth(1);
+        }
+
+        ofDrawLine(posA.x, posA.y, posB.x, posB.y);
+    }
+
+    // Reset line width
+    ofSetLineWidth(1);
 
     for (Actor *actor: actors) {
         switch (actor->getShape()) {
