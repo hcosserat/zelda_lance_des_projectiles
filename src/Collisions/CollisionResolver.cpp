@@ -275,27 +275,9 @@ void CollisionResolver::resolveCableConstraint(Contact &c) const {
 
 void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float frame_duration,
                                 const ConstraintRegistry *constraintRegistry) const {
-    // Get all basic shapes of world
-    std::vector<Actor *> allActors;
-
-    for (Actor *actor: actors) {
-        if (actor->getShape() == BlobShape) {
-            Blob &blob = dynamic_cast<Blob &>(*actor);
-            for (Circle &circle: blob.circles) {
-                allActors.push_back(&circle);
-            }
-            for (Circle &circle: blob.separatedCircles) {
-                allActors.push_back(&circle);
-            }
-            allActors.push_back(&blob); // pour gérer le cercle central
-        } else {
-            allActors.push_back(actor);
-        }
-    }
-
     // Lister les contacts
     std::vector<Contact> contacts;
-    contacts.reserve(allActors.size() * 2);
+    contacts.reserve(actors.size() * 2);
 
     // Check for constraints
     if (constraintRegistry) {
@@ -303,10 +285,10 @@ void CollisionResolver::resolve(const std::vector<Actor *> &actors, const float 
     }
 
     // Check for regular collisions
-    for (size_t i = 0; i < allActors.size(); ++i) {
-        for (size_t j = i + 1; j < allActors.size(); ++j) {
+    for (size_t i = 0; i < actors.size(); ++i) {
+        for (size_t j = i + 1; j < actors.size(); ++j) {
             Contact c;
-            if (buildContact(*allActors[i], *allActors[j], c, frame_duration)) {
+            if (buildContact(*actors[i], *actors[j], c, frame_duration)) {
                 contacts.push_back(c);
             }
         }

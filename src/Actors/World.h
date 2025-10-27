@@ -6,7 +6,6 @@
 #include "Actor.h"
 
 class Circle;
-class Blob;
 
 class World {
 public:
@@ -14,7 +13,6 @@ public:
     ParticleForceRegistry particleForceRegistry;
     ConstraintRegistry constraintRegistry;
     CollisionResolver collisionResolver;
-    Blob *blob;
 
     explicit World();
 
@@ -26,7 +24,7 @@ public:
 
     void update(float dt);
 
-    Blob *getBlob() const;
+    void draw_rect(Actor *actor) const;
 
     void draw() const;
 };
