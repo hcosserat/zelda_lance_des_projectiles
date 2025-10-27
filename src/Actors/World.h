@@ -14,18 +14,15 @@ public:
     ParticleForceRegistry particleForceRegistry;
     ConstraintRegistry constraintRegistry;
     CollisionResolver collisionResolver;
-    Circle *circleAnchor;
-    Circle *circleBungee1;
-    Circle *circleBungee2;
     Blob *blob;
 
     explicit World();
 
     void applyForces(float dt);
 
-    void updateVelocities(float dt);
+    void updateVelocities(float dt) const;
 
-    void updatePositions(float dt);
+    void updatePositions(float dt) const;
 
     void update(float dt);
 

@@ -4,8 +4,11 @@
 #include "../Forces/ParticleForceRegistry.h"
 
 class Rect; // Forward declaration
+class ConstraintRegistry; // Forward declaration
 
 class Blob : public Actor {
+    ConstraintRegistry *constraintRegistry; // To manage constraints
+
 public:
     float centerRadius;
     std::vector<Circle> circles;
@@ -13,11 +16,12 @@ public:
     bool isJumping = false;
 
     explicit Blob(
+        ConstraintRegistry *registry,
         const Particle &centerParticle = Particle(Vector(400, 500, 0), Vector(0, 0, 0),
                                                   Vector(0, 0, 0), 100, Vector(0, 0, 0)),
         const float centerRadius = 18,
         const std::vector<Circle> &circles = {})
-        : Actor(centerParticle), centerRadius(centerRadius), circles(circles) {
+        : Actor(centerParticle), constraintRegistry(registry), centerRadius(centerRadius), circles(circles) {
     }
 
     Shape getShape() const override {

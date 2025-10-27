@@ -17,9 +17,8 @@ void ofApp::update() {
     world.update(dt);
 
     // Update display value in HUD
-    const auto blob = world.getBlob();
-    if (blob) {
-        hud.setTargetValue(blob->circles.size());
+    if (world.blob) {
+        hud.setTargetValue(world.blob->circles.size());
     } else {
         hud.setTargetValue(0);
     }
@@ -44,15 +43,15 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(const int key) {
-    if (world.getBlob()) {
-        world.getBlob()->handleKeyPressed(key);
+    if (world.blob) {
+        world.blob->handleKeyPressed(key);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(const int key) {
-    if (world.getBlob()) {
-        world.getBlob()->handleKeyReleased(key);
+    if (world.blob) {
+        world.blob->handleKeyReleased(key);
     }
 }
 

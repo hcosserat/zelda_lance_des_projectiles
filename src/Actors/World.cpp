@@ -1,7 +1,5 @@
 #include "World.h"
 #include "Forces/Gravity.h"
-#include "Forces/AnchorSpringForce.h"
-#include "Forces/BungeeForce.h"
 #include "Circle.h"
 #include "Rect.h"
 #include "Blob.h"
@@ -9,10 +7,9 @@
 
 World::World() : blob(nullptr) {
     // Add Blob
-    Blob *newBlob = new Blob();
-    newBlob->addCircle();
-    actors.emplace_back(newBlob);
-    blob = newBlob;
+    blob = new Blob(&constraintRegistry);
+    blob->addCircle();
+    actors.emplace_back(blob);
 
     // Anchor spring on a rect
     actors.emplace_back(new Rect(
@@ -20,28 +17,30 @@ World::World() : blob(nullptr) {
         Vector{60, 0, 0},
         Vector{0, 10, 0}
     ));
-    circleAnchor = new Circle(
+    const auto circleAnchor = new Circle(
         Particle(Vector{200, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
         20.0f
     );
     actors.push_back(circleAnchor);
+    constraintRegistry.addAnchorSpring(circleAnchor, Vector{200, 200, 0}, 150.0f, 20.0f);
 
-    // Bungee spring on a rect
+    // Bungee spring setup
     actors.emplace_back(new Rect(
         Particle(Vector{800, 200, 0}),
         Vector{120, 0, 0},
         Vector{0, 10, 0}
     ));
-    circleBungee1 = new Circle(
+    const auto circleBungee1 = new Circle(
         Particle(Vector{700, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
         20.0f
     );
-    circleBungee2 = new Circle(
+    const auto circleBungee2 = new Circle(
         Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
         20.0f
     );
     actors.push_back(circleBungee1);
     actors.push_back(circleBungee2);
+    constraintRegistry.addBungeeSpring(circleBungee1, circleBungee2, 150.0f, 10.0f);
 
     // Add Floor
     actors.emplace_back(new Rect(
@@ -57,94 +56,53 @@ World::World() : blob(nullptr) {
 
 void World::applyForces(const float dt) {
     particleForceRegistry.clear();
-    std::vector<SpringForce *> blobForces; // fixme : memory leak!!!!
-
     ParticleGravity grav;
-    constraintRegistry.clear(); // todo: gérer les cables du blob autrement
 
-    // Anchor spring force
-    AnchorSpringForce *anchorSpring = new AnchorSpringForce( // todo: créer un registre qui gère les ressorts
-        Vector{200, 200, 0}, // Anchor point
-        20.0f, // Spring constant
-        150.0f // Rest length
-    );
-    particleForceRegistry.add(&circleAnchor->centerParticle, anchorSpring);
-    // Bungee spring forces
-    BungeeForce *bungeeSpring = new BungeeForce(
-        &circleBungee1->centerParticle,
-        10.0f, // Spring constant
-        150.0f // Rest length
-    );
-    particleForceRegistry.add(&circleBungee2->centerParticle, bungeeSpring);
-
+    // Apply gravity to all actors
     for (auto *actor: actors) {
         particleForceRegistry.add(&actor->centerParticle, &grav);
-
-        if (actor->getShape() == BlobShape) {
-            Blob *blob = dynamic_cast<Blob *>(actor);
-            for (auto &c: blob->circles) {
-                // Apply gravity to each circle
-                particleForceRegistry.add(&c.centerParticle, &grav);
-
-                // Create spring forces between circles
-                SpringForce *psf;
-                float restLengthC = 4 * c.radius;
-                if (&c == &blob->circles.back()) {
-                    psf = new SpringForce(&blob->circles.front().centerParticle, 100.0f, restLengthC);
-                } else {
-                    psf = new SpringForce(&std::next(&c)->centerParticle, 100.0f, restLengthC);
-                }
-                blobForces.push_back(psf);
-                particleForceRegistry.add(&c.centerParticle, psf);
-                // Create spring forces between circle and center
-                float restLength = 4 * (blob->centerRadius + c.radius);
-                SpringForce *sf = new SpringForce(&blob->centerParticle, 100.0f, restLength);
-                blobForces.push_back(sf);
-                particleForceRegistry.add(&c.centerParticle, sf);
-                // Create elasticity limits between circles and center
-                constraintRegistry.addCable(blob, &c, 200);
-            }
-            for (auto &c: blob->separatedCircles) {
-                particleForceRegistry.add(&c.centerParticle, &grav);
-            }
-        }
+    }
+    // Apply gravity to blob circles
+    for (auto &c: blob->circles) {
+        particleForceRegistry.add(&c.centerParticle, &grav);
+    }
+    // Apply gravity to separated circles
+    for (auto &c: blob->separatedCircles) {
+        particleForceRegistry.add(&c.centerParticle, &grav);
     }
 
+    constraintRegistry.applySpringForces(particleForceRegistry);
     particleForceRegistry.updateForces(dt);
 }
 
-void World::updateVelocities(const float dt) {
+void World::updateVelocities(const float dt) const {
     for (auto *actor: actors) {
         actor->centerParticle.integrateVelocity(dt);
-        if (Blob *blob = dynamic_cast<Blob *>(actor)) {
-            for (auto &c: blob->circles) {
-                c.centerParticle.integrateVelocity(dt);
-            }
-            for (auto &c: blob->separatedCircles) {
-                c.centerParticle.integrateVelocity(dt);
-            }
-        }
+    }
+    for (auto &c: blob->circles) {
+        c.centerParticle.integrateVelocity(dt);
+    }
+    for (auto &c: blob->separatedCircles) {
+        c.centerParticle.integrateVelocity(dt);
     }
 }
 
-void World::updatePositions(const float dt) {
+void World::updatePositions(const float dt) const {
     for (auto *actor: actors) {
         actor->centerParticle.integratePosition(dt);
         actor->centerParticle.clearAccum();
-        if (Blob *blob = dynamic_cast<Blob *>(actor)) {
-            for (auto &c: blob->circles) {
-                c.centerParticle.integratePosition(dt);
-                c.centerParticle.clearAccum();
-            }
-            for (auto &c: blob->separatedCircles) {
-                c.centerParticle.integratePosition(dt);
-                c.centerParticle.clearAccum();
-            }
-        }
+    }
+    for (auto &c: blob->circles) {
+        c.centerParticle.integratePosition(dt);
+        c.centerParticle.clearAccum();
+    }
+    for (auto &c: blob->separatedCircles) {
+        c.centerParticle.integratePosition(dt);
+        c.centerParticle.clearAccum();
     }
 }
 
-void World::update(float dt) {
+void World::update(const float dt) {
     applyForces(dt);
     updateVelocities(dt);
     collisionResolver.resolve(actors, dt, &constraintRegistry);
