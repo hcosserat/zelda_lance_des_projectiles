@@ -1,49 +1,40 @@
 #include "ofApp.h"
+#include "Blob.h"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    // test_vector();
+    // Unit tests
+    test_vector();
+
+    // Initialization of app attributes
     dt = 1.0f / 60;
     world = World();
-
-    // Get the blob
-    for (Actor* actor : world.actors) {
-        if (actor->getShape() == BlobShape) {
-            blob = dynamic_cast<Blob*>(actor);
-            break;
-        }
-    }
-
-    // Initialize Collision Resolver
-    collisionResolver = CollisionResolver();
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
     dt = ofGetLastFrameTime();
-    world.applyForces(dt);
-    world.updateVelocities(dt);
-    collisionResolver.resolve(world.actors, dt, &world.constraintRegistry);
-    world.updatePositions(dt);
+    world.update(dt);
 
     // Update display value in HUD
-    int totalBlobParticles = 0;
+    const auto blob = world.getBlob();
     if (blob) {
-        totalBlobParticles = blob->circles.size();
+        hud.setTargetValue(blob->circles.size());
+    } else {
+        hud.setTargetValue(0);
     }
-    hud.setTargetValue(static_cast<float>(totalBlobParticles));
     hud.update(dt);
 }
 
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    // Actors
+    // Draw world and all actors
     world.draw();
-    // Delta Time
+
+    // Draw UI elements
     ofSetColor(255);
-    ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20); // Affiche avec 3 décimales, à (10, 20)
-    // HUD
+    ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20);
     hud.draw(10, 40);
 }
 
@@ -52,52 +43,16 @@ void ofApp::exit() {
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key) {
-    if (!blob) return;
-
-    switch (key) {
-    case 'a':
-        blob->addCircle();
-        break;
-    case 'r':
-        blob->removeCircle();
-        break;
-    case 's':
-        blob->separateCircle();
-        break;
-    case 'f':
-        blob->fusionCircle();
-        break;
-        // Left arrow to move left
-    case OF_KEY_LEFT:
-        blob->centerParticle.vel.x = -100;
-        break;
-        // Right arrow to move right
-    case OF_KEY_RIGHT:
-        blob->centerParticle.vel.x = 100;
-        break;
-        // Space to jump
-    case ' ':
-        blob->centerParticle.vel.y = -250;
-        break;
-    default:
-        break;
+void ofApp::keyPressed(const int key) {
+    if (world.getBlob()) {
+        world.getBlob()->handleKeyPressed(key);
     }
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key) {
-    switch (key) {
-    case OF_KEY_LEFT:
-    case OF_KEY_RIGHT:
-        blob->centerParticle.vel.x = 0;
-        break;
-    case ' ':
-        blob->centerParticle.vel.y = 0;
-        // TODO : No need to set to 0, just let gravity do its job but doesn't work well for now
-        break;
-    default:
-        break;
+void ofApp::keyReleased(const int key) {
+    if (world.getBlob()) {
+        world.getBlob()->handleKeyReleased(key);
     }
 }
 

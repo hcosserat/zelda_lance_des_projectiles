@@ -1,26 +1,15 @@
 #pragma once
 
 #include "ofMain.h"
-#include "Maths/Vector.h"
-#include "Actors/Particle.h"
-#include "Maths/VectorTest.h"
-#include "Actors/Circle.h"
-#include "Actors/Rect.h"
-#include "Blob.h"
 #include "Actors/World.h"
 #include "HUD.h"
-#include "Collisions/CollisionResolver.h"
 #include "Maths/VectorTest.h"
-#include "Actors/Particle.h"
-#include "Forces/Gravity.h"
 
-class ofApp : public ofBaseApp {
+class ofApp final : public ofBaseApp {
 public:
     float dt;
     World world;
-    Blob *blob;
     HUD hud;
-    CollisionResolver collisionResolver;
 
     void setup() override;
 

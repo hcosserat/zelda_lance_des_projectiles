@@ -10,6 +10,7 @@ public:
     float centerRadius;
     std::vector<Circle> circles;
     std::vector<Circle> separatedCircles;
+    bool isJumping = false;
 
     explicit Blob(
         const Particle &centerParticle = Particle(Vector(400, 500, 0), Vector(0, 0, 0),
@@ -40,4 +41,8 @@ public:
     void separateCircle();
 
     void fusionCircle();
+
+    void handleKeyPressed(int key);
+
+    void handleKeyReleased(int key);
 };

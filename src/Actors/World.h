@@ -2,18 +2,22 @@
 #include <vector>
 #include "Forces/ParticleForceRegistry.h"
 #include "../Collisions/ConstraintRegistry.h"
+#include "../Collisions/CollisionResolver.h"
 #include "Actor.h"
 
 class Circle;
+class Blob;
 
 class World {
 public:
     std::vector<Actor *> actors;
-    ParticleForceRegistry Registry;
+    ParticleForceRegistry particleForceRegistry;
     ConstraintRegistry constraintRegistry;
-    Circle* circleAnchor;
-    Circle* circleBungee1;
-	Circle* circleBungee2;
+    CollisionResolver collisionResolver;
+    Circle *circleAnchor;
+    Circle *circleBungee1;
+    Circle *circleBungee2;
+    Blob *blob;
 
     explicit World();
 
@@ -22,6 +26,10 @@ public:
     void updateVelocities(float dt);
 
     void updatePositions(float dt);
+
+    void update(float dt);
+
+    Blob *getBlob() const;
 
     void draw() const;
 };

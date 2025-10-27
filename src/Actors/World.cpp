@@ -1,17 +1,18 @@
 #include "World.h"
 #include "Forces/Gravity.h"
+#include "Forces/AnchorSpringForce.h"
+#include "Forces/BungeeForce.h"
 #include "Circle.h"
 #include "Rect.h"
 #include "Blob.h"
-#include "AnchorSpringForce.h"
-#include "BungeeForce.h"
 
 
-World::World() {
+World::World() : blob(nullptr) {
     // Add Blob
-    Blob *blob = new Blob();
-    blob->addCircle();
-    actors.emplace_back(blob);
+    Blob *newBlob = new Blob();
+    newBlob->addCircle();
+    actors.emplace_back(newBlob);
+    blob = newBlob;
 
     // Anchor spring on a rect
     actors.emplace_back(new Rect(
@@ -39,7 +40,6 @@ World::World() {
         Particle(Vector{900, 180, 0}, Vector{0, 0, 0}, Vector{0, 0, 0}, 0.5f),
         20.0f
     );
-    actors.push_back(circleAnchor);
     actors.push_back(circleBungee1);
     actors.push_back(circleBungee2);
 
@@ -56,35 +56,35 @@ World::World() {
 }
 
 void World::applyForces(const float dt) {
-    Registry.clear();
+    particleForceRegistry.clear();
     std::vector<SpringForce *> blobForces; // fixme : memory leak!!!!
 
     ParticleGravity grav;
-    constraintRegistry.clear();  // todo: gérer les cables du blob autrement
+    constraintRegistry.clear(); // todo: gérer les cables du blob autrement
 
     // Anchor spring force
-    AnchorSpringForce *anchorSpring = new AnchorSpringForce(  // todo: créer un registre qui gère les ressorts
+    AnchorSpringForce *anchorSpring = new AnchorSpringForce( // todo: créer un registre qui gère les ressorts
         Vector{200, 200, 0}, // Anchor point
         20.0f, // Spring constant
         150.0f // Rest length
     );
-    Registry.add(&circleAnchor->centerParticle, anchorSpring);
+    particleForceRegistry.add(&circleAnchor->centerParticle, anchorSpring);
     // Bungee spring forces
     BungeeForce *bungeeSpring = new BungeeForce(
         &circleBungee1->centerParticle,
         10.0f, // Spring constant
         150.0f // Rest length
     );
-    Registry.add(&circleBungee2->centerParticle, bungeeSpring);
+    particleForceRegistry.add(&circleBungee2->centerParticle, bungeeSpring);
 
     for (auto *actor: actors) {
-        Registry.add(&actor->centerParticle, &grav);
+        particleForceRegistry.add(&actor->centerParticle, &grav);
 
         if (actor->getShape() == BlobShape) {
             Blob *blob = dynamic_cast<Blob *>(actor);
             for (auto &c: blob->circles) {
                 // Apply gravity to each circle
-                Registry.add(&c.centerParticle, &grav);
+                particleForceRegistry.add(&c.centerParticle, &grav);
 
                 // Create spring forces between circles
                 SpringForce *psf;
@@ -95,22 +95,22 @@ void World::applyForces(const float dt) {
                     psf = new SpringForce(&std::next(&c)->centerParticle, 100.0f, restLengthC);
                 }
                 blobForces.push_back(psf);
-                Registry.add(&c.centerParticle, psf);
+                particleForceRegistry.add(&c.centerParticle, psf);
                 // Create spring forces between circle and center
                 float restLength = 4 * (blob->centerRadius + c.radius);
                 SpringForce *sf = new SpringForce(&blob->centerParticle, 100.0f, restLength);
                 blobForces.push_back(sf);
-                Registry.add(&c.centerParticle, sf);
+                particleForceRegistry.add(&c.centerParticle, sf);
                 // Create elasticity limits between circles and center
                 constraintRegistry.addCable(blob, &c, 200);
             }
             for (auto &c: blob->separatedCircles) {
-                Registry.add(&c.centerParticle, &grav);
+                particleForceRegistry.add(&c.centerParticle, &grav);
             }
         }
     }
 
-    Registry.updateForces(dt);
+    particleForceRegistry.updateForces(dt);
 }
 
 void World::updateVelocities(const float dt) {
@@ -142,6 +142,17 @@ void World::updatePositions(const float dt) {
             }
         }
     }
+}
+
+void World::update(float dt) {
+    applyForces(dt);
+    updateVelocities(dt);
+    collisionResolver.resolve(actors, dt, &constraintRegistry);
+    updatePositions(dt);
+}
+
+Blob *World::getBlob() const {
+    return blob;
 }
 
 void World::draw() const {

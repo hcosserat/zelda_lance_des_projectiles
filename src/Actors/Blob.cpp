@@ -1,5 +1,6 @@
 #include "Blob.h"
 #include "Rect.h"
+#include "ofMain.h"
 
 void Blob::addCircle() {
     Circle c = Circle(
@@ -56,5 +57,54 @@ CollisionResult Blob::_collidesWith(const Actor &other) {
         }
         default:
             return {false};
+    }
+}
+
+void Blob::handleKeyPressed(int key) {
+    switch (key) {
+        // Blob manipulation controls
+        case 'a':
+            addCircle();
+            break;
+        case 'r':
+            removeCircle();
+            break;
+        case 's':
+            separateCircle();
+            break;
+        case 'f':
+            fusionCircle();
+            break;
+
+        // Movement controls
+        case OF_KEY_LEFT:
+            centerParticle.vel.x = -100;
+            break;
+        case OF_KEY_RIGHT:
+            centerParticle.vel.x = 100;
+            break;
+        case ' ': // Jump
+            if (!isJumping) {
+                centerParticle.vel.y = -250;
+                isJumping = true;
+                break;
+            }
+        default:
+            break;
+    }
+}
+
+void Blob::handleKeyReleased(int key) {
+    switch (key) {
+        case OF_KEY_LEFT:
+        case OF_KEY_RIGHT:
+            centerParticle.vel.x = 0;
+            break;
+        case ' ': {
+            isJumping = false;
+            break;
+        }
+        default:
+            break;
     }
 }
