@@ -126,30 +126,60 @@ void World::draw() const {
             if (actor->getShape() == BlobShape) {
                 const Blob *blob = dynamic_cast<const Blob *>(actor);
 
-                // Check if constraint.a or constraint.b is one of the blob's circles
+                // Check if constraint.a is one of the blob's circles
                 for (const auto &c: blob->circles) {
-                    if (constraint.a == &c || constraint.b == &c) {
+                    if (constraint.a == &c) {
                         isInternalBlobConstraint = true;
                         break;
                     }
                 }
+
+                // Also check constraint.b if it exists
+                if (!isInternalBlobConstraint && constraint.b) {
+                    for (const auto &c: blob->circles) {
+                        if (constraint.b == &c) {
+                            isInternalBlobConstraint = true;
+                            break;
+                        }
+                    }
+                }
+
                 if (isInternalBlobConstraint) break;
             }
         }
 
         if (isInternalBlobConstraint) continue;
 
-        // Draw the constraint line
-        const Vector posA = constraint.a->centerParticle.pos;
-        const Vector posB = constraint.b->centerParticle.pos;
+        // Handle different constraint types for drawing
+        Vector posA = constraint.a->centerParticle.pos;
+        Vector posB;
 
-        if (constraint.type == Rod) {
-            ofSetColor(255, 0, 0); // Red for rod constraints
+        if (constraint.type == AnchorSpring) {
+            // For anchor springs, draw from actor to anchor point
+            posB = constraint.anchorPoint;
+            ofSetColor(255, 165, 0); // Orange for anchor springs
             ofSetLineWidth(2);
+        } else if (constraint.b) {
+            // For constraints between two actors
+            posB = constraint.b->centerParticle.pos;
+
+            if (constraint.type == Rod) {
+                ofSetColor(255, 0, 0); // Red for rod constraints
+                ofSetLineWidth(2);
+            } else if (constraint.type == Cable) {
+                ofSetColor(0, 100, 255); // Blue for cable constraints
+                ofSetLineWidth(1);
+            } else if (constraint.type == BungeeSpring) {
+                ofSetColor(255, 255, 0); // Yellow for bungee springs
+                ofSetLineWidth(2);
+            } else {
+                // Default for other spring types
+                ofSetColor(0, 255, 0); // Green for regular springs
+                ofSetLineWidth(1);
+            }
         } else {
-            // Cable
-            ofSetColor(0, 100, 255); // Blue for cable constraints
-            ofSetLineWidth(1);
+            // Skip constraints without a second actor and not anchor springs
+            continue;
         }
 
         ofDrawLine(posA.x, posA.y, posB.x, posB.y);

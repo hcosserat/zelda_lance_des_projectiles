@@ -52,7 +52,7 @@ private:
 
     void resolveInterpenetration(Contact &c) const;
 
-    void resolveRestingContact(Contact &c) const;
+    void resolveRestingContact(const Contact &c) const;
 
     void resolveRodConstraint(Contact &c) const;
 

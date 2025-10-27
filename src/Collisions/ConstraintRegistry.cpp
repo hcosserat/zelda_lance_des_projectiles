@@ -8,17 +8,19 @@
 
 void ConstraintRegistry::applySpringForces(ParticleForceRegistry &forceRegistry) {
     // Clear previous spring forces
-    for (auto* force : springForces) {
+    for (auto *force: springForces) {
         delete force;
     }
     springForces.clear();
 
-    for (const auto &constraint : constraints) {
+    for (const auto &constraint: constraints) {
         switch (constraint.type) {
             case Spring: {
                 // Create spring forces between two actors
-                SpringForce *forceAB = new SpringForce(&constraint.b->centerParticle, constraint.springConstant, constraint.length);
-                SpringForce *forceBA = new SpringForce(&constraint.a->centerParticle, constraint.springConstant, constraint.length);
+                SpringForce *forceAB = new SpringForce(&constraint.b->centerParticle, constraint.springConstant,
+                                                       constraint.length);
+                SpringForce *forceBA = new SpringForce(&constraint.a->centerParticle, constraint.springConstant,
+                                                       constraint.length);
 
                 springForces.push_back(forceAB);
                 springForces.push_back(forceBA);
@@ -29,15 +31,18 @@ void ConstraintRegistry::applySpringForces(ParticleForceRegistry &forceRegistry)
             }
             case AnchorSpring: {
                 // Create anchor spring force
-                AnchorSpringForce *anchorForce = new AnchorSpringForce(constraint.anchorPoint, constraint.springConstant, constraint.length);
+                AnchorSpringForce *anchorForce = new AnchorSpringForce(constraint.anchorPoint,
+                                                                       constraint.springConstant, constraint.length);
                 springForces.push_back(anchorForce);
                 forceRegistry.add(&constraint.a->centerParticle, anchorForce);
                 break;
             }
             case BungeeSpring: {
                 // Create bungee spring forces between two actors
-                BungeeForce *bungeeAB = new BungeeForce(&constraint.b->centerParticle, constraint.springConstant, constraint.length);
-                BungeeForce *bungeeBA = new BungeeForce(&constraint.a->centerParticle, constraint.springConstant, constraint.length);
+                BungeeForce *bungeeAB = new BungeeForce(&constraint.b->centerParticle, constraint.springConstant,
+                                                        constraint.length);
+                BungeeForce *bungeeBA = new BungeeForce(&constraint.a->centerParticle, constraint.springConstant,
+                                                        constraint.length);
 
                 springForces.push_back(bungeeAB);
                 springForces.push_back(bungeeBA);
@@ -57,17 +62,17 @@ void ConstraintRegistry::applySpringForces(ParticleForceRegistry &forceRegistry)
 void ConstraintRegistry::removeConstraint(Actor *a, Actor *b) {
     constraints.erase(
         std::remove_if(constraints.begin(), constraints.end(),
-            [a, b](const Constraint& constraint) {
-                return (constraint.a == a && constraint.b == b) ||
-                       (constraint.a == b && constraint.b == a);
-            }),
+                       [a, b](const Constraint &constraint) {
+                           return (constraint.a == a && constraint.b == b) ||
+                                  (constraint.a == b && constraint.b == a);
+                       }),
         constraints.end()
     );
 }
 
 void ConstraintRegistry::clear() {
     constraints.clear();
-    for (auto* force : springForces) {
+    for (auto *force: springForces) {
         delete force;
     }
     springForces.clear();

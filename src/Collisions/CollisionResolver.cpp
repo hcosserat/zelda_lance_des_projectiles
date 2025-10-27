@@ -78,6 +78,8 @@ bool CollisionResolver::buildContact(Actor &a, Actor &b, Contact &out, const flo
 
 void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, const ConstraintRegistry *registry) {
     for (const Constraint constraint: registry->getConstraints()) {
+        if (!constraint.b) continue; // Skip if no second actor
+
         const Vector d = constraint.b->centerParticle.pos - constraint.a->centerParticle.pos;
         const float currentLength = d.norm();
 
@@ -111,6 +113,8 @@ void CollisionResolver::buildConstraintContacts(std::vector<Contact> &contacts, 
                 });
                 break;
             }
+            default:
+                break;
         }
     }
 }
@@ -198,7 +202,7 @@ void CollisionResolver::resolveInterpenetration(Contact &c) const {
     c.b->centerParticle.vel += k * c.n * c.b->centerParticle.inverseMass;
 }
 
-void CollisionResolver::resolveRestingContact(Contact &c) const {
+void CollisionResolver::resolveRestingContact(const Contact &c) const {
     // For resting contacts, we do position correction and no bounce
     const float invMassA = c.a->centerParticle.inverseMass;
     const float invMassB = c.b->centerParticle.inverseMass;
