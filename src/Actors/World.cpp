@@ -76,9 +76,9 @@ void World::updatePositions(const float dt) const {
 }
 
 void World::update(const float dt) {
+    collisionResolver.resolve(actors, dt, &constraintRegistry);
     applyForces(dt);
     updateVelocities(dt);
-    collisionResolver.resolve(actors, dt, &constraintRegistry);
     updatePositions(dt);
 }
 
