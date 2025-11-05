@@ -2,7 +2,6 @@
 #include "Forces/Gravity.h"
 #include "Circle.h"
 #include "Rect.h"
-#include "Blob.h"
 
 
 World::World() {

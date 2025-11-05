@@ -1,5 +1,4 @@
 #include "CollisionResolver.h"
-#include "../Actors/Blob.h"
 
 // Construction des contacts
 bool CollisionResolver::buildC_C(Circle &A, Circle &B, Contact &c, const float frame_duration) {
