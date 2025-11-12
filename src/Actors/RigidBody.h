@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Maths/Vector.h"
+#include "../Maths/Matrix3.h"
+#include "../Forces/Force.h"
 
 class RigidBody {
     Vector center; // centre géométrique
@@ -9,18 +11,28 @@ class RigidBody {
     Vector vel; // vélocité
     Vector acc; // accéleration
 
+    Vector orientation; // orientation (angles d'Euler)
+    Vector angularVel; // vitesse angulaire
+    Vector angularAcc; // accéleration angulaire
+
     float invMass; // inverse de la masse totale
 
-    /* todo: une implémentation de sa rotation, vitesse angulaire et accéleration angulaire */
+    Matrix3 invInertiaTensor; // inverse du tenseur d'inertie ( J^(-1) ) dans le repère du monde
 
-    RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel,
-              const Vector &acc, const float mass)
-        : center(center)
-          , massCenter(massCenter)
-          , vel(vel)
-          , acc(acc)
-          , invMass(mass != 0.f ? 1.f / mass : 0.f) {
-    }
+    std::vector<Force> accumForces;
 
-    void updatePos(float dt);
+public:
+    RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
+              const Vector &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
+              const Matrix3 &invInertiaTensor);
+
+    void integratePos(float dt);
+
+    void integrateOrientation(float dt);
+
+    void addForce(const Force &force);
+
+    void clearAccumulator();
+
+    void updateAccelerationsWithAccumulator();
 };
