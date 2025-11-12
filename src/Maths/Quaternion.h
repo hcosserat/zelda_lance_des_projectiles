@@ -7,42 +7,40 @@
 #include "glm/vec3.hpp"
 
 class Quaternion {
-
 public:
+    // Attributs
+    float w, x, y, z;
 
-	// Attributs
-	float w, x, y, z;
+    // Constructeur
+    explicit Quaternion(float w = 1, float x = 0, float y = 0, float z = 0);
 
-	// Constructeur
-	explicit Quaternion(float w = 1, float x = 0, float y = 0, float z = 0);
+    glm::quat glmQuat() const;
 
-	glm::quat glmQuat() const;
+    Quaternion neg();
 
-	Quaternion neg();
+    float norm() const;
 
-	float norm() const;
+    void normalize();
 
-	void normalize();
+    Quaternion conj() const;
 
-	Quaternion conj() const;
+    Quaternion inverse() const;
 
-	Quaternion inverse() const;
+    Quaternion operator*(const Quaternion &other) const;
 
-	Quaternion operator*(const Quaternion& other) const;
+    Quaternion diff(const Quaternion &other) const;
 
-	Quaternion diff(const Quaternion& other) const;
+    float dot(const Quaternion &other) const;
 
-	float dot(const Quaternion& other) const;
+    Quaternion exp(float t) const;
 
-	Quaternion exp(float t) const;
+    void fromAxisAngle(const glm::vec3 &axis, float angleRad);
 
-	void fromAxisAngle(const glm::vec3& axis, float angleRad);
+    Matrix4 toRotationMatrix4() const;
 
-	Matrix4 toRotationMatrix4() const;
+    glm::vec3 rotateVector(const glm::vec3 &v) const;
 
-	glm::vec3 rotateVector(const glm::vec3& v) const;
+    Quaternion operator+(const Quaternion &other) const;
 
-	Quaternion operator+(const Quaternion& other) const;
-
-	Quaternion operator*(float scalar) const;
-}
+    Quaternion operator*(float scalar) const;
+};

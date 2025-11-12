@@ -53,7 +53,7 @@ public:
     // Destructor to clean up memory
     ~ConstraintRegistry();
 
-    const std::vector<Constraint> &getConstraints() const {
+    [[nodiscard]] const std::vector<Constraint> &getConstraints() const {
         return constraints;
     }
 };

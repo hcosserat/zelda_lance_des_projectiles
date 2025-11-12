@@ -27,8 +27,7 @@ void Quaternion::normalize() {
 		x /= n;
 		y /= n;
 		z /= n;
-	}
-	else {
+	} else {
 		w = 1;
 		x = 0;
 		y = 0;
@@ -46,11 +45,11 @@ Quaternion Quaternion::inverse() const {
 		Quaternion conjQ = conj();
 		return Quaternion(conjQ.w / (n * n), conjQ.x / (n * n), conjQ.y / (n * n), conjQ.z / (n * n));
 	} else {
-		return Quaternion(0, 0, 0, 0); // Retourne un quaternion nul si la norme est zéro
+		return Quaternion(0, 0, 0, 0); // Retourne un quaternion nul si la norme est zï¿½ro
 	}
 }
 
-Quaternion Quaternion::operator*(const Quaternion& other) const {
+Quaternion Quaternion::operator*(const Quaternion &other) const {
 	return Quaternion(
 		w * other.w - x * other.x - y * other.y - z * other.z,
 		w * other.x + x * other.w + y * other.z - z * other.y,
@@ -58,12 +57,13 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
 		w * other.z + x * other.y - y * other.x + z * other.w);
 }
 
-Quaternion Quaternion::diff(const Quaternion& other) const {	// Déplacement angulaire de this vers other
+Quaternion Quaternion::diff(const Quaternion &other) const {
+	// Dï¿½placement angulaire de this vers other
 	Quaternion conjThis = (*this).conj();
 	return other * conjThis;
 }
 
-float Quaternion::dot(const Quaternion& other) const {
+float Quaternion::dot(const Quaternion &other) const {
 	return w * other.w + x * other.x + y * other.y + z * other.z;
 }
 
@@ -78,7 +78,7 @@ Quaternion Quaternion::exp(float t) const {
 	}
 }
 
-void Quaternion::fromAxisAngle(const glm::vec3& axis, float angleRad) {
+void Quaternion::fromAxisAngle(const glm::vec3 &axis, float angleRad) {
 	float halfAngle = angleRad / 2.0f;
 	float sinHalfAngle = sin(halfAngle);
 	w = cos(halfAngle);
@@ -117,14 +117,14 @@ Matrix4 Quaternion::toRotationMatrix4() const {
 	return R;
 }
 
-glm::vec3 Quaternion::rotateVector(const glm::vec3& v) const {
+glm::vec3 Quaternion::rotateVector(const glm::vec3 &v) const {
 	// p' = q * p * q^-1
 	Quaternion p(0, v.x, v.y, v.z);
 	Quaternion result = (*this) * p * this->conj();
 	return glm::vec3(result.x, result.y, result.z);
 }
 
-Quaternion Quaternion::operator+(const Quaternion& other) const {
+Quaternion Quaternion::operator+(const Quaternion &other) const {
 	return Quaternion(w + other.w, x + other.x, y + other.y, z + other.z);
 }
 

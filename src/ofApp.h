@@ -5,6 +5,7 @@
 #include "HUD.h"
 #include "Maths/VectorTest.h"
 #include "Actors/RigidBody.h"
+#include "Actors/Sphere.h"
 
 class ofApp final : public ofBaseApp {
 public:

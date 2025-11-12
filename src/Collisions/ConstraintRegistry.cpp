@@ -81,4 +81,3 @@ void ConstraintRegistry::clear() {
 ConstraintRegistry::~ConstraintRegistry() {
     clear();
 }
-
