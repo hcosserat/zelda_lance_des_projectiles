@@ -20,6 +20,22 @@ float Quaternion::norm() const {
 	return sqrt(w * w + x * x + y * y + z * z);
 }
 
+void Quaternion::normalize() {
+	float n = norm();
+	if (n > 0) {
+		w /= n;
+		x /= n;
+		y /= n;
+		z /= n;
+	}
+	else {
+		w = 1;
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+}
+
 Quaternion Quaternion::conj() const {
 	return Quaternion(w, -x, -y, -z);
 }
@@ -60,4 +76,58 @@ Quaternion Quaternion::exp(float t) const {
 	} else {
 		return Quaternion(cos(t * angle), 0, 0, 0);
 	}
+}
+
+void Quaternion::fromAxisAngle(const glm::vec3& axis, float angleRad) {
+	float halfAngle = angleRad / 2.0f;
+	float sinHalfAngle = sin(halfAngle);
+	w = cos(halfAngle);
+	x = axis.x * sinHalfAngle;
+	y = axis.y * sinHalfAngle;
+	z = axis.z * sinHalfAngle;
+}
+
+Matrix4 Quaternion::toRotationMatrix4() const {
+	Matrix4 R;
+	float xx = x * x;
+	float yy = y * y;
+	float zz = z * z;
+	float xy = x * y;
+	float xz = x * z;
+	float yz = y * z;
+	float wx = w * x;
+	float wy = w * y;
+	float wz = w * z;
+	R(0, 0) = 1 - 2 * (yy + zz);
+	R(0, 1) = 2 * (xy - wz);
+	R(0, 2) = 2 * (xz + wy);
+	R(0, 3) = 0;
+	R(1, 0) = 2 * (xy + wz);
+	R(1, 1) = 1 - 2 * (xx + zz);
+	R(1, 2) = 2 * (yz - wx);
+	R(1, 3) = 0;
+	R(2, 0) = 2 * (xz - wy);
+	R(2, 1) = 2 * (yz + wx);
+	R(2, 2) = 1 - 2 * (xx + yy);
+	R(2, 3) = 0;
+	R(3, 0) = 0;
+	R(3, 1) = 0;
+	R(3, 2) = 0;
+	R(3, 3) = 1;
+	return R;
+}
+
+glm::vec3 Quaternion::rotateVector(const glm::vec3& v) const {
+	// p' = q * p * q^-1
+	Quaternion p(0, v.x, v.y, v.z);
+	Quaternion result = (*this) * p * this->conj();
+	return glm::vec3(result.x, result.y, result.z);
+}
+
+Quaternion Quaternion::operator+(const Quaternion& other) const {
+	return Quaternion(w + other.w, x + other.x, y + other.y, z + other.z);
+}
+
+Quaternion Quaternion::operator*(float scalar) const {
+	return Quaternion(w * scalar, x * scalar, y * scalar, z * scalar);
 }

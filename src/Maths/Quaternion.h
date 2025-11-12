@@ -3,6 +3,8 @@
 #include "../ofMain.h"
 #include <ostream>
 #include <cmath>
+#include "Matrix4.h"
+#include "glm/vec3.hpp"
 
 class Quaternion {
 
@@ -20,6 +22,8 @@ public:
 
 	float norm() const;
 
+	void normalize();
+
 	Quaternion conj() const;
 
 	Quaternion inverse() const;
@@ -32,5 +36,13 @@ public:
 
 	Quaternion exp(float t) const;
 
+	void fromAxisAngle(const glm::vec3& axis, float angleRad);
 
+	Matrix4 toRotationMatrix4() const;
+
+	glm::vec3 rotateVector(const glm::vec3& v) const;
+
+	Quaternion operator+(const Quaternion& other) const;
+
+	Quaternion operator*(float scalar) const;
 }
