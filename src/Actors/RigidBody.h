@@ -4,6 +4,12 @@
 #include "../Maths/Matrix3.h"
 #include "../Forces/Force.h"
 
+enum ShapeType {
+    BOX,
+	CYLINDER,
+    AXE
+};
+
 class RigidBody {
     Vector center; // centre géométrique
     Vector massCenter; // centre de masse
@@ -22,6 +28,13 @@ class RigidBody {
     std::vector<Force> accumForces;
 
 public:
+    ShapeType shape;
+	Vector boxDimensions; // used if shape == BOX
+	float radius; // used if shape == CYLINDER
+	float height; // used if shape == CYLINDER
+	Vector axeHandleDimensions; // used if shape == AXE
+	Vector axeHeadDimensions; // used if shape == AXE
+
     RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
               const Vector &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
               const Matrix3 &invInertiaTensor);

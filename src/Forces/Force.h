@@ -3,4 +3,4 @@
 struct Force {
     Vector force;
     Vector applicationPoint;
-}
+};

@@ -6,12 +6,21 @@
 #include "Maths/VectorTest.h"
 #include "Actors/RigidBody.h"
 #include "Actors/Sphere.h"
+#include "Actors/RigidBody.h"
+
+enum ProjectileType {
+    P_BOX,
+    P_CYLINDER,
+    P_AXE
+};
 
 class ofApp final : public ofBaseApp {
 public:
     float dt;
     World world;
     HUD hud;
+	ofEasyCam cam;
+    ProjectileType currentProjectileType;
 
     void setup() override;
 

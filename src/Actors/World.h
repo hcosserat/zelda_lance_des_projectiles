@@ -4,27 +4,19 @@
 #include "../Collisions/ConstraintRegistry.h"
 #include "../Collisions/CollisionResolver.h"
 #include "Actor.h"
+#include "Actors/RigidBody.h"
 
 class Circle;
 
 class World {
 public:
-    std::vector<Actor *> actors;
-    ParticleForceRegistry particleForceRegistry;
-    ConstraintRegistry constraintRegistry;
-    CollisionResolver collisionResolver;
+	std::vector<RigidBody*> rigidBodies;
 
     explicit World();
 
-    void applyForces(float dt);
-
-    void updateVelocities(float dt) const;
-
-    void updatePositions(float dt) const;
-
     void update(float dt);
 
-    void draw_rect(Actor *actor) const;
-
     void draw() const;
+
+	void addRigidBody(RigidBody* body);
 };
