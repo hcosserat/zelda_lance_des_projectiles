@@ -55,7 +55,7 @@ void RigidBody::updateAccelerationsWithAccumulator() {
         return;
     }
 
-    for (const auto &f : accumForces) {
+    for (const auto &f: accumForces) {
         acc += f.force * invMass;
 
         const Vector r = f.applicationPoint - massCenter;
