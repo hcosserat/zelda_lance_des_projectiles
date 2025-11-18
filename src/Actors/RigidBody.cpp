@@ -51,12 +51,16 @@ void RigidBody::updateAccelerationsWithAccumulator() {
     acc = Vector(0, 0, 0);
     angularAcc = Vector(0, 0, 0);
 
-    for (const auto [force, applicationPoint]: accumForces) {
-        acc += force; // todo: on est sûr de tout prendre ?
+    if (invMass == 0.0f) {
+        return;
+    }
 
-        Vector l = massCenter - applicationPoint;
-        Vector tau = force.cross(l);
-        angularAcc += invInertiaTensor * tau; // todo: normalement c'est tau en ligne * matrice mais jsp
+    for (const auto &f : accumForces) {
+        acc += f.force * invMass;
+
+        const Vector r = f.applicationPoint - massCenter;
+        const Vector tau = r.cross(f.force);
+
+        angularAcc += invInertiaTensor * tau;
     }
 }
-

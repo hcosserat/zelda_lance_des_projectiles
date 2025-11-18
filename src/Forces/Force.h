@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../Maths/Vector.h"
 
 struct Force {

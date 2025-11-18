@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "../Maths/Vector.h"
 #include "../Maths/Matrix3.h"
 #include "../Forces/Force.h"
