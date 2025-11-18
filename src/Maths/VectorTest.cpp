@@ -134,6 +134,6 @@ int test_vector() {
     test_distance();
     test_op_eq();
 
-    std::cout << "Tous les tests sont pass�s avec succ�s !" << std::endl;
+    std::cout << "Tests Vector OK !" << std::endl;
     return 0;
 }

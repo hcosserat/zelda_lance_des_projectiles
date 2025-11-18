@@ -42,8 +42,9 @@ Quaternion Quaternion::conj() const {
 Quaternion Quaternion::inverse() const {
 	float n = norm();
 	if (n > 0) {
-		Quaternion conjQ = conj();
-		return Quaternion(conjQ.w / (n * n), conjQ.x / (n * n), conjQ.y / (n * n), conjQ.z / (n * n));
+		Quaternion q = conj();
+		q = q * (1.0f / (n * n));
+		return q;
 	} else {
 		return Quaternion(0, 0, 0, 0); // Retourne un quaternion nul si la norme est z�ro
 	}
@@ -68,15 +69,22 @@ float Quaternion::dot(const Quaternion &other) const {
 }
 
 Quaternion Quaternion::exp(float t) const {
-	float angle = acos(w);
+	Quaternion q = *this;
+	q.normalize();
+	float angle = acos(q.w);
 	float sinAngle = sin(angle);
-	if (sinAngle > 0) {
-		float coeff = sin(t * angle) / sinAngle;
-		return Quaternion(cos(t * angle), x * coeff, y * coeff, z * coeff);
-	} else {
-		return Quaternion(cos(t * angle), 0, 0, 0);
-	}
+
+	if (sinAngle < 1e-8f)
+		return Quaternion(1, 0, 0, 0);
+
+	float coeff = sin(t * angle) / sinAngle;
+
+	return Quaternion(cos(t * angle),
+		q.x * coeff,
+		q.y * coeff,
+		q.z * coeff);
 }
+
 
 void Quaternion::fromAxisAngle(const glm::vec3 &axis, float angleRad) {
 	float halfAngle = angleRad / 2.0f;
@@ -117,10 +125,13 @@ Matrix4 Quaternion::toRotationMatrix4() const {
 	return R;
 }
 
-glm::vec3 Quaternion::rotateVector(const glm::vec3 &v) const {
-	// p' = q * p * q^-1
+glm::vec3 Quaternion::rotateVector(const glm::vec3 & v) const {
+	Quaternion q = *this;
+	q.normalize();
+
 	Quaternion p(0, v.x, v.y, v.z);
-	Quaternion result = (*this) * p * this->conj();
+	Quaternion result = q * p * q.conj();
+
 	return glm::vec3(result.x, result.y, result.z);
 }
 
