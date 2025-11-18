@@ -13,6 +13,7 @@ enum ShapeType {
 };
 
 class RigidBody {
+public:
     Vector center; // centre géométrique
     Vector massCenter; // centre de masse
 
@@ -25,11 +26,11 @@ class RigidBody {
 
     float invMass; // inverse de la masse totale
 
-    Matrix3 invInertiaTensor; // inverse du tenseur d'inertie ( J^(-1) ) dans le repère du monde
+	Matrix3 invInertiaTensorBody;   // J^{-1} dans le repère de l'objet (constant)
+	Matrix3 invInertiaTensor;       // J^{-1} dans le repère du monde (mis à jour à chaque frame)
 
     std::vector<Force> accumForces;
 
-public:
     ShapeType shape;
 	Vector boxDimensions; // used if shape == BOX
 	float radius; // used if shape == CYLINDER
@@ -50,4 +51,10 @@ public:
     void clearAccumulator();
 
     void updateAccelerationsWithAccumulator();
+
+	void updateInvInertiaTensor();
+
+private:
+	static Matrix3 buildRotationMatrixFromEulerXYZ(float pitch, float yaw, float roll) ;
 };
+

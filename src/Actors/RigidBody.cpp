@@ -10,7 +10,7 @@ RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vecto
                                                         , angularVel(angularVel)
                                                         , angularAcc(angularAcc)
                                                         , invMass(mass != 0.f ? 1.f / mass : 0.f)
-                                                        , invInertiaTensor(invInertiaTensor) {
+                                                        , invInertiaTensorBody(invInertiaTensor) {
 }
 
 void RigidBody::integratePos(const float dt) {
@@ -63,4 +63,24 @@ void RigidBody::updateAccelerationsWithAccumulator() {
 
         angularAcc += invInertiaTensor * tau;
     }
+}
+
+Matrix3 RigidBody::buildRotationMatrixFromEulerXYZ(const float pitch, const float yaw, const float roll) {
+    const float cp = std::cos(pitch), sp = std::sin(pitch);
+    const float cy = std::cos(yaw), sy = std::sin(yaw);
+    const float cr = std::cos(roll), sr = std::sin(roll);
+
+    const Matrix3 Rx(Vector{1, 0, 0}, Vector{0, cp, sp}, Vector{0, -sp, cp});
+
+    const Matrix3 Ry(Vector{cy, 0, -sy}, Vector{0, 1, 0}, Vector{sy, 0, cy});
+
+    const Matrix3 Rz(Vector{cr, sr, 0}, Vector{-sr, cr, 0}, Vector{0, 0, 1});
+
+    return Rz * Ry * Rx;
+}
+
+void RigidBody::updateInvInertiaTensor() {
+    const Matrix3 R = buildRotationMatrixFromEulerXYZ(orientation.x, orientation.y, orientation.z);
+    const Matrix3 Rt = R.transpose();
+    invInertiaTensor = R * invInertiaTensorBody * Rt;
 }
