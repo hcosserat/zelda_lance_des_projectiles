@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "Actors/World.h"
-#include "HUD.h"
 #include "Maths/VectorTest.h"
 #include "Actors/RigidBody.h"
 #include "Actors/Sphere.h"
@@ -18,7 +17,6 @@ class ofApp final : public ofBaseApp {
 public:
     float dt;
     World world;
-    HUD hud;
 	ofEasyCam cam;
     ProjectileType currentProjectileType;
 

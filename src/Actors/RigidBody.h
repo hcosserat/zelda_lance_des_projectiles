@@ -8,7 +8,7 @@
 
 enum ShapeType {
     BOX,
-	CYLINDER,
+    CYLINDER,
     AXE
 };
 
@@ -26,17 +26,17 @@ public:
 
     float invMass; // inverse de la masse totale
 
-	Matrix3 invInertiaTensorBody;   // J^{-1} dans le repère de l'objet (constant)
-	Matrix3 invInertiaTensor;       // J^{-1} dans le repère du monde (mis à jour à chaque frame)
+    Matrix3 invInertiaTensorBody; // J^{-1} dans le repère de l'objet (constant)
+    Matrix3 invInertiaTensor; // J^{-1} dans le repère du monde (mis à jour à chaque frame)
 
     std::vector<Force> accumForces;
 
     ShapeType shape;
-	Vector boxDimensions; // used if shape == BOX
-	float radius; // used if shape == CYLINDER
-	float height; // used if shape == CYLINDER
-	Vector axeHandleDimensions; // used if shape == AXE
-	Vector axeHeadDimensions; // used if shape == AXE
+    Vector boxDimensions; // used if shape == BOX
+    float radius{}; // used if shape == CYLINDER
+    float height{}; // used if shape == CYLINDER
+    Vector axeHandleDimensions; // used if shape == AXE
+    Vector axeHeadDimensions; // used if shape == AXE
 
     RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
               const Vector &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
@@ -52,9 +52,8 @@ public:
 
     void updateAccelerationsWithAccumulator();
 
-	void updateInvInertiaTensor();
+    void updateInvInertiaTensor();
 
 private:
-	static Matrix3 buildRotationMatrixFromEulerXYZ(float pitch, float yaw, float roll) ;
+    static Matrix3 buildRotationMatrixFromEulerXYZ(float pitch, float yaw, float roll);
 };
-

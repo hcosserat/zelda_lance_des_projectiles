@@ -1,5 +1,4 @@
 #include "World.h"
-#include "Forces/Gravity.h"
 #include "Matrix4.h"
 
 
@@ -32,7 +31,7 @@ void World::draw() const {
                     body->massCenter.y,
                     body->massCenter.z);
 
-        const Vector& o = body->orientation; // pitch=x, yaw=y, roll=z
+        const Vector &o = body->orientation; // pitch=x, yaw=y, roll=z
         ofRotateZDeg(ofRadToDeg(o.z)); // roll
         ofRotateYDeg(ofRadToDeg(o.y)); // yaw
         ofRotateXDeg(ofRadToDeg(o.x)); // pitch

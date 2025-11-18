@@ -10,7 +10,9 @@ RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vecto
                                                         , angularVel(angularVel)
                                                         , angularAcc(angularAcc)
                                                         , invMass(mass != 0.f ? 1.f / mass : 0.f)
-                                                        , invInertiaTensorBody(invInertiaTensor) {
+                                                        , invInertiaTensorBody(invInertiaTensor)
+                                                        , invInertiaTensor(invInertiaTensor)
+                                                        , shape(BOX) {
 }
 
 void RigidBody::integratePos(const float dt) {
@@ -22,8 +24,9 @@ void RigidBody::integratePos(const float dt) {
     // Mise à jour de la vélocité
     vel += acc * dt;
 
-    // Mise à jour de la position
+    // Mise à jour de la position (both center and massCenter translate together)
     center += vel * dt;
+    massCenter += vel * dt;
 }
 
 void RigidBody::integrateOrientation(const float dt) {
@@ -70,10 +73,14 @@ Matrix3 RigidBody::buildRotationMatrixFromEulerXYZ(const float pitch, const floa
     const float cy = std::cos(yaw), sy = std::sin(yaw);
     const float cr = std::cos(roll), sr = std::sin(roll);
 
-    const Matrix3 Rx(Vector{1, 0, 0}, Vector{0, cp, sp}, Vector{0, -sp, cp});
+    // Rotation matrices as columns: Matrix3(col0, col1, col2)
+    // Rx: rotate around X-axis (pitch)
+    const Matrix3 Rx(Vector{1, 0, 0}, Vector{0, cp, -sp}, Vector{0, sp, cp});
 
-    const Matrix3 Ry(Vector{cy, 0, -sy}, Vector{0, 1, 0}, Vector{sy, 0, cy});
+    // Ry: rotate around Y-axis (yaw)
+    const Matrix3 Ry(Vector{cy, 0, sy}, Vector{0, 1, 0}, Vector{-sy, 0, cy});
 
+    // Rz: rotate around Z-axis (roll)
     const Matrix3 Rz(Vector{cr, sr, 0}, Vector{-sr, cr, 0}, Vector{0, 0, 1});
 
     return Rz * Ry * Rx;

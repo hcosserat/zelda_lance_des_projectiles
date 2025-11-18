@@ -1,9 +1,5 @@
 #pragma once
 #include <vector>
-#include "Forces/ParticleForceRegistry.h"
-#include "../Collisions/ConstraintRegistry.h"
-#include "../Collisions/CollisionResolver.h"
-#include "Actor.h"
 #include "Actors/RigidBody.h"
 
 class Circle;
