@@ -4,6 +4,9 @@
 void ofApp::setup() {
     // Unit tests
     test_vector();
+	test_matrix3();
+	test_matrix4();
+	test_quaternion();
 
     // Initialization of app attributes
     dt = 1.0f / 60;
