@@ -51,4 +51,6 @@ public:
     void dragEvent(ofDragInfo dragInfo) override;
 
     void gotMessage(ofMessage msg) override;
+
+	void throwProjectile();
 };
