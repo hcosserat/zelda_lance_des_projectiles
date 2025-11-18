@@ -140,7 +140,6 @@ void ofApp::throwProjectile() {
     float mass = 20.0f;
     Vector initialPosition(0, 5, 0);
     Vector force(0, 1500, 5000); // Force propelling the projectile up and forward
-	Vector gravity(0, -9.81f * mass, 0); // Gravity force
     Vector localApplicationPoint(0.5, 0.5, 0); // Apply force not in the center of mass to induce rotation
     RigidBody* projectile = nullptr;
     Matrix3 inertiaTensor;
@@ -159,7 +158,7 @@ void ofApp::throwProjectile() {
         inertiaTensor(2, 2) = k * (w * w + h * h);
         invInertiaTensor = inertiaTensor.inverse();
         projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-            Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0),
+            Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
             mass, invInertiaTensor);
         projectile->shape = BOX;
         projectile->boxDimensions = boxDimensions;
@@ -177,7 +176,7 @@ void ofApp::throwProjectile() {
         inertiaTensor(2, 2) = Izz;
         invInertiaTensor = inertiaTensor.inverse();
         projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-            Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0),
+            Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
             mass, invInertiaTensor);
         projectile->shape = CYLINDER;
         projectile->radius = radius;
@@ -199,7 +198,7 @@ void ofApp::throwProjectile() {
         inertiaTensor(2, 2) = k * (w * w + h * h);
         invInertiaTensor = inertiaTensor.inverse();
         projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-            Vector(0, 0, 0), Vector(0, 0, 0), Vector(0, 0, 0),
+            Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
             mass, invInertiaTensor);
         projectile->shape = AXE;
         projectile->axeHandleDimensions = handleDimensions;
@@ -212,8 +211,6 @@ void ofApp::throwProjectile() {
     Vector globalApplicationPoint = initialPosition + localApplicationPoint;
     // Apply the force at the specified local application point
     projectile->addForce(Force(force, globalApplicationPoint));
-	// Apply gravity force
-	projectile->addForce(Force(gravity, globalApplicationPoint));
     // Add the projectile to the world
     world.addRigidBody(projectile);
 }

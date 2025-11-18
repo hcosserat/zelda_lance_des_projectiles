@@ -125,6 +125,27 @@ Matrix4 Quaternion::toRotationMatrix4() const {
 	return R;
 }
 
+Matrix3 Quaternion::toRotationMatrix3() const {
+	float xx = x * x;
+	float yy = y * y;
+	float zz = z * z;
+	float xy = x * y;
+	float xz = x * z;
+	float yz = y * z;
+	float wx = w * x;
+	float wy = w * y;
+	float wz = w * z;
+
+	// Colonne 0
+	Vector c0(1 - 2 * (yy + zz), 2 * (xy + wz), 2 * (xz - wy));
+	// Colonne 1
+	Vector c1(2 * (xy - wz), 1 - 2 * (xx + zz), 2 * (yz + wx));
+	// Colonne 2
+	Vector c2(2 * (xz + wy), 2 * (yz - wx), 1 - 2 * (xx + yy));
+
+	return Matrix3(c0, c1, c2);
+}
+
 glm::vec3 Quaternion::rotateVector(const glm::vec3 & v) const {
 	Quaternion q = *this;
 	q.normalize();

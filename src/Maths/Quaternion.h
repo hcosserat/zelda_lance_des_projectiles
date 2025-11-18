@@ -38,6 +38,8 @@ public:
 
     Matrix4 toRotationMatrix4() const;
 
+    Matrix3 toRotationMatrix3() const;
+
     glm::vec3 rotateVector(const glm::vec3 &v) const;
 
     Quaternion operator+(const Quaternion &other) const;

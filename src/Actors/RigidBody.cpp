@@ -1,7 +1,7 @@
 #include "RigidBody.h"
 
 RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
-                     const Vector &orientation, const Vector &angularVel, const Vector &angularAcc, const float mass,
+                     const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc, const float mass,
                      const Matrix3 &invInertiaTensor) : center(center)
                                                         , massCenter(massCenter)
                                                         , vel(vel)
@@ -39,7 +39,10 @@ void RigidBody::integrateOrientation(const float dt) {
     angularVel += angularAcc * dt;
 
     // Mise à jour de l'orientation
-    orientation += angularVel * dt;
+	const Quaternion omega(0, angularVel.x, angularVel.y, angularVel.z);
+    Quaternion deltaOrientation = omega * orientation * 0.5f * dt;
+    orientation = orientation + deltaOrientation;
+	orientation.normalize();
 }
 
 void RigidBody::addForce(const Force &force) {
@@ -68,6 +71,7 @@ void RigidBody::updateAccelerationsWithAccumulator() {
     }
 }
 
+/*
 Matrix3 RigidBody::buildRotationMatrixFromEulerXYZ(const float pitch, const float yaw, const float roll) {
     const float cp = std::cos(pitch), sp = std::sin(pitch);
     const float cy = std::cos(yaw), sy = std::sin(yaw);
@@ -85,9 +89,10 @@ Matrix3 RigidBody::buildRotationMatrixFromEulerXYZ(const float pitch, const floa
 
     return Rz * Ry * Rx;
 }
+*/
 
 void RigidBody::updateInvInertiaTensor() {
-    const Matrix3 R = buildRotationMatrixFromEulerXYZ(orientation.x, orientation.y, orientation.z);
+	const Matrix3 R = orientation.toRotationMatrix3();
     const Matrix3 Rt = R.transpose();
     invInertiaTensor = R * invInertiaTensorBody * Rt;
 }

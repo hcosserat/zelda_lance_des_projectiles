@@ -8,6 +8,8 @@ World::World() {
 
 void World::update(const float dt) {
     for (RigidBody *body: rigidBodies) {
+        float mass = 1/ body->invMass;
+		body->addForce(Force(Vector(0, -9.81f * mass, 0), body->massCenter)); // Gravity force
         // Update accelerations based on accumulated forces
         body->updateAccelerationsWithAccumulator();
         // Integrate position and orientation
@@ -31,10 +33,7 @@ void World::draw() const {
                     body->massCenter.y,
                     body->massCenter.z);
 
-        const Vector &o = body->orientation; // pitch=x, yaw=y, roll=z
-        ofRotateZDeg(ofRadToDeg(o.z)); // roll
-        ofRotateYDeg(ofRadToDeg(o.y)); // yaw
-        ofRotateXDeg(ofRadToDeg(o.x)); // pitch
+        ofMultMatrix(glm::mat4_cast(body->orientation.glmQuat()));
 
         // Center of mass
         ofSetColor(255, 0, 0);

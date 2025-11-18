@@ -5,6 +5,7 @@
 #include "../Maths/Vector.h"
 #include "../Maths/Matrix3.h"
 #include "../Forces/Force.h"
+#include "../Maths/Quaternion.h"
 
 enum ShapeType {
     BOX,
@@ -20,7 +21,7 @@ public:
     Vector vel; // vélocité
     Vector acc; // accéleration
 
-    Vector orientation; // orientation (angles d'Euler)
+    Quaternion orientation; // orientation (angles d'Euler)
     Vector angularVel; // vitesse angulaire
     Vector angularAcc; // accéleration angulaire
 
@@ -39,7 +40,7 @@ public:
     Vector axeHeadDimensions; // used if shape == AXE
 
     RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
-              const Vector &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
+              const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
               const Matrix3 &invInertiaTensor);
 
     void integratePos(float dt);
@@ -55,5 +56,5 @@ public:
     void updateInvInertiaTensor();
 
 private:
-    static Matrix3 buildRotationMatrixFromEulerXYZ(float pitch, float yaw, float roll);
+    //static Matrix3 buildRotationMatrixFromEulerXYZ(float pitch, float yaw, float roll);
 };
