@@ -47,11 +47,11 @@ void Octree::subdivide() {
     int nextDepth = depth + 1;
 
     for (int i = 0; i < 8; ++i) {
-        Vector childCenter = Vector{
+        Vector childCenter (
             center.x + h * ((i & 1) ? 1 : -1),
             center.y + h * ((i & 2) ? 1 : -1),
             center.z + h * ((i & 4) ? 1 : -1)
-        };
+        );
 
         children[i] = std::make_unique<Octree>(
             childCenter, h, nextDepth, maxDepth, maxElements);

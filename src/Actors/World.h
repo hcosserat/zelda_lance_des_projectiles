@@ -1,18 +1,23 @@
 #pragma once
-#include <vector>
+#include "Collisions/Octree.h" // ton chemin réel ici
 #include "Actors/RigidBody.h"
-
-class Circle;
+#include <vector>
 
 class World {
 public:
-	std::vector<RigidBody*> rigidBodies;
+	std::vector<RigidBody *> rigidBodies;
 
-    explicit World();
+	explicit World();
 
-    void update(float dt);
+	void update(float dt);
+	void draw() const;
 
-    void draw() const;
+	void addRigidBody(RigidBody * body);
 
-	void addRigidBody(RigidBody* body);
+private:
+	Octree * tree; // Le spatial index
+	float treeHalfSize = 200.0f; // Taille du monde (à ajuster)
+
+	void rebuildOctree();
+	void drawOctree(const Octree * node) const;
 };

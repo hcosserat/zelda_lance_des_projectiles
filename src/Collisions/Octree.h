@@ -5,7 +5,7 @@
 class Octree {
 public:
 	Octree(const Vector & center, float halfSize,
-		int depth = 0, int maxDepth = 6, int maxElements = 6);
+		int depth = 0, int maxDepth = 3, int maxElements = 3);
 
 	void insert(RigidBody * body);
 	void query(const Vector & point, float radius,
@@ -13,7 +13,6 @@ public:
 
 	void clear();
 
-private:
 	std::unique_ptr<Octree> children[8];
 	std::vector<RigidBody *> elements;
 
@@ -35,4 +34,12 @@ private:
 
 	// Trouver l’enfant correspondant à une position
 	int getChildIndex(const Vector & pos) const;
+
+	void getCollisionPartitions(std::vector<std::vector<RigidBody *>> & out) const;
+
+	private:
+
+	void redistributeElements();
+
+	void collectPartitions(std::vector<std::vector<RigidBody *>> & out) const;
 };
