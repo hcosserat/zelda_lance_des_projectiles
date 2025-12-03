@@ -44,8 +44,13 @@ bool Octree::intersects(const Vector & point, float radius) const {
 		std::min(point.y, center.y + halfSize));
 	float z = std::max(center.z - halfSize,
 		std::min(point.z, center.z + halfSize));
+	Vector pointB(x, y, z);
 
+<<<<<<< Updated upstream
 	return distanceSquared(point, Vector{x, y, z}) <= radius * radius;
+=======
+	return distanceSquared(point, pointB) <= radius * radius;
+>>>>>>> Stashed changes
 }
 
 // ------------------------------------------------------------
@@ -56,11 +61,14 @@ void Octree::subdivide() {
 	int nextDepth = depth + 1;
 
 	for (int i = 0; i < 8; ++i) {
+<<<<<<< Updated upstream
 		Vector childCenter = Vector{
 			center.x + h * ((i & 1) ? 1 : -1),
+=======
+		Vector childCenter(center.x + h * ((i & 1) ? 1 : -1),
+>>>>>>> Stashed changes
 			center.y + h * ((i & 2) ? 1 : -1),
-			center.z + h * ((i & 4) ? 1 : -1)
-		};
+			center.z + h * ((i & 4) ? 1 : -1));
 
 		children[i] = std::make_unique<Octree>(
 			childCenter, h, nextDepth, maxDepth, maxElements);
