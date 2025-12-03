@@ -10,7 +10,8 @@
 enum ShapeType {
     BOX,
     CYLINDER,
-    AXE
+    AXE,
+    PLANE
 };
 
 class RigidBody {
