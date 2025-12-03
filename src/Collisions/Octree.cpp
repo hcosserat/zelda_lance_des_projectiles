@@ -45,7 +45,7 @@ bool Octree::intersects(const Vector & point, float radius) const {
 	float z = std::max(center.z - halfSize,
 		std::min(point.z, center.z + halfSize));
 
-	return distanceSquared(point, Vector{ x, y, z }) <= radius * radius;
+	return distanceSquared(point, Vector{x, y, z}) <= radius * radius;
 }
 
 // ------------------------------------------------------------

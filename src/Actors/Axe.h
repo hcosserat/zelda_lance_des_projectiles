@@ -5,7 +5,7 @@
 class Axe final : public RigidBody {
 public:
     Vector handleDimensions; // Manche
-    Vector headDimensions;   // Tête
+    Vector headDimensions; // Tête
 
     // Constructeur
     Axe(const Vector& center, const Vector& massCenter, const Vector& vel, const Vector& acc,
