@@ -34,4 +34,12 @@ public:
 
 	// Trouver l’enfant correspondant à une position
 	int getChildIndex(const Vector & pos) const;
+
+	void getCollisionPartitions(std::vector<std::vector<RigidBody *>> & out) const;
+
+	private:
+
+	void redistributeElements();
+
+	void collectPartitions(std::vector<std::vector<RigidBody *>> & out) const;
 };
