@@ -32,6 +32,8 @@ public:
 
     std::vector<Force> accumForces;
 
+	float boundingRadius = 2.0;
+
     ShapeType shape;
     Vector boxDimensions; // used if shape == BOX
     float radius{}; // used if shape == CYLINDER
