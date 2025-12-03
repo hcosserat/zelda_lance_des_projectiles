@@ -10,7 +10,7 @@ Cylinder::Cylinder(const Vector& center, const Vector& massCenter, const Vector&
 }
 
 void Cylinder::drawShape() const {
-    ofNoFill(); // Dessiner les arêtes uniquement
+    ofNoFill(); // Dessiner les arÃªtes uniquement
     ofSetColor(50, 200, 50);
     ofDrawCylinder(0, 0, 0,
         radius, height);

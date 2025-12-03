@@ -11,5 +11,5 @@ public:
         const Quaternion& orientation, const Vector& angularVel, const Vector& angularAcc, float mass,
         const Matrix3& invInertiaTensor, const Vector& dimensions);
 
-    void drawShape() const override;
+    void drawShape() const;
 };
