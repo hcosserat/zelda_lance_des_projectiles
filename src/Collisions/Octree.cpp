@@ -1,6 +1,20 @@
 #include "Octree.h"
 
-#include <ShapeComponent.h>
+#include "../Actors/ShapeComponent.h"
+
+// Aide: vérifier si un corps est strictement inclus dans les bornes d'un noeud
+static bool containsStrict(const Vector& nodeCenter, float halfSize, const RigidBody* body) {
+    float r = body->shape->boundingRadius();
+    // Si rayon infini (Plane), ne peut jamais être strictement inclus
+    if (std::isinf(r)) return false;
+
+    return body->center.x - r >= nodeCenter.x - halfSize &&
+           body->center.x + r <= nodeCenter.x + halfSize &&
+           body->center.y - r >= nodeCenter.y - halfSize &&
+           body->center.y + r <= nodeCenter.y + halfSize &&
+           body->center.z - r >= nodeCenter.z - halfSize &&
+           body->center.z + r <= nodeCenter.z + halfSize;
+}
 
 // ------------------------------------------------------------
 // Constructeur
@@ -58,6 +72,21 @@ void Octree::subdivide() {
         children[i] = std::make_unique<Octree>(
             childCenter, h, nextDepth, maxDepth, maxElements);
     }
+
+    // Redistribuer les éléments existants
+    redistributeElements();
+}
+
+// ------------------------------------------------------------
+// Redistribue les éléments après subdivision
+// ------------------------------------------------------------
+void Octree::redistributeElements() {
+    std::vector<RigidBody*> oldElements = std::move(elements);
+    elements.clear();
+
+    for (auto* body : oldElements) {
+        insert(body);
+    }
 }
 
 // ------------------------------------------------------------
@@ -75,22 +104,26 @@ int Octree::getChildIndex(const Vector &pos) const {
 // Insert
 // ------------------------------------------------------------
 void Octree::insert(RigidBody *body) {
-    if (!contains(body))
-        return;
-
-    // Node feuille avec place disponible
-    if (depth == maxDepth || (elements.size() < maxElements && children[0] == nullptr)) {
-        elements.push_back(body);
+    // Si on a des enfants
+    if (children[0] != nullptr) {
+        int index = getChildIndex(body->center);
+        // Si l'objet rentre STRICTEMENT dans l'enfant, on le descend
+        if (containsStrict(children[index]->center, children[index]->halfSize, body)) {
+            children[index]->insert(body);
+        } else {
+            // Sinon on le garde ici
+            elements.push_back(body);
+        }
         return;
     }
 
-    // Si pas encore subdivis�
-    if (children[0] == nullptr)
-        subdivide();
+    // Feuille : stocker
+    elements.push_back(body);
 
-    // Insérer dans l'enfant correspondant
-    int idx = getChildIndex(body->center);
-    children[idx]->insert(body);
+    // Si trop d'éléments, subdiviser
+    if (elements.size() > maxElements && depth < maxDepth) {
+        subdivide();
+    }
 }
 
 // ------------------------------------------------------------
@@ -123,24 +156,38 @@ void Octree::clear() {
 }
 
 // ------------------------------------------------------------
-// Get collision partitions (groups of bodies that may collide)
+// Get collision partitions
 // ------------------------------------------------------------
 void Octree::getCollisionPartitions(std::vector<std::vector<RigidBody *> > &out) const {
     out.clear();
-    collectPartitions(out);
+    std::vector<RigidBody*> ancestors;
+    collectPartitions(ancestors, out);
 }
 
-void Octree::collectPartitions(std::vector<std::vector<RigidBody *> > &out) const {
-    // If this node has elements, they form a potential collision group
-    if (!elements.empty()) {
-        out.push_back(elements);
+void Octree::collectPartitions(std::vector<RigidBody *> &ancestors, std::vector<std::vector<RigidBody *> > &out) const {
+    // 1. Ajouter les éléments de ce niveau à la pile des ancêtres
+    size_t pushCount = 0;
+    for (auto* e : elements) {
+        ancestors.push_back(e);
+        pushCount++;
     }
 
-    // Recursively collect from children
-    for (const auto &child: children) {
+    // 2. Descendre récursivement
+    bool isLeaf = true;
+    for (const auto &child : children) {
         if (child) {
-            child->collectPartitions(out);
+            isLeaf = false;
+            child->collectPartitions(ancestors, out);
         }
     }
-}
 
+    // 3. Si feuille, émettre une partition
+    if (isLeaf && !ancestors.empty()) {
+        out.push_back(ancestors);
+    }
+
+    // 4. Backtrack
+    for (size_t i = 0; i < pushCount; ++i) {
+        ancestors.pop_back();
+    }
+}

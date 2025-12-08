@@ -14,7 +14,7 @@ class BoxShape : public ShapeComponent {
 public:
     BoxShape(const Vector &dims)
         : dimensions(dims) {
-        // Compute bounding radius from half-extents
+        // Calcul du rayon de la sphère englobante à partir des demi-extents
         float hx = dims.x / 2.0f;
         float hy = dims.y / 2.0f;
         float hz = dims.z / 2.0f;
@@ -38,7 +38,7 @@ public:
 
     std::vector<Vector> getVerticesWorld(const RigidBody &body) const override;
 
-    // Compute inertia tensor for a box with given mass
+    // Inertie pour un parallélépipède uniforme
     static Matrix3 computeInertiaTensor(const Vector &dims, float mass) {
         float w = dims.x;
         float h = dims.y;

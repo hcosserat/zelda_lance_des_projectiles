@@ -4,7 +4,8 @@
 CollisionComponent::CollisionComponent(float worldSize)
     : tree(std::make_unique<Octree>(Vector(0, 0, 0), worldSize))
       , debugDrawEnabled(true)
-      , elasticity(0.1f) {
+      , elasticity(0.6f)
+      , damping(0.8f) {
 }
 
 void CollisionComponent::updateSpatialStructure(const std::vector<std::unique_ptr<RigidBody> > &bodies) {
@@ -15,21 +16,21 @@ void CollisionComponent::updateSpatialStructure(const std::vector<std::unique_pt
 }
 
 bool CollisionComponent::broadPhaseCheck(RigidBody *a, RigidBody *b) const {
-    // Bounding sphere intersection test
+    // Test d'intersection de sphères englobantes
     float radiusSum = a->boundingRadius() + b->boundingRadius();
     float distSquared = a->center.distanceSquared(b->center);
     return distSquared <= radiusSum * radiusSum;
 }
 
 void CollisionComponent::detectCollisions(const std::vector<std::unique_ptr<RigidBody> > &bodies) {
-    // Clear previous frame's collisions
+    // Effacer les collisions du frame précédent
     collisions.clear();
 
-    // Step 1: Get collision partitions from octree (spatial partitioning)
+    // Étape 1 : partitions de collision via l'octree
     std::vector<std::vector<RigidBody *> > partitions;
     tree->getCollisionPartitions(partitions);
 
-    // Step 2: For each partition, check pairs
+    // Étape 2 : pour chaque partition, tester les paires
     for (const auto &partition: partitions) {
         size_t count = partition.size();
         for (size_t i = 0; i < count; ++i) {
@@ -37,16 +38,16 @@ void CollisionComponent::detectCollisions(const std::vector<std::unique_ptr<Rigi
                 RigidBody *bodyA = partition[i];
                 RigidBody *bodyB = partition[j];
 
-                // Step 3: Broad phase - bounding sphere check
+                // Étape 3 : broad phase
                 if (!broadPhaseCheck(bodyA, bodyB)) {
                     continue;
                 }
 
-                // Step 4: Narrow phase - precise collision detection
+                // Étape 4 : narrow phase
                 CollisionData collision = NarrowPhase::CheckCollision(bodyA, bodyB);
 
                 if (collision.hasCollision()) {
-                    // Store collision for resolution
+                    // Stocker pour résolution
                     collisions.push_back(collision);
                 }
             }
@@ -54,17 +55,17 @@ void CollisionComponent::detectCollisions(const std::vector<std::unique_ptr<Rigi
     }
 }
 
-// ============== Collision Resolution ==============
+// ============== Résolution des collisions ==============
 
 void CollisionComponent::resolveCollisions(float dt) {
-    // First, correct all positions to resolve interpenetration
+    // Correction positionnelle pour tous les contacts
     for (const auto &collision: collisions) {
         for (const auto &contact: collision.contacts) {
             correctPositions(contact, collision.body1, collision.body2);
         }
     }
 
-    // Then, resolve impulses based on corrected state
+    // Résolution par impulsions
     for (const auto &collision: collisions) {
         for (const auto &contact: collision.contacts) {
             resolveContact(contact, collision.body1, collision.body2, dt);
@@ -73,45 +74,41 @@ void CollisionComponent::resolveCollisions(float dt) {
 }
 
 void CollisionComponent::resolveContact(const Contact &contact, RigidBody *body1, RigidBody *body2, float dt) {
-    // Skip if both bodies are static (infinite mass)
+    // Ignorer si les deux corps sont statiques
     if (body1->invMass == 0 && body2->invMass == 0) {
         return;
     }
 
-    // Contact point relative to each body's center of mass
+    // Point relatif aux centres de masse
     Vector r1 = contact.point - body1->massCenter;
     Vector r2 = contact.point - body2->massCenter;
 
-    // Velocity at contact point for each body: v + ω × r
+    // Vitesse au point de contact : v + ω × r
     Vector v1 = body1->vel + body1->angularVel.cross(r1);
     Vector v2 = body2->vel + body2->angularVel.cross(r2);
 
-    // Relative velocity at contact point
+    // Vitesse relative
     Vector relativeVel = v1 - v2;
 
-    // Relative velocity along the collision normal
+    // Composante le long de la normale
     float velAlongNormal = relativeVel.dot(contact.normal);
 
-    // Calculate the change in velocity due to acceleration in this frame
+    // Variation due aux accélérations
     Vector accInducedVel = body1->acc - body2->acc;
     float accInducedVelAlongNormal = accInducedVel.dot(contact.normal) * dt;
 
-    // Don't resolve if velocities are separating
+    // Ne pas résoudre si les vitesses s'écartent
     if (velAlongNormal > 0 && accInducedVelAlongNormal >= 0) {
         return;
     }
 
-    // Compute the impulse scalar
-    // j = -(1 + e) * v_rel · n / (1/m1 + 1/m2 + ((I1^-1 * (r1 × n)) × r1 + (I2^-1 * (r2 × n)) × r2) · n)
-
+    // Calcul de l'impulsion
     Vector r1CrossN = r1.cross(contact.normal);
     Vector r2CrossN = r2.cross(contact.normal);
 
-    // Transform through inverse inertia tensors
     Vector term1 = body1->invInertiaTensor * r1CrossN;
     Vector term2 = body2->invInertiaTensor * r2CrossN;
 
-    // Cross with r again
     Vector angularTerm1 = term1.cross(r1);
     Vector angularTerm2 = term2.cross(r2);
 
@@ -121,20 +118,30 @@ void CollisionComponent::resolveContact(const Contact &contact, RigidBody *body1
     float j = -(1.0f + elasticity) * velAlongNormal;
     j /= (inverseMassSum + angularComponent);
 
-    // Apply impulse
+    // Appliquer l'impulsion
     Vector impulse = contact.normal * j;
 
-    // Update linear velocities
+    // Mettre à jour vitesses linéaires
     body1->vel = body1->vel + impulse * body1->invMass;
     body2->vel = body2->vel - impulse * body2->invMass;
 
-    // Update angular velocities
+    // Mettre à jour vitesses angulaires
     body1->angularVel = body1->angularVel + body1->invInertiaTensor * r1.cross(impulse);
     body2->angularVel = body2->angularVel - body2->invInertiaTensor * r2.cross(impulse);
+
+    // Amortissement
+    if (body1->invMass > 0) {
+        body1->vel = body1->vel * damping;
+        body1->angularVel = body1->angularVel * damping;
+    }
+    if (body2->invMass > 0) {
+        body2->vel = body2->vel * damping;
+        body2->angularVel = body2->angularVel * damping;
+    }
 }
 
 void CollisionComponent::correctPositions(const Contact &contact, RigidBody *body1, RigidBody *body2) {
-    // Skip if both bodies are static
+    // Ignorer si les deux sont statiques
     if (body1->invMass == 0 && body2->invMass == 0) {
         return;
     }
@@ -145,7 +152,7 @@ void CollisionComponent::correctPositions(const Contact &contact, RigidBody *bod
     float correctionMagnitude = std::max(contact.interpenetration, 0.0f) / totalInvMass;
     Vector correction = contact.normal * correctionMagnitude;
 
-    // Move bodies apart proportional to their inverse masses
+    // Déplacer proportionnellement à la masse inverse
     body1->center = body1->center + correction * body1->invMass;
     body1->massCenter = body1->massCenter + correction * body1->invMass;
 
@@ -153,7 +160,7 @@ void CollisionComponent::correctPositions(const Contact &contact, RigidBody *bod
     body2->massCenter = body2->massCenter - correction * body2->invMass;
 }
 
-// ============== Debug Rendering ==============
+// ============== Rendu debug ==============
 
 void CollisionComponent::drawDebug() const {
     if (debugDrawEnabled) {

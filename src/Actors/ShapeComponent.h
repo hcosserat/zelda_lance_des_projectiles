@@ -8,7 +8,7 @@ enum ShapeType {
     PLANE
 };
 
-class RigidBody; // Forward declaration
+class RigidBody; // Déclaration anticipée
 
 class ShapeComponent {
 public:
@@ -20,6 +20,6 @@ public:
 
     virtual void drawShape() const = 0;
 
-    // For collision detection
+    // Pour la détection de collision (par défaut aucun sommet)
     virtual std::vector<Vector> getVerticesWorld(const RigidBody &body) const { return {}; }
 };

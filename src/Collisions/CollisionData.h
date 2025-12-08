@@ -2,12 +2,12 @@
 #include "../Maths/Vector.h"
 #include <vector>
 
-class RigidBody; // Forward declaration
+class RigidBody; // Déclaration anticipée
 
 struct Contact {
-    Vector point; // Contact point in world space
-    Vector normal; // Collision normal (from body1 to body2)
-    float interpenetration; // Penetration depth
+    Vector point; // Point de contact en espace monde
+    Vector normal; // Normal de collision (de body1 vers body2)
+    float interpenetration; // Profondeur de pénétration
 };
 
 struct CollisionData {

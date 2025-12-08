@@ -26,11 +26,11 @@ CollisionData NarrowPhase::BoxAndPlane(RigidBody *boxBody, RigidBody *planeBody)
     collisionData.body1 = boxBody;
     collisionData.body2 = planeBody;
 
-    // Get the box shape and its vertices
+    // Obtenir les sommets du cube
     auto *boxShape = dynamic_cast<BoxShape *>(boxBody->shape.get());
     auto vertices = boxShape->getVerticesWorld(*boxBody);
 
-    // Get the plane shape
+    // Obtenir le plan
     auto *planeShape = dynamic_cast<PlaneShape *>(planeBody->shape.get());
     Vector planeNormal = planeShape->getNormal();
 
@@ -38,8 +38,7 @@ CollisionData NarrowPhase::BoxAndPlane(RigidBody *boxBody, RigidBody *planeBody)
         Vector boxToPlane = Q - planeShape->getPoint(); // Q - P
         float distance = boxToPlane.dot(planeNormal); // t = (Q - P) * n
         if (distance < 0) {
-            // Collision detected
-            // The normal should point from the plane towards the box, so it's just the plane's normal.
+            // Collision détectée
             collisionData.addContact(Q - planeNormal * distance, planeNormal, -distance);
         }
     }
@@ -63,7 +62,7 @@ void NarrowPhase::TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetB
 
     auto vertices = testBoxShape->getVerticesWorld(*testBody);
 
-    // Récupération des axes locaux de targetBox (glm car Quaternion utilise glm)
+    // Récupération des axes locaux du targetBox
     glm::vec3 glmAxisX(1.0f, 0.0f, 0.0f);
     glm::vec3 glmAxisY(0.0f, 1.0f, 0.0f);
     glm::vec3 glmAxisZ(0.0f, 0.0f, 1.0f);
@@ -75,7 +74,7 @@ void NarrowPhase::TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetB
     Vector axisZ(rawZ.x, rawZ.y, rawZ.z);
     Vector axes[3] = {axisX, axisY, axisZ};
 
-    // Demi-dimensions de targetBox
+    // Demi-dimensions
     const Vector &targetDims = targetBoxShape->getDimensions();
     float halfDims[3] = {
         targetDims.x / 2.0f,
@@ -88,7 +87,7 @@ void NarrowPhase::TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetB
         bool isInside = true;
         float minPenetration = std::numeric_limits<float>::max();
         Vector bestNormal;
-        // Test de chaque axe
+        // Tester chaque axe
         for (int i = 0; i < 3; i++) {
             float dist = relPos.dot(axes[i]);
 

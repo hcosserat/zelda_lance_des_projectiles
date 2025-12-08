@@ -11,48 +11,52 @@ class CollisionComponent {
 public:
     explicit CollisionComponent(float worldSize = 200.0f);
 
-    // Rebuild spatial structure with current bodies
+    // Reconstruire la structure spatiale avec les corps actuels
     void updateSpatialStructure(const std::vector<std::unique_ptr<RigidBody> > &bodies);
 
-    // Run full collision detection pipeline
+    // Exécuter la pipeline complète de détection de collision
     void detectCollisions(const std::vector<std::unique_ptr<RigidBody> > &bodies);
 
-    // Resolve all detected collisions using impulse-based resolution
+    // Résoudre toutes les collisions détectées (impulsions)
     void resolveCollisions(float dt);
 
-    // Get detected collisions from last frame
+    // Obtenir les collisions détectées
     const std::vector<CollisionData> &getCollisions() const { return collisions; }
 
-    // Check if any collisions occurred
+    // Indique si des collisions ont eu lieu
     bool hasCollisions() const { return !collisions.empty(); }
 
     // Configuration
     void setElasticity(float e) { elasticity = e; }
     float getElasticity() const { return elasticity; }
 
-    // Debug rendering
+    void setDamping(float d) { damping = d; }
+    float getDamping() const { return damping; }
+
+    // Rendu debug
     void drawDebug() const;
     void setDebugDraw(bool enabled) { debugDrawEnabled = enabled; }
     bool isDebugDrawEnabled() const { return debugDrawEnabled; }
 
-    // Access octree for external queries
+    // Accès à l'octree pour requêtes externes
     const Octree *getOctree() const { return tree.get(); }
 
 private:
     std::unique_ptr<Octree> tree;
     std::vector<CollisionData> collisions;
     bool debugDrawEnabled;
-    float elasticity; // Coefficient of restitution (0 = inelastic, 1 = perfectly elastic)
+    float elasticity; // Coef de restitution (0 = inélastique, 1 = élastique)
+    float damping; // Amortissement après collision
 
-    // Broad phase: bounding sphere intersection
+    // Broad phase : test sphères englobantes
     bool broadPhaseCheck(RigidBody *a, RigidBody *b) const;
 
-    // Impulse-based collision resolution for a single contact
+    // Résolution par impulsion pour un contact
     void resolveContact(const Contact &contact, RigidBody *body1, RigidBody *body2, float dt);
 
-    // Positional correction to prevent sinking
+    // Correction positionnelle pour éviter le sinking
     void correctPositions(const Contact &contact, RigidBody *body1, RigidBody *body2);
 
-    // Debug drawing helpers
+    // Aides dessin debug
     void drawOctree(const Octree *node) const;
 };

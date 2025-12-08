@@ -2,7 +2,6 @@
 #include "Actors/BoxShape.h"
 #include "Actors/PlaneShape.h"
 
-// Unit tests - included only in cpp
 #include "Maths/VectorTest.h"
 #include "Maths/Matrix3Test.h"
 #include "Maths/Matrix4Test.h"
@@ -10,14 +9,17 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    // Run unit tests
+    // Lancer les tests unitaires
     test_vector();
     test_matrix3();
     test_matrix4();
     test_quaternion();
 
+    // Configurer la caméra pour observer la zone de collisions
+    cam.setPosition(0, 25, 50); // Centré sur X, élevé, reculé sur Z
+    cam.lookAt({0, 10, 0}); // Regarder à la hauteur de la collision
 
-    // Configure rendering
+    // Rendu
     ofEnableDepthTest();
     ofSetBackgroundColor(30, 30, 30);
 }
@@ -30,12 +32,10 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    // 3D scene
     cam.begin();
     world.draw();
     cam.end();
 
-    // 2D UI overlay
     drawHUD();
 }
 
@@ -47,7 +47,8 @@ void ofApp::drawHUD() const {
     ofDrawBitmapString("Delta Time: " + ofToString(dt * 1000.0f, 2) + " ms", 10, 20);
     ofDrawBitmapString("FPS: " + ofToString(1.0f / dt, 1), 10, 40);
     ofDrawBitmapStringHighlight(
-        "Press Space: Throw Box", 40, 70);
+        "Espace: Lancer deux boîtes", 40, 70);
+    ofDrawBitmapString("D: debug", 40, 90);
 
     ofEnableDepthTest();
 }
@@ -64,7 +65,7 @@ void ofApp::keyPressed(const int key) {
             break;
         case 'd':
         case 'D':
-            // Toggle debug drawing
+            // Basculer le dessin debug
             static bool debugEnabled = true;
             debugEnabled = !debugEnabled;
             world.setDebugDraw(debugEnabled);
@@ -76,33 +77,68 @@ void ofApp::keyPressed(const int key) {
 
 //--------------------------------------------------------------
 void ofApp::throwProjectile() {
-    Vector position(0, 50, 0);
-    Vector dimensions(10, 10, 10);
-    float mass = 1000000;
+    // Masse volumique (kg/m³)
+    const float volumetricMass = 2500.0f; // similaire au béton
 
-    auto shape = std::make_unique<BoxShape>(dimensions);
-    Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
-    Matrix3 invInertiaTensor = inertiaTensor.inverse();
+    // Hauteur de lancement
+    const float launchHeight = 10.0f;
 
-    auto projectile = std::make_unique<RigidBody>(
-        position, // center
-        position, // massCenter
-        Vector(0, 0, 0), // velocity
-        Vector(0, 0, 0), // acceleration
+    // Distance sur l'axe X
+    const float launchDistance = 30.0f;
+
+    // Dimensions de base avec légère variation aléatoire
+    float randomScale1 = ofRandom(0.8f, 1.2f);
+    float randomScale2 = ofRandom(0.8f, 1.2f);
+    Vector dimensions1(3.0f * randomScale1, 3.0f * randomScale1, 3.0f * randomScale1);
+    Vector dimensions2(3.0f * randomScale2, 3.0f * randomScale2, 3.0f * randomScale2);
+
+    // Calcul des masses à partir du volume
+    float volume1 = dimensions1.x * dimensions1.y * dimensions1.z;
+    float volume2 = dimensions2.x * dimensions2.y * dimensions2.z;
+    float mass1 = volume1 * volumetricMass;
+    float mass2 = volume2 * volumetricMass;
+
+    // Boîte 1 : lancée depuis la gauche (X négatif)
+    Vector position1(-launchDistance, launchHeight, 0);
+    auto shape1 = std::make_unique<BoxShape>(dimensions1);
+    Matrix3 inertiaTensor1 = BoxShape::computeInertiaTensor(dimensions1, mass1);
+    Matrix3 invInertiaTensor1 = inertiaTensor1.inverse();
+
+    auto projectile1 = std::make_unique<RigidBody>(
+        position1, // centre
+        position1, // centre de masse
+        Vector(15, 10, 0), // vitesse initiale
+        Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
-        Vector(0, 0, 0), // angular velocity
-        Vector(0, 0, 0), // angular acceleration
-        mass,
-        invInertiaTensor,
-        std::move(shape)
+        Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire
+        Vector(0, 0, 0), // accélération angulaire
+        mass1,
+        invInertiaTensor1,
+        std::move(shape1)
     );
 
-    // Apply force to throw the projectile
-    Vector force(0, 1500, 5000);
-    Vector applicationPoint = position + Vector(0.5f, 0.5f, 0); // Off-center for rotation
-    projectile->addForce(Force(force, applicationPoint));
+    // Boîte 2 : lancée depuis la droite (X positif)
+    Vector position2(launchDistance, launchHeight, 0);
+    auto shape2 = std::make_unique<BoxShape>(dimensions2);
+    Matrix3 inertiaTensor2 = BoxShape::computeInertiaTensor(dimensions2, mass2);
+    Matrix3 invInertiaTensor2 = inertiaTensor2.inverse();
 
-    world.addRigidBody(std::move(projectile));
+    auto projectile2 = std::make_unique<RigidBody>(
+        position2, // centre
+        position2, // centre de masse
+        Vector(-15.0f, 10, 0), // vitesse initiale
+        Vector(0, 0, 0), // accélération
+        Quaternion(), // orientation
+        Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire
+        Vector(0, 0, 0), // accélération angulaire
+        mass2,
+        invInertiaTensor2,
+        std::move(shape2)
+    );
+
+    // Ajouter les projectiles au monde
+    world.addRigidBody(std::move(projectile1));
+    world.addRigidBody(std::move(projectile2));
 }
 
 //--------------------------------------------------------------

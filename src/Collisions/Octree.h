@@ -1,6 +1,6 @@
 #pragma once
-#include "Maths/Vector.h"
-#include "Actors/RigidBody.h"
+#include "../Maths/Vector.h"
+#include "../Actors/RigidBody.h"
 
 class Octree {
 public:
@@ -27,13 +27,13 @@ public:
 	// Test si un rigidbody est dans le cube
 	bool contains(const RigidBody *body) const;
 
-	// Test si une sph�re intersecte le cube
+	// Test si une sphère intersecte le cube
 	bool intersects(const Vector &point, float radius) const;
 
 	// Division de ce noeud en 8
 	void subdivide();
 
-	// Trouver l�enfant correspondant � une position
+	// Trouver l'enfant correspondant à une position
 	int getChildIndex(const Vector &pos) const;
 
 	void getCollisionPartitions(std::vector<std::vector<RigidBody *> > &out) const;
@@ -41,5 +41,5 @@ public:
 private:
 	void redistributeElements();
 
-	void collectPartitions(std::vector<std::vector<RigidBody *> > &out) const;
+	void collectPartitions(std::vector<RigidBody *> &ancestors, std::vector<std::vector<RigidBody *> > &out) const;
 };

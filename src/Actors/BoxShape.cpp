@@ -8,7 +8,7 @@ std::vector<Vector> BoxShape::getVerticesWorld(const RigidBody &body) const {
     float halfY = dimensions.y / 2.0f;
     float halfZ = dimensions.z / 2.0f;
 
-    // Local vertices
+    // Sommets locaux
     vertices.emplace_back(halfX, halfY, halfZ);
     vertices.emplace_back(-halfX, halfY, halfZ);
     vertices.emplace_back(halfX, -halfY, halfZ);
@@ -18,7 +18,7 @@ std::vector<Vector> BoxShape::getVerticesWorld(const RigidBody &body) const {
     vertices.emplace_back(halfX, -halfY, -halfZ);
     vertices.emplace_back(-halfX, -halfY, -halfZ);
 
-    // Transform to world space
+    // Transformation vers l'espace monde
     for (auto &vertex: vertices) {
         glm::vec3 inputVec(vertex.x, vertex.y, vertex.z);
         glm::vec3 result = body.orientation.rotateVector(inputVec);

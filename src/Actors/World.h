@@ -9,11 +9,11 @@ public:
 	explicit World(float worldSize = 200.0f);
 	~World();
 
-	// Physics
+	// Physique
 	void update(float dt);
 	void addRigidBody(std::unique_ptr<RigidBody> body);
 
-	// Rendering
+	// Rendu
 	void draw() const;
 
 	void setDebugDraw(bool enabled);
@@ -22,7 +22,7 @@ public:
 	void setGravity(const Vector &g) { gravity = g; }
 	Vector getGravity() const { return gravity; }
 
-	// Collision access
+	// Accès aux collisions
 	const CollisionComponent &getCollisionComponent() const { return collisionComponent; }
 
 private:
@@ -30,11 +30,11 @@ private:
 	CollisionComponent collisionComponent;
 	Vector gravity;
 
-	// Physics helpers
+	// Aides physique
 	void applyGravity();
 	void integrateAll(float dt);
 
-	// Rendering helpers
+	// Aides rendu
 	void drawBodies() const;
 	void drawGrid() const;
 };

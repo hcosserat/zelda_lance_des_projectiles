@@ -27,17 +27,16 @@ public:
     void dragEvent(ofDragInfo dragInfo) override;
 
 private:
-    // Core systems
-    World world{200.0f}; // Initialize directly with size
+    // Systèmes principaux
+    World world{200.0f}; // taille du monde
     ofEasyCam cam;
 
     // Timing
     float dt{1.0f / 60.0f};
 
-    // Projectile spawning
+    // Génération de projectiles
     void throwProjectile();
 
     // UI
     void drawHUD() const;
 };
-

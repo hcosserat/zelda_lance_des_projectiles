@@ -3,19 +3,19 @@
 
 World::World(float worldSize)
 	: collisionComponent(worldSize)
-	, gravity(0, -9.81f, 0) {
-	// Create ground plane at y=0 with normal pointing up
+	  , gravity(0, -9.81f, 0) {
+	// Créer le sol (plan) en y=0
 	auto groundShape = std::make_unique<PlaneShape>(Vector(0, 0, 0), Vector(0, 1, 0));
 	auto groundPlane = std::make_unique<RigidBody>(
-		Vector(0, 0, 0),      // center
-		Vector(0, 0, 0),      // massCenter
-		Vector(0, 0, 0),      // velocity
-		Vector(0, 0, 0),      // acceleration
-		Quaternion(),         // orientation
-		Vector(0, 0, 0),      // angular velocity
-		Vector(0, 0, 0),      // angular acceleration
-		0.0f,                 // mass = 0 (static/infinite mass)
-		Matrix3() * 0,            // inertia tensor (zero for static)
+		Vector(0, 0, 0), // centre
+		Vector(0, 0, 0), // centre de masse
+		Vector(0, 0, 0), // vitesse
+		Vector(0, 0, 0), // accélération
+		Quaternion(), // orientation
+		Vector(0, 0, 0), // vitesse angulaire
+		Vector(0, 0, 0), // accélération angulaire
+		0.0f, // masse = 0 (statique)
+		Matrix3() * 0, // inertie nulle pour objet statique
 		std::move(groundShape)
 	);
 	addRigidBody(std::move(groundPlane));
@@ -23,7 +23,7 @@ World::World(float worldSize)
 
 World::~World() = default;
 
-// ============== Physics ==============
+// ============== Physique ==============
 
 void World::update(float dt) {
 	applyGravity();
@@ -34,9 +34,9 @@ void World::update(float dt) {
 }
 
 void World::applyGravity() {
-	for (auto& body : rigidBodies) {
+	for (auto &body: rigidBodies) {
 		if (body->invMass > 0) {
-			// Skip static bodies (infinite mass)
+			// Ignorer les corps statiques
 			float mass = 1.0f / body->invMass;
 			body->addForce(Force(gravity * mass, body->massCenter));
 		}
@@ -57,7 +57,7 @@ void World::addRigidBody(std::unique_ptr<RigidBody> body) {
 	rigidBodies.push_back(std::move(body));
 }
 
-// ============== Rendering ==============
+// ============== Rendu ==============
 
 void World::draw() const {
 	drawGrid();
@@ -80,26 +80,26 @@ void World::drawBodies() const {
 		ofTranslate(body->massCenter.x, body->massCenter.y, body->massCenter.z);
 		ofMultMatrix(glm::mat4_cast(body->orientation.glmQuat()));
 
-		// Draw center of mass marker
+		// Marqueur centre de masse
 		ofSetColor(255, 0, 0);
 		ofDrawSphere(0, 0, 0, 0.1f);
 
-		// Delegate shape drawing to the shape component
+		// Délégué au shape
 		body->shape->drawShape();
 
 		ofPopMatrix();
 
 		if (collisionComponent.isDebugDrawEnabled()) {
-			// Draw velocity vector
+			// Vecteur vitesse
 			ofSetColor(0, 255, 255); // Cyan
 			ofDrawLine(body->massCenter.x, body->massCenter.y, body->massCenter.z,
 			           body->massCenter.x + body->vel.x,
 			           body->massCenter.y + body->vel.y,
 			           body->massCenter.z + body->vel.z);
 
-			// Draw bounding sphere
+			// Sphère englobante
 			ofNoFill();
-			ofSetColor(255, 255, 0); // Yellow
+			ofSetColor(255, 255, 0); // Jaune
 			ofDrawSphere(body->center.x, body->center.y, body->center.z, body->boundingRadius());
 			ofFill();
 		}
