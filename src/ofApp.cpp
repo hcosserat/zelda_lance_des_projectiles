@@ -75,32 +75,10 @@ void ofApp::keyPressed(const int key) {
 }
 
 //--------------------------------------------------------------
-void ofApp::spawnBox(const Vector &position, const Vector &dimensions, float mass) {
-    auto shape = std::make_unique<BoxShape>(dimensions);
-    Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
-    Matrix3 invInertiaTensor = inertiaTensor.inverse();
-
-    auto body = std::make_unique<RigidBody>(
-        position, // center
-        position, // massCenter
-        Vector(0, 0, 0), // velocity
-        Vector(0, 0, 0), // acceleration
-        Quaternion(), // orientation
-        Vector(0, 0, 0), // angular velocity
-        Vector(0, 0, 0), // angular acceleration
-        mass,
-        invInertiaTensor,
-        std::move(shape)
-    );
-
-    world.addRigidBody(std::move(body));
-}
-
-//--------------------------------------------------------------
 void ofApp::throwProjectile() {
-    Vector position(0, 5, 0);
-    Vector dimensions(1, 1, 1);
-    float mass = 20.0f;
+    Vector position(0, 50, 0);
+    Vector dimensions(10, 10, 10);
+    float mass = 1000000;
 
     auto shape = std::make_unique<BoxShape>(dimensions);
     Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
@@ -170,4 +148,3 @@ void ofApp::gotMessage(ofMessage msg) {
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo) {
 }
-

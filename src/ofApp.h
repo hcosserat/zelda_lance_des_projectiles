@@ -35,8 +35,6 @@ private:
     float dt{1.0f / 60.0f};
 
     // Projectile spawning
-    void spawnBox(const Vector &position, const Vector &dimensions, float mass);
-
     void throwProjectile();
 
     // UI

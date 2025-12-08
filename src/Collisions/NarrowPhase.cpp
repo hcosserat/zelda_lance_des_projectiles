@@ -2,6 +2,10 @@
 #include <limits>
 
 CollisionData NarrowPhase::CheckCollision(RigidBody *body1, RigidBody *body2) {
+    CollisionData result;
+    result.body1 = body1;
+    result.body2 = body2;
+
     if (body1->shape->type() == BOX && body2->shape->type() == PLANE) {
         return BoxAndPlane(body1, body2);
     }
@@ -14,11 +18,13 @@ CollisionData NarrowPhase::CheckCollision(RigidBody *body1, RigidBody *body2) {
         return BoxAndBox(body1, body2);
     }
 
-    return {};
+    return result;
 }
 
 CollisionData NarrowPhase::BoxAndPlane(RigidBody *boxBody, RigidBody *planeBody) {
     CollisionData collisionData;
+    collisionData.body1 = boxBody;
+    collisionData.body2 = planeBody;
 
     // Get the box shape and its vertices
     auto *boxShape = dynamic_cast<BoxShape *>(boxBody->shape.get());
@@ -26,13 +32,15 @@ CollisionData NarrowPhase::BoxAndPlane(RigidBody *boxBody, RigidBody *planeBody)
 
     // Get the plane shape
     auto *planeShape = dynamic_cast<PlaneShape *>(planeBody->shape.get());
+    Vector planeNormal = planeShape->getNormal();
 
     for (const auto &Q: vertices) {
         Vector boxToPlane = Q - planeShape->getPoint(); // Q - P
-        float distance = boxToPlane.dot(planeShape->getNormal()); // t = (Q - P) * n
+        float distance = boxToPlane.dot(planeNormal); // t = (Q - P) * n
         if (distance < 0) {
-            // Collision détectée
-            collisionData.addContact(Q - planeShape->getNormal() * distance, planeShape->getNormal(), -distance);
+            // Collision detected
+            // The normal should point from the plane towards the box, so it's just the plane's normal.
+            collisionData.addContact(Q - planeNormal * distance, planeNormal, -distance);
         }
     }
     return collisionData;
@@ -40,12 +48,16 @@ CollisionData NarrowPhase::BoxAndPlane(RigidBody *boxBody, RigidBody *planeBody)
 
 CollisionData NarrowPhase::BoxAndBox(RigidBody *boxBody1, RigidBody *boxBody2) {
     CollisionData collisionData;
-    TestVerticesAgainstBox(boxBody1, boxBody2, collisionData);
-    TestVerticesAgainstBox(boxBody2, boxBody1, collisionData);
+    collisionData.body1 = boxBody1;
+    collisionData.body2 = boxBody2;
+
+    TestVerticesAgainstBox(boxBody1, boxBody2, collisionData, false);
+    TestVerticesAgainstBox(boxBody2, boxBody1, collisionData, true);
     return collisionData;
 }
 
-void NarrowPhase::TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetBoxBody, CollisionData &collisionData) {
+void NarrowPhase::TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetBoxBody, CollisionData &collisionData,
+                                         bool flipNormal) {
     auto *testBoxShape = dynamic_cast<BoxShape *>(testBody->shape.get());
     auto *targetBoxShape = dynamic_cast<BoxShape *>(targetBoxBody->shape.get());
 
@@ -99,7 +111,8 @@ void NarrowPhase::TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetB
         }
 
         if (isInside) {
-            collisionData.addContact(Q, bestNormal, minPenetration);
+            Vector finalNormal = flipNormal ? bestNormal * -1.0f : bestNormal;
+            collisionData.addContact(Q, finalNormal, minPenetration);
         }
     }
 }

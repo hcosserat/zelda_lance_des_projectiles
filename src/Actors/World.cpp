@@ -1,8 +1,24 @@
 ﻿#include "World.h"
+#include "PlaneShape.h"
 
 World::World(float worldSize)
 	: collisionComponent(worldSize)
-	  , gravity(0, -9.81f, 0) {
+	, gravity(0, -9.81f, 0) {
+	// Create ground plane at y=0 with normal pointing up
+	auto groundShape = std::make_unique<PlaneShape>(Vector(0, 0, 0), Vector(0, 1, 0));
+	auto groundPlane = std::make_unique<RigidBody>(
+		Vector(0, 0, 0),      // center
+		Vector(0, 0, 0),      // massCenter
+		Vector(0, 0, 0),      // velocity
+		Vector(0, 0, 0),      // acceleration
+		Quaternion(),         // orientation
+		Vector(0, 0, 0),      // angular velocity
+		Vector(0, 0, 0),      // angular acceleration
+		0.0f,                 // mass = 0 (static/infinite mass)
+		Matrix3() * 0,            // inertia tensor (zero for static)
+		std::move(groundShape)
+	);
+	addRigidBody(std::move(groundPlane));
 }
 
 World::~World() = default;
@@ -14,8 +30,7 @@ void World::update(float dt) {
 	integrateAll(dt);
 	collisionComponent.updateSpatialStructure(rigidBodies);
 	collisionComponent.detectCollisions(rigidBodies);
-
-	// TODO: Collision resolution will be added here
+	collisionComponent.resolveCollisions(dt);
 }
 
 void World::applyGravity() {
@@ -73,5 +88,20 @@ void World::drawBodies() const {
 		body->shape->drawShape();
 
 		ofPopMatrix();
+
+		if (collisionComponent.isDebugDrawEnabled()) {
+			// Draw velocity vector
+			ofSetColor(0, 255, 255); // Cyan
+			ofDrawLine(body->massCenter.x, body->massCenter.y, body->massCenter.z,
+			           body->massCenter.x + body->vel.x,
+			           body->massCenter.y + body->vel.y,
+			           body->massCenter.z + body->vel.z);
+
+			// Draw bounding sphere
+			ofNoFill();
+			ofSetColor(255, 255, 0); // Yellow
+			ofDrawSphere(body->center.x, body->center.y, body->center.z, body->boundingRadius());
+			ofFill();
+		}
 	}
 }

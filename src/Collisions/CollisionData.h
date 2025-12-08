@@ -2,17 +2,22 @@
 #include "../Maths/Vector.h"
 #include <vector>
 
+class RigidBody; // Forward declaration
+
 struct Contact {
-	Vector point; // Point d'impact (R)
-	Vector normal; // Normal de collision
-	float interpenetration; // Profondeur (||t||)
+    Vector point; // Contact point in world space
+    Vector normal; // Collision normal (from body1 to body2)
+    float interpenetration; // Penetration depth
 };
 
 struct CollisionData {
-	std::vector<Contact> contacts;
-	bool hasCollision() const { return !contacts.empty(); }
+    RigidBody *body1 = nullptr;
+    RigidBody *body2 = nullptr;
+    std::vector<Contact> contacts;
 
-	void addContact(const Vector &pt, const Vector &norm, float interpen) {
-		contacts.push_back({pt, norm, interpen});
-	}
+    bool hasCollision() const { return !contacts.empty(); }
+
+    void addContact(const Vector &pt, const Vector &norm, float interpen) {
+        contacts.push_back({pt, norm, interpen});
+    }
 };
