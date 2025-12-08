@@ -1,5 +1,7 @@
 #include "Octree.h"
 
+#include <ShapeComponent.h>
+
 // ------------------------------------------------------------
 // Constructeur
 // ------------------------------------------------------------
@@ -18,7 +20,7 @@ Octree::Octree(const Vector &center, float halfSize,
 // Test si le rigidbody est dans notre cube
 // ------------------------------------------------------------
 bool Octree::contains(const RigidBody *body) const {
-    float r = body->boundingRadius;
+    float r = body->shape->boundingRadius();
 
     return body->center.x + r >= center.x - halfSize && body->center.x - r <= center.x + halfSize && body->center.y + r
            >= center.y - halfSize && body->center.y - r <= center.y + halfSize && body->center.z + r >= center.z -
@@ -101,7 +103,7 @@ void Octree::query(const Vector &point, float radius,
 
     // Tester les éléments locaux
     for (auto *e: elements) {
-        float r = radius + e->boundingRadius;
+        float r = radius + e->shape->boundingRadius();
         if (point.distanceSquared(e->center) <= r * r)
             result.push_back(e);
     }

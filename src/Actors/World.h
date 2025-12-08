@@ -5,7 +5,7 @@
 
 class World {
 public:
-	std::vector<RigidBody *> rigidBodies;
+	std::vector<std::unique_ptr<RigidBody>> rigidBodies;
 
 	explicit World();
 
@@ -13,7 +13,7 @@ public:
 
 	void draw() const;
 
-	void addRigidBody(RigidBody *body);
+	void addRigidBody(std::unique_ptr<RigidBody> body);
 
 private:
 	Octree *tree; // Le spatial index

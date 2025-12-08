@@ -8,7 +8,7 @@ World::World() {
 
 
 void World::update(float dt) {
-	for (RigidBody *body: rigidBodies) {
+	for (auto& body : rigidBodies) {
 		float mass = 1 / body->invMass;
 		body->addForce(Force(Vector(0, -9.81f * mass, 0), body->massCenter));
 		body->updateAccelerationsWithAccumulator();
@@ -26,7 +26,7 @@ void World::draw() const {
 	ofDrawGrid(10.0f, 10, false, false, true, false);
 
 	// Dessin des objets physiques
-	for (const RigidBody *body: rigidBodies) {
+	for (const auto& body : rigidBodies) {
 		ofPushMatrix();
 		ofTranslate(body->massCenter.x, body->massCenter.y, body->massCenter.z);
 		ofMultMatrix(glm::mat4_cast(body->orientation.glmQuat()));
@@ -34,29 +34,23 @@ void World::draw() const {
 		ofSetColor(255, 0, 0);
 		ofDrawSphere(0, 0, 0, 0.1f);
 
-		switch (body->shape) {
-			case BOX:
-				ofSetColor(200, 50, 50);
-				ofDrawBox(0, 0, 0,
-				          body->boxDimensions.x, body->boxDimensions.y, body->boxDimensions.z);
-				break;
-			case PLANE:
-				break;
-		}
+		// Delegate drawing to the shape component
+		body->shape->drawShape();
+
 		ofPopMatrix();
 	}
 	drawOctree(tree);
 }
 
 
-void World::addRigidBody(RigidBody *body) {
-	rigidBodies.push_back(body);
+void World::addRigidBody(std::unique_ptr<RigidBody> body) {
+	rigidBodies.push_back(std::move(body));
 }
 
 void World::rebuildOctree() {
 	tree->clear();
-	for (RigidBody *rb: rigidBodies)
-		tree->insert(rb);
+	for (const auto& body : rigidBodies)
+		tree->insert(body.get());
 }
 
 void World::drawOctree(const Octree *node) const {

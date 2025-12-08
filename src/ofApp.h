@@ -7,8 +7,6 @@
 #include "Maths/Matrix4Test.h"
 #include "Maths/QuaternionTest.h"
 #include "Actors/RigidBody.h"
-#include "Actors/Sphere.h"
-#include "Actors/RigidBody.h"
 
 enum ProjectileType {
     P_BOX,

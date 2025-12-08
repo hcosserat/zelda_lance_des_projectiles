@@ -1,19 +1,21 @@
 #include "RigidBody.h"
+#include "ShapeComponent.h"
 
 RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
                      const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc,
                      const float mass,
-                     const Matrix3 &invInertiaTensor, ShapeType shape) : center(center)
-                                                        , massCenter(massCenter)
-                                                        , vel(vel)
-                                                        , acc(acc)
-                                                        , orientation(orientation)
-                                                        , angularVel(angularVel)
-                                                        , angularAcc(angularAcc)
-                                                        , invMass(mass != 0.f ? 1.f / mass : 0.f)
-                                                        , invInertiaTensorBody(invInertiaTensor)
-                                                        , invInertiaTensor(invInertiaTensor)
-                                                        , shape(shape) {
+                     const Matrix3 &invInertiaTensor, std::unique_ptr<ShapeComponent> shapeComponent) : center(center)
+                                                                         , massCenter(massCenter)
+                                                                         , vel(vel)
+                                                                         , acc(acc)
+                                                                         , orientation(orientation)
+                                                                         , angularVel(angularVel)
+                                                                         , angularAcc(angularAcc)
+                                                                         , invMass(mass != 0.f ? 1.f / mass : 0.f)
+                                                                         , invInertiaTensorBody(invInertiaTensor)
+                                                                         , invInertiaTensor(invInertiaTensor)
+                                                                         , accumForces()
+                                                                         , shape(std::move(shapeComponent)) {
 }
 
 void RigidBody::integratePos(const float dt) {

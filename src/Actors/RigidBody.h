@@ -1,16 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "../Maths/Vector.h"
 #include "../Maths/Matrix3.h"
 #include "../Forces/Force.h"
 #include "../Maths/Quaternion.h"
-
-enum ShapeType {
-    BOX,
-    PLANE
-};
+#include "ShapeComponent.h"
 
 class RigidBody {
 public:
@@ -31,13 +28,11 @@ public:
 
     std::vector<Force> accumForces;
 
-    float boundingRadius = 2.0;
-
-    ShapeType shape;
+    std::unique_ptr<ShapeComponent> shape; // Owns the shape component
 
     RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
               const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
-              const Matrix3 &invInertiaTensor, ShapeType shape);
+              const Matrix3 &invInertiaTensor, std::unique_ptr<ShapeComponent> shapeComponent);
 
     void integratePos(float dt);
 

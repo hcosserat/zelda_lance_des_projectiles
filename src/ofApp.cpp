@@ -1,4 +1,6 @@
 #include "ofApp.h"
+#include "Actors/BoxShape.h"
+#include "Actors/PlaneShape.h"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -141,7 +143,7 @@ void ofApp::throwProjectile() {
     Vector initialPosition(0, 5, 0);
     Vector force(0, 1500, 5000); // Force propelling the projectile up and forward
     Vector localApplicationPoint(0.5, 0.5, 0); // Apply force not in the center of mass to induce rotation
-    RigidBody *projectile = nullptr;
+    std::unique_ptr<RigidBody> projectile = nullptr;
     Matrix3 inertiaTensor;
     Matrix3 invInertiaTensor;
 
@@ -157,11 +159,11 @@ void ofApp::throwProjectile() {
             inertiaTensor(1, 1) = k * (w * w + d * d);
             inertiaTensor(2, 2) = k * (w * w + h * h);
             invInertiaTensor = inertiaTensor.inverse();
-            projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
+
+            auto boxShape = std::make_unique<BoxShape>(boxDimensions);
+            projectile = std::make_unique<RigidBody>(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
                                        Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-                                       mass, invInertiaTensor);
-            projectile->shape = BOX;
-            projectile->boxDimensions = boxDimensions;
+                                       mass, invInertiaTensor, std::move(boxShape));
             break;
         }
         case P_CYLINDER: {
@@ -175,12 +177,13 @@ void ofApp::throwProjectile() {
             inertiaTensor(1, 1) = Iyy;
             inertiaTensor(2, 2) = Izz;
             invInertiaTensor = inertiaTensor.inverse();
-            projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
+
+            // For now, approximate cylinder as a box
+            Vector cylinderDims(radius * 2, height, radius * 2);
+            auto cylinderShape = std::make_unique<BoxShape>(cylinderDims);
+            projectile = std::make_unique<RigidBody>(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
                                        Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-                                       mass, invInertiaTensor);
-            projectile->shape = CYLINDER;
-            projectile->radius = radius;
-            projectile->height = height;
+                                       mass, invInertiaTensor, std::move(cylinderShape));
             break;
         }
         case P_AXE: {
@@ -197,12 +200,11 @@ void ofApp::throwProjectile() {
             inertiaTensor(1, 1) = k * (w * w + d * d);
             inertiaTensor(2, 2) = k * (w * w + h * h);
             invInertiaTensor = inertiaTensor.inverse();
-            projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
+
+            auto axeShape = std::make_unique<BoxShape>(overallDims);
+            projectile = std::make_unique<RigidBody>(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
                                        Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-                                       mass, invInertiaTensor);
-            projectile->shape = AXE;
-            projectile->axeHandleDimensions = handleDimensions;
-            projectile->axeHeadDimensions = headDimensions;
+                                       mass, invInertiaTensor, std::move(axeShape));
             break;
         }
         default:
@@ -212,5 +214,5 @@ void ofApp::throwProjectile() {
     // Apply the force at the specified local application point
     projectile->addForce(Force(force, globalApplicationPoint));
     // Add the projectile to the world
-    world.addRigidBody(projectile);
+    world.addRigidBody(std::move(projectile));
 }
