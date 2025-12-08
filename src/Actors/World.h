@@ -1,5 +1,5 @@
 #pragma once
-#include "Collisions/Octree.h" // ton chemin réel ici
+#include "Collisions/Octree.h" // ton chemin rï¿½el ici
 #include "Actors/RigidBody.h"
 #include <vector>
 
@@ -10,14 +10,16 @@ public:
 	explicit World();
 
 	void update(float dt);
+
 	void draw() const;
 
-	void addRigidBody(RigidBody * body);
+	void addRigidBody(RigidBody *body);
 
 private:
-	Octree * tree; // Le spatial index
-	float treeHalfSize = 200.0f; // Taille du monde (à ajuster)
+	Octree *tree; // Le spatial index
+	float treeHalfSize = 200.0f; // Taille du monde (ï¿½ ajuster)
 
 	void rebuildOctree();
-	void drawOctree(const Octree * node) const;
+
+	void drawOctree(const Octree *node) const;
 };

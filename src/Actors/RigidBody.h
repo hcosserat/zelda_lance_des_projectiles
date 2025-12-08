@@ -9,8 +9,6 @@
 
 enum ShapeType {
     BOX,
-    CYLINDER,
-    AXE,
     PLANE
 };
 
@@ -33,18 +31,13 @@ public:
 
     std::vector<Force> accumForces;
 
-	float boundingRadius = 2.0;
+    float boundingRadius = 2.0;
 
     ShapeType shape;
-    Vector boxDimensions; // used if shape == BOX
-    float radius{}; // used if shape == CYLINDER
-    float height{}; // used if shape == CYLINDER
-    Vector axeHandleDimensions; // used if shape == AXE
-    Vector axeHeadDimensions; // used if shape == AXE
 
     RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
               const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
-              const Matrix3 &invInertiaTensor);
+              const Matrix3 &invInertiaTensor, ShapeType shape);
 
     void integratePos(float dt);
 
@@ -57,7 +50,4 @@ public:
     void updateAccelerationsWithAccumulator();
 
     void updateInvInertiaTensor();
-
-private:
-    //static Matrix3 buildRotationMatrixFromEulerXYZ(float pitch, float yaw, float roll);
 };

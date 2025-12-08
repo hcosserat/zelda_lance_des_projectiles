@@ -4,9 +4,9 @@
 void ofApp::setup() {
     // Unit tests
     test_vector();
-	test_matrix3();
-	test_matrix4();
-	test_quaternion();
+    test_matrix3();
+    test_matrix4();
+    test_quaternion();
 
     // Initialization of app attributes
     dt = 1.0f / 60;
@@ -45,23 +45,24 @@ void ofApp::draw() {
     // Display current projectile type
     string typeName;
     switch (currentProjectileType) {
-    case P_BOX:
-        typeName = "Box";
-        break;
-    case P_CYLINDER:
-        typeName = "Cylinder";
-        break;
-    case P_AXE:
-        typeName = "Axe";
-        break;
-    default:
-        typeName = "Unknown";
-        break;
+        case P_BOX:
+            typeName = "Box";
+            break;
+        case P_CYLINDER:
+            typeName = "Cylinder";
+            break;
+        case P_AXE:
+            typeName = "Axe";
+            break;
+        default:
+            typeName = "Unknown";
+            break;
     }
     ofSetColor(255);
     ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20);
     ofDrawBitmapString("Current Projectile: " + typeName, 400, 40);
-    ofDrawBitmapStringHighlight("Press 1: Choose Box \nPress 2: Choose Cylinder \nPress 3: Choose Axe \nPress Space: Throw Projectile", 40, 60);
+    ofDrawBitmapStringHighlight(
+        "Press 1: Choose Box \nPress 2: Choose Cylinder \nPress 3: Choose Axe \nPress Space: Throw Projectile", 40, 60);
     ofEnableDepthTest();
 }
 
@@ -84,7 +85,7 @@ void ofApp::keyPressed(const int key) {
             break;
         case ' ':
             throwProjectile();
-			break;
+            break;
         default:
             break;
     }
@@ -104,7 +105,6 @@ void ofApp::mouseDragged(int x, int y, int button) {
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button) {
-
 }
 
 //--------------------------------------------------------------
@@ -141,72 +141,72 @@ void ofApp::throwProjectile() {
     Vector initialPosition(0, 5, 0);
     Vector force(0, 1500, 5000); // Force propelling the projectile up and forward
     Vector localApplicationPoint(0.5, 0.5, 0); // Apply force not in the center of mass to induce rotation
-    RigidBody* projectile = nullptr;
+    RigidBody *projectile = nullptr;
     Matrix3 inertiaTensor;
     Matrix3 invInertiaTensor;
 
     switch (currentProjectileType) {
-    case P_BOX: {
-        Vector boxDimensions(1, 1, 1);
-        float w = boxDimensions.x;
-        float h = boxDimensions.y;
-        float d = boxDimensions.z;
-        float k = (1.0f / 12.0f) * mass;
-        inertiaTensor = Matrix3::Identity();
-        inertiaTensor(0, 0) = k * (h * h + d * d);
-        inertiaTensor(1, 1) = k * (w * w + d * d);
-        inertiaTensor(2, 2) = k * (w * w + h * h);
-        invInertiaTensor = inertiaTensor.inverse();
-        projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-            Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-            mass, invInertiaTensor);
-        projectile->shape = BOX;
-        projectile->boxDimensions = boxDimensions;
-        break;
-    }
-    case P_CYLINDER: {
-        float radius = 0.5f;
-        float height = 2.0f;
-        float Ixx = (1.0f / 12.0f) * mass * (3 * radius * radius + height * height);
-        float Iyy = (0.5f) * mass * radius * radius;
-        float Izz = Ixx;
-        inertiaTensor = Matrix3::Identity();
-        inertiaTensor(0, 0) = Ixx;
-        inertiaTensor(1, 1) = Iyy;
-        inertiaTensor(2, 2) = Izz;
-        invInertiaTensor = inertiaTensor.inverse();
-        projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-            Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-            mass, invInertiaTensor);
-        projectile->shape = CYLINDER;
-        projectile->radius = radius;
-        projectile->height = height;
-        break;
-    }
-    case P_AXE: {
-        Vector handleDimensions(0.2f, 2.0f, 0.2f);
-        Vector headDimensions(0.8f, 0.5f, 0.1f);
-        // Approximate to a big box for simplicity
-        Vector overallDims(0.8f, 2.5f, 0.2f);
-        float w = overallDims.x;
-        float h = overallDims.y;
-        float d = overallDims.z;
-        float k = (1.0f / 12.0f) * mass;
-        inertiaTensor = Matrix3::Identity();
-        inertiaTensor(0, 0) = k * (h * h + d * d);
-        inertiaTensor(1, 1) = k * (w * w + d * d);
-        inertiaTensor(2, 2) = k * (w * w + h * h);
-        invInertiaTensor = inertiaTensor.inverse();
-        projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-            Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-            mass, invInertiaTensor);
-        projectile->shape = AXE;
-        projectile->axeHandleDimensions = handleDimensions;
-        projectile->axeHeadDimensions = headDimensions;
-        break;
-    }
-    default:
-        return; // Unknown type
+        case P_BOX: {
+            Vector boxDimensions(1, 1, 1);
+            float w = boxDimensions.x;
+            float h = boxDimensions.y;
+            float d = boxDimensions.z;
+            float k = (1.0f / 12.0f) * mass;
+            inertiaTensor = Matrix3::Identity();
+            inertiaTensor(0, 0) = k * (h * h + d * d);
+            inertiaTensor(1, 1) = k * (w * w + d * d);
+            inertiaTensor(2, 2) = k * (w * w + h * h);
+            invInertiaTensor = inertiaTensor.inverse();
+            projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
+                                       Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
+                                       mass, invInertiaTensor);
+            projectile->shape = BOX;
+            projectile->boxDimensions = boxDimensions;
+            break;
+        }
+        case P_CYLINDER: {
+            float radius = 0.5f;
+            float height = 2.0f;
+            float Ixx = (1.0f / 12.0f) * mass * (3 * radius * radius + height * height);
+            float Iyy = (0.5f) * mass * radius * radius;
+            float Izz = Ixx;
+            inertiaTensor = Matrix3::Identity();
+            inertiaTensor(0, 0) = Ixx;
+            inertiaTensor(1, 1) = Iyy;
+            inertiaTensor(2, 2) = Izz;
+            invInertiaTensor = inertiaTensor.inverse();
+            projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
+                                       Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
+                                       mass, invInertiaTensor);
+            projectile->shape = CYLINDER;
+            projectile->radius = radius;
+            projectile->height = height;
+            break;
+        }
+        case P_AXE: {
+            Vector handleDimensions(0.2f, 2.0f, 0.2f);
+            Vector headDimensions(0.8f, 0.5f, 0.1f);
+            // Approximate to a big box for simplicity
+            Vector overallDims(0.8f, 2.5f, 0.2f);
+            float w = overallDims.x;
+            float h = overallDims.y;
+            float d = overallDims.z;
+            float k = (1.0f / 12.0f) * mass;
+            inertiaTensor = Matrix3::Identity();
+            inertiaTensor(0, 0) = k * (h * h + d * d);
+            inertiaTensor(1, 1) = k * (w * w + d * d);
+            inertiaTensor(2, 2) = k * (w * w + h * h);
+            invInertiaTensor = inertiaTensor.inverse();
+            projectile = new RigidBody(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
+                                       Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
+                                       mass, invInertiaTensor);
+            projectile->shape = AXE;
+            projectile->axeHandleDimensions = handleDimensions;
+            projectile->axeHeadDimensions = headDimensions;
+            break;
+        }
+        default:
+            return; // Unknown type
     }
     Vector globalApplicationPoint = initialPosition + localApplicationPoint;
     // Apply the force at the specified local application point

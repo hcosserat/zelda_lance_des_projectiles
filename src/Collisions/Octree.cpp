@@ -26,7 +26,7 @@ bool Octree::contains(const RigidBody *body) const {
 }
 
 // ------------------------------------------------------------
-// Intersection cube / sph�re
+// Intersection cube / sphère
 // ------------------------------------------------------------
 bool Octree::intersects(const Vector &point, float radius) const {
     float x = std::max(center.x - halfSize,
@@ -47,7 +47,7 @@ void Octree::subdivide() {
     int nextDepth = depth + 1;
 
     for (int i = 0; i < 8; ++i) {
-        Vector childCenter (
+        Vector childCenter(
             center.x + h * ((i & 1) ? 1 : -1),
             center.y + h * ((i & 2) ? 1 : -1),
             center.z + h * ((i & 4) ? 1 : -1)
@@ -86,7 +86,7 @@ void Octree::insert(RigidBody *body) {
     if (children[0] == nullptr)
         subdivide();
 
-    // Ins�rer dans l�enfant correspondant
+    // Insérer dans l'enfant correspondant
     int idx = getChildIndex(body->center);
     children[idx]->insert(body);
 }
@@ -99,7 +99,7 @@ void Octree::query(const Vector &point, float radius,
     if (!intersects(point, radius))
         return;
 
-    // Tester les �l�ments locaux
+    // Tester les éléments locaux
     for (auto *e: elements) {
         float r = radius + e->boundingRadius;
         if (point.distanceSquared(e->center) <= r * r)

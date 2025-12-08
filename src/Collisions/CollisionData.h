@@ -11,7 +11,8 @@ struct Contact {
 struct CollisionData {
 	std::vector<Contact> contacts;
 	bool hasCollision() const { return !contacts.empty(); }
-	void addContact(const Vector& pt, const Vector& norm, float interpen) {
-		contacts.push_back({ pt, norm, interpen });
+
+	void addContact(const Vector &pt, const Vector &norm, float interpen) {
+		contacts.push_back({pt, norm, interpen});
 	}
 };

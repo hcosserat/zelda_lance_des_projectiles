@@ -20,7 +20,7 @@ class ofApp final : public ofBaseApp {
 public:
     float dt;
     World world;
-	ofEasyCam cam;
+    ofEasyCam cam;
     ProjectileType currentProjectileType;
 
     void setup() override;
@@ -55,5 +55,5 @@ public:
 
     void gotMessage(ofMessage msg) override;
 
-	void throwProjectile();
+    void throwProjectile();
 };

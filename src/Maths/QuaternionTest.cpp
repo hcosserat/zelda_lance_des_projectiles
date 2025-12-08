@@ -90,7 +90,7 @@ static void test_rotation_matrix() {
 
     Matrix4 R = q.toRotationMatrix4();
 
-    // Same expected rotation as Euler Z 90°
+    // Same expected rotation as Euler Z 90ï¿½
     assert(approx(R(0, 0), 0));
     assert(approx(R(1, 0), 1));
     assert(approx(R(0, 1), -1));
@@ -131,7 +131,7 @@ static void test_exp() {
     Quaternion half = q.exp(0.5f);
     glm::vec3 v = half.rotateVector(glm::vec3(1, 0, 0));
 
-    // 45° rotation
+    // 45ï¿½ rotation
     assert(approx(v.x, std::sqrt(0.5f)));
     assert(approx(v.y, std::sqrt(0.5f)));
 }
@@ -163,6 +163,6 @@ int test_quaternion() {
     test_exp();
     test_diff();
 
-	std::cout << "Tests Quaternions OK !" << std::endl;
+    std::cout << "Tests Quaternions OK !" << std::endl;
     return 0;
 }

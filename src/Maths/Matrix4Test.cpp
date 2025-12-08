@@ -11,9 +11,15 @@ static bool approx(float a, float b, float eps = 1e-5f) {
 static void test_constructor_identity() {
     Matrix4 I = Matrix4::Identity();
 
-    assert(approx(I(0, 0), 1)); assert(approx(I(1, 0), 0)); assert(approx(I(2, 0), 0));
-    assert(approx(I(0, 1), 0)); assert(approx(I(1, 1), 1)); assert(approx(I(2, 1), 0));
-    assert(approx(I(0, 2), 0)); assert(approx(I(1, 2), 0)); assert(approx(I(2, 2), 1));
+    assert(approx(I(0, 0), 1));
+    assert(approx(I(1, 0), 0));
+    assert(approx(I(2, 0), 0));
+    assert(approx(I(0, 1), 0));
+    assert(approx(I(1, 1), 1));
+    assert(approx(I(2, 1), 0));
+    assert(approx(I(0, 2), 0));
+    assert(approx(I(1, 2), 0));
+    assert(approx(I(2, 2), 1));
 
     assert(approx(I(0, 3), 0));
     assert(approx(I(1, 3), 0));
@@ -23,8 +29,12 @@ static void test_constructor_identity() {
 static void test_access_read_write() {
     Matrix4 M;
 
-    M(0, 0) = 2;  M(1, 1) = 3;  M(2, 2) = 4;
-    M(0, 3) = 10; M(1, 3) = 20; M(2, 3) = 30;
+    M(0, 0) = 2;
+    M(1, 1) = 3;
+    M(2, 2) = 4;
+    M(0, 3) = 10;
+    M(1, 3) = 20;
+    M(2, 3) = 30;
 
     assert(approx(M(0, 0), 2));
     assert(approx(M(1, 1), 3));
@@ -39,8 +49,12 @@ static void test_mul_scalar() {
     Matrix4 I = Matrix4::Identity();
     Matrix4 M = I * 2.f;
 
-    assert(approx(M(0, 0), 2)); assert(approx(M(1, 1), 2)); assert(approx(M(2, 2), 2));
-    assert(approx(M(0, 3), 0)); assert(approx(M(1, 3), 0)); assert(approx(M(2, 3), 0));
+    assert(approx(M(0, 0), 2));
+    assert(approx(M(1, 1), 2));
+    assert(approx(M(2, 2), 2));
+    assert(approx(M(0, 3), 0));
+    assert(approx(M(1, 3), 0));
+    assert(approx(M(2, 3), 0));
 }
 
 static void test_mul_matrix() {
@@ -183,6 +197,6 @@ int test_matrix4() {
     test_inverse_rigid();
     test_rotation_and_translation_getters();
 
-	std::cout << "Tests Matrix4 OK !" << std::endl;
+    std::cout << "Tests Matrix4 OK !" << std::endl;
     return 0;
 }

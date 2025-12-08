@@ -88,16 +88,16 @@ float Matrix3::determinant() const {
 }
 
 Matrix3 Matrix3::inverse(float eps) const {
-	Vector c0 = cross(b, c);
-	Vector c1 = cross(c, a);
-	Vector c2 = cross(a, b);
-	float det = dot(a, c0);
-	if (std::fabs(det) < eps) throw std::runtime_error("Matrix3 non inversible");
-	float invDet = 1.0f / det;
-	return Matrix3(
-		Vector(c0.x * invDet, c1.x * invDet, c2.x * invDet),
-		Vector(c0.y * invDet, c1.y * invDet, c2.y * invDet),
-		Vector(c0.z * invDet, c1.z * invDet, c2.z * invDet));
+    Vector c0 = cross(b, c);
+    Vector c1 = cross(c, a);
+    Vector c2 = cross(a, b);
+    float det = dot(a, c0);
+    if (std::fabs(det) < eps) throw std::runtime_error("Matrix3 non inversible");
+    float invDet = 1.0f / det;
+    return Matrix3(
+        Vector(c0.x * invDet, c1.x * invDet, c2.x * invDet),
+        Vector(c0.y * invDet, c1.y * invDet, c2.y * invDet),
+        Vector(c0.z * invDet, c1.z * invDet, c2.z * invDet));
 }
 
 // Constructions

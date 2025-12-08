@@ -1,8 +1,9 @@
 #include "RigidBody.h"
 
 RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
-                     const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc, const float mass,
-                     const Matrix3 &invInertiaTensor) : center(center)
+                     const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc,
+                     const float mass,
+                     const Matrix3 &invInertiaTensor, ShapeType shape) : center(center)
                                                         , massCenter(massCenter)
                                                         , vel(vel)
                                                         , acc(acc)
@@ -12,7 +13,7 @@ RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vecto
                                                         , invMass(mass != 0.f ? 1.f / mass : 0.f)
                                                         , invInertiaTensorBody(invInertiaTensor)
                                                         , invInertiaTensor(invInertiaTensor)
-                                                        , shape(BOX) {
+                                                        , shape(shape) {
 }
 
 void RigidBody::integratePos(const float dt) {
@@ -39,10 +40,10 @@ void RigidBody::integrateOrientation(const float dt) {
     angularVel += angularAcc * dt;
 
     // Mise à jour de l'orientation
-	const Quaternion omega(0, angularVel.x, angularVel.y, angularVel.z);
+    const Quaternion omega(0, angularVel.x, angularVel.y, angularVel.z);
     Quaternion deltaOrientation = omega * orientation * 0.5f * dt;
     orientation = orientation + deltaOrientation;
-	orientation.normalize();
+    orientation.normalize();
 }
 
 void RigidBody::addForce(const Force &force) {
@@ -71,28 +72,8 @@ void RigidBody::updateAccelerationsWithAccumulator() {
     }
 }
 
-/*
-Matrix3 RigidBody::buildRotationMatrixFromEulerXYZ(const float pitch, const float yaw, const float roll) {
-    const float cp = std::cos(pitch), sp = std::sin(pitch);
-    const float cy = std::cos(yaw), sy = std::sin(yaw);
-    const float cr = std::cos(roll), sr = std::sin(roll);
-
-    // Rotation matrices as columns: Matrix3(col0, col1, col2)
-    // Rx: rotate around X-axis (pitch)
-    const Matrix3 Rx(Vector{1, 0, 0}, Vector{0, cp, -sp}, Vector{0, sp, cp});
-
-    // Ry: rotate around Y-axis (yaw)
-    const Matrix3 Ry(Vector{cy, 0, sy}, Vector{0, 1, 0}, Vector{-sy, 0, cy});
-
-    // Rz: rotate around Z-axis (roll)
-    const Matrix3 Rz(Vector{cr, sr, 0}, Vector{-sr, cr, 0}, Vector{0, 0, 1});
-
-    return Rz * Ry * Rx;
-}
-*/
-
 void RigidBody::updateInvInertiaTensor() {
-	const Matrix3 R = orientation.toRotationMatrix3();
+    const Matrix3 R = orientation.toRotationMatrix3();
     const Matrix3 Rt = R.transpose();
     invInertiaTensor = R * invInertiaTensorBody * Rt;
 }

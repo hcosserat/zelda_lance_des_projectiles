@@ -56,15 +56,15 @@ void test_matrix3_vector_mul() {
 }
 
 void test_matrix3_matrix_mul() {
-	Matrix3 A(Vector(1, 0, 0), Vector(0, 2, 0), Vector(0, 0, 3));
-	Matrix3 B(Vector(1, 2, 3), Vector(1, 1, 1), Vector(2, 2, 2));
+    Matrix3 A(Vector(1, 0, 0), Vector(0, 2, 0), Vector(0, 0, 3));
+    Matrix3 B(Vector(1, 2, 3), Vector(1, 1, 1), Vector(2, 2, 2));
 
-	Matrix3 C = A * B;
+    Matrix3 C = A * B;
 
-	// Vérification colonnes
-	assert(C.a.x == 1 && C.a.y == 4 && C.a.z == 9);
-	assert(C.b.x == 1 && C.b.y == 2 && C.b.z == 3);
-	assert(C.c.x == 2 && C.c.y == 4 && C.c.z == 6);
+    // Vï¿½rification colonnes
+    assert(C.a.x == 1 && C.a.y == 4 && C.a.z == 9);
+    assert(C.b.x == 1 && C.b.y == 2 && C.b.z == 3);
+    assert(C.c.x == 2 && C.c.y == 4 && C.c.z == 6);
 }
 
 
@@ -118,7 +118,7 @@ void test_matrix3_from_euler() {
 
 void test_matrix3_from_quaternion() {
     float s = std::sqrt(0.5f);
-    Matrix3 R = Matrix3::FromQuaternion(s, 0, 0, s); // 90° autour de Z
+    Matrix3 R = Matrix3::FromQuaternion(s, 0, 0, s); // 90ï¿½ autour de Z
 
     Vector r = R * Vector(1, 0, 0);
     assert(std::fabs(r.x) < 1e-5);
