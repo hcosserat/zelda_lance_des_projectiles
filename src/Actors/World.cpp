@@ -1,10 +1,8 @@
 ﻿#include "World.h"
 
 World::World(float worldSize)
-	: tree(std::make_unique<Octree>(Vector(0, 0, 0), worldSize))
-	, treeHalfSize(worldSize)
-	, gravity(0, -9.81f, 0)
-	, debugDrawEnabled(true) {
+	: collisionComponent(worldSize)
+	  , gravity(0, -9.81f, 0) {
 }
 
 World::~World() = default;
@@ -14,12 +12,16 @@ World::~World() = default;
 void World::update(float dt) {
 	applyGravity();
 	integrateAll(dt);
-	rebuildOctree();
+	collisionComponent.updateSpatialStructure(rigidBodies);
+	collisionComponent.detectCollisions(rigidBodies);
+
+	// TODO: Collision resolution will be added here
 }
 
 void World::applyGravity() {
 	for (auto& body : rigidBodies) {
-		if (body->invMass > 0) { // Skip static bodies (infinite mass)
+		if (body->invMass > 0) {
+			// Skip static bodies (infinite mass)
 			float mass = 1.0f / body->invMass;
 			body->addForce(Force(gravity * mass, body->massCenter));
 		}
@@ -40,22 +42,16 @@ void World::addRigidBody(std::unique_ptr<RigidBody> body) {
 	rigidBodies.push_back(std::move(body));
 }
 
-void World::rebuildOctree() {
-	tree->clear();
-	for (const auto& body : rigidBodies) {
-		tree->insert(body.get());
-	}
-}
-
 // ============== Rendering ==============
 
 void World::draw() const {
 	drawGrid();
 	drawBodies();
+	collisionComponent.drawDebug();
+}
 
-	if (debugDrawEnabled) {
-		drawOctree(tree.get());
-	}
+void World::setDebugDraw(bool enabled) {
+	collisionComponent.setDebugDraw(enabled);
 }
 
 void World::drawGrid() const {
@@ -77,22 +73,5 @@ void World::drawBodies() const {
 		body->shape->drawShape();
 
 		ofPopMatrix();
-	}
-}
-
-void World::drawOctree(const Octree* node) const {
-	if (!node) return;
-
-	Vector c = node->center;
-	float h = node->halfSize;
-
-	ofNoFill();
-	ofSetColor(255, 243, 0);
-	ofDrawBox(c.x, c.y, c.z, h * 2, h * 2, h * 2);
-
-	for (const auto& child : node->children) {
-		if (child) {
-			drawOctree(child.get());
-		}
 	}
 }

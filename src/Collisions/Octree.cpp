@@ -121,3 +121,26 @@ void Octree::clear() {
     for (auto &child: children)
         child.reset();
 }
+
+// ------------------------------------------------------------
+// Get collision partitions (groups of bodies that may collide)
+// ------------------------------------------------------------
+void Octree::getCollisionPartitions(std::vector<std::vector<RigidBody *> > &out) const {
+    out.clear();
+    collectPartitions(out);
+}
+
+void Octree::collectPartitions(std::vector<std::vector<RigidBody *> > &out) const {
+    // If this node has elements, they form a potential collision group
+    if (!elements.empty()) {
+        out.push_back(elements);
+    }
+
+    // Recursively collect from children
+    for (const auto &child: children) {
+        if (child) {
+            child->collectPartitions(out);
+        }
+    }
+}
+

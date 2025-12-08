@@ -39,7 +39,7 @@ public:
     std::vector<Vector> getVerticesWorld(const RigidBody &body) const override;
 
     // Compute inertia tensor for a box with given mass
-    static Matrix3 computeInertiaTensor(const Vector& dims, float mass) {
+    static Matrix3 computeInertiaTensor(const Vector &dims, float mass) {
         float w = dims.x;
         float h = dims.y;
         float d = dims.z;

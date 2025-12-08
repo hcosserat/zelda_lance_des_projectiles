@@ -23,18 +23,20 @@ public:
 
     void windowResized(int w, int h) override;
     void gotMessage(ofMessage msg) override;
+
     void dragEvent(ofDragInfo dragInfo) override;
 
 private:
     // Core systems
-    World world{200.0f};  // Initialize directly with size
+    World world{200.0f}; // Initialize directly with size
     ofEasyCam cam;
 
     // Timing
     float dt{1.0f / 60.0f};
 
     // Projectile spawning
-    void spawnBox(const Vector& position, const Vector& dimensions, float mass);
+    void spawnBox(const Vector &position, const Vector &dimensions, float mass);
+
     void throwProjectile();
 
     // UI

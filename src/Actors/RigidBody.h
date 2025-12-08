@@ -30,6 +30,9 @@ public:
 
     std::unique_ptr<ShapeComponent> shape; // Owns the shape component
 
+    // Getter for bounding radius - delegates to shape component
+    float boundingRadius() const { return shape->boundingRadius(); }
+
     RigidBody(const Vector &center, const Vector &massCenter, const Vector &vel, const Vector &acc,
               const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc, float mass,
               const Matrix3 &invInertiaTensor, std::unique_ptr<ShapeComponent> shapeComponent);

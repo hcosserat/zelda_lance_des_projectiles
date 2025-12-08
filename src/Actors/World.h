@@ -1,5 +1,5 @@
 #pragma once
-#include "Collisions/Octree.h"
+#include "Collisions/CollisionComponent.h"
 #include "Actors/RigidBody.h"
 #include <vector>
 #include <memory>
@@ -15,26 +15,26 @@ public:
 
 	// Rendering
 	void draw() const;
-	void setDebugDraw(bool enabled) { debugDrawEnabled = enabled; }
+
+	void setDebugDraw(bool enabled);
 
 	// Configuration
-	void setGravity(const Vector& g) { gravity = g; }
+	void setGravity(const Vector &g) { gravity = g; }
 	Vector getGravity() const { return gravity; }
+
+	// Collision access
+	const CollisionComponent &getCollisionComponent() const { return collisionComponent; }
 
 private:
 	std::vector<std::unique_ptr<RigidBody>> rigidBodies;
-	std::unique_ptr<Octree> tree;
-	float treeHalfSize;
+	CollisionComponent collisionComponent;
 	Vector gravity;
-	bool debugDrawEnabled;
 
 	// Physics helpers
 	void applyGravity();
 	void integrateAll(float dt);
-	void rebuildOctree();
 
 	// Rendering helpers
 	void drawBodies() const;
-	void drawOctree(const Octree* node) const;
 	void drawGrid() const;
 };

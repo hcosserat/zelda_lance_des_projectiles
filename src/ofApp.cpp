@@ -75,19 +75,19 @@ void ofApp::keyPressed(const int key) {
 }
 
 //--------------------------------------------------------------
-void ofApp::spawnBox(const Vector& position, const Vector& dimensions, float mass) {
+void ofApp::spawnBox(const Vector &position, const Vector &dimensions, float mass) {
     auto shape = std::make_unique<BoxShape>(dimensions);
     Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
     Matrix3 invInertiaTensor = inertiaTensor.inverse();
 
     auto body = std::make_unique<RigidBody>(
-        position,           // center
-        position,           // massCenter
-        Vector(0, 0, 0),    // velocity
-        Vector(0, 0, 0),    // acceleration
-        Quaternion(),       // orientation
-        Vector(0, 0, 0),    // angular velocity
-        Vector(0, 0, 0),    // angular acceleration
+        position, // center
+        position, // massCenter
+        Vector(0, 0, 0), // velocity
+        Vector(0, 0, 0), // acceleration
+        Quaternion(), // orientation
+        Vector(0, 0, 0), // angular velocity
+        Vector(0, 0, 0), // angular acceleration
         mass,
         invInertiaTensor,
         std::move(shape)
@@ -107,13 +107,13 @@ void ofApp::throwProjectile() {
     Matrix3 invInertiaTensor = inertiaTensor.inverse();
 
     auto projectile = std::make_unique<RigidBody>(
-        position,           // center
-        position,           // massCenter
-        Vector(0, 0, 0),    // velocity
-        Vector(0, 0, 0),    // acceleration
-        Quaternion(),       // orientation
-        Vector(0, 0, 0),    // angular velocity
-        Vector(0, 0, 0),    // angular acceleration
+        position, // center
+        position, // massCenter
+        Vector(0, 0, 0), // velocity
+        Vector(0, 0, 0), // acceleration
+        Quaternion(), // orientation
+        Vector(0, 0, 0), // angular velocity
+        Vector(0, 0, 0), // angular acceleration
         mass,
         invInertiaTensor,
         std::move(shape)
