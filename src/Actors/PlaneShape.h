@@ -10,7 +10,7 @@ private:
     Vector normal;
 
 public:
-    PlaneShape(const Vector& p, const Vector& n)
+    PlaneShape(const Vector &p, const Vector &n)
         : point(p), normal(n) {
         this->normal.normalize();
     }
@@ -27,6 +27,6 @@ public:
         // Could draw a debug quad here if needed
     }
 
-    const Vector& getPoint() const { return point; }
-    const Vector& getNormal() const { return normal; }
+    const Vector &getPoint() const { return point; }
+    const Vector &getNormal() const { return normal; }
 };

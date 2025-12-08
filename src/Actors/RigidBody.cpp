@@ -5,17 +5,17 @@ RigidBody::RigidBody(const Vector &center, const Vector &massCenter, const Vecto
                      const Quaternion &orientation, const Vector &angularVel, const Vector &angularAcc,
                      const float mass,
                      const Matrix3 &invInertiaTensor, std::unique_ptr<ShapeComponent> shapeComponent) : center(center)
-                                                                         , massCenter(massCenter)
-                                                                         , vel(vel)
-                                                                         , acc(acc)
-                                                                         , orientation(orientation)
-                                                                         , angularVel(angularVel)
-                                                                         , angularAcc(angularAcc)
-                                                                         , invMass(mass != 0.f ? 1.f / mass : 0.f)
-                                                                         , invInertiaTensorBody(invInertiaTensor)
-                                                                         , invInertiaTensor(invInertiaTensor)
-                                                                         , accumForces()
-                                                                         , shape(std::move(shapeComponent)) {
+    , massCenter(massCenter)
+    , vel(vel)
+    , acc(acc)
+    , orientation(orientation)
+    , angularVel(angularVel)
+    , angularAcc(angularAcc)
+    , invMass(mass != 0.f ? 1.f / mass : 0.f)
+    , invInertiaTensorBody(invInertiaTensor)
+    , invInertiaTensor(invInertiaTensor)
+    , accumForces()
+    , shape(std::move(shapeComponent)) {
 }
 
 void RigidBody::integratePos(const float dt) {

@@ -1,25 +1,40 @@
 #pragma once
-#include "Collisions/Octree.h" // ton chemin r�el ici
+#include "Collisions/Octree.h"
 #include "Actors/RigidBody.h"
 #include <vector>
+#include <memory>
 
 class World {
 public:
-	std::vector<std::unique_ptr<RigidBody>> rigidBodies;
+	explicit World(float worldSize = 200.0f);
+	~World();
 
-	explicit World();
-
+	// Physics
 	void update(float dt);
-
-	void draw() const;
-
 	void addRigidBody(std::unique_ptr<RigidBody> body);
 
-private:
-	Octree *tree; // Le spatial index
-	float treeHalfSize = 200.0f; // Taille du monde (� ajuster)
+	// Rendering
+	void draw() const;
+	void setDebugDraw(bool enabled) { debugDrawEnabled = enabled; }
 
+	// Configuration
+	void setGravity(const Vector& g) { gravity = g; }
+	Vector getGravity() const { return gravity; }
+
+private:
+	std::vector<std::unique_ptr<RigidBody>> rigidBodies;
+	std::unique_ptr<Octree> tree;
+	float treeHalfSize;
+	Vector gravity;
+	bool debugDrawEnabled;
+
+	// Physics helpers
+	void applyGravity();
+	void integrateAll(float dt);
 	void rebuildOctree();
 
-	void drawOctree(const Octree *node) const;
+	// Rendering helpers
+	void drawBodies() const;
+	void drawOctree(const Octree* node) const;
+	void drawGrid() const;
 };

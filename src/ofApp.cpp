@@ -2,69 +2,53 @@
 #include "Actors/BoxShape.h"
 #include "Actors/PlaneShape.h"
 
+// Unit tests - included only in cpp
+#include "Maths/VectorTest.h"
+#include "Maths/Matrix3Test.h"
+#include "Maths/Matrix4Test.h"
+#include "Maths/QuaternionTest.h"
+
 //--------------------------------------------------------------
 void ofApp::setup() {
-    // Unit tests
+    // Run unit tests
     test_vector();
     test_matrix3();
     test_matrix4();
     test_quaternion();
 
-    // Initialization of app attributes
-    dt = 1.0f / 60;
-    world = World();
 
-    // Enable depth testing for 3D rendering
+    // Configure rendering
     ofEnableDepthTest();
     ofSetBackgroundColor(30, 30, 30);
-
-    // Set initial projectile type
-    currentProjectileType = P_BOX;
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
     dt = ofGetLastFrameTime();
     world.update(dt);
-
-    // Update display value in HUD
-    //hud.update(dt);
 }
-
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    // Draw from the camera's perspective
+    // 3D scene
     cam.begin();
-
-    // Draw world and all actors
     world.draw();
-
     cam.end();
 
-    // Draw UI elements
+    // 2D UI overlay
+    drawHUD();
+}
+
+//--------------------------------------------------------------
+void ofApp::drawHUD() const {
     ofDisableDepthTest();
-    // Display current projectile type
-    string typeName;
-    switch (currentProjectileType) {
-        case P_BOX:
-            typeName = "Box";
-            break;
-        case P_CYLINDER:
-            typeName = "Cylinder";
-            break;
-        case P_AXE:
-            typeName = "Axe";
-            break;
-        default:
-            typeName = "Unknown";
-            break;
-    }
+
     ofSetColor(255);
-    ofDrawBitmapString("Delta Time: " + ofToString(dt, 3) + " ms", 10, 20);
-    ofDrawBitmapString("Current Projectile: " + typeName, 400, 40);
+    ofDrawBitmapString("Delta Time: " + ofToString(dt * 1000.0f, 2) + " ms", 10, 20);
+    ofDrawBitmapString("FPS: " + ofToString(1.0f / dt, 1), 10, 40);
     ofDrawBitmapStringHighlight(
-        "Press 1: Choose Box \nPress 2: Choose Cylinder \nPress 3: Choose Axe \nPress Space: Throw Projectile", 40, 60);
+        "Press Space: Throw Box", 40, 70);
+
     ofEnableDepthTest();
 }
 
@@ -74,23 +58,73 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(const int key) {
-    // Change projectile type based on key press
     switch (key) {
-        case '1':
-            currentProjectileType = P_BOX;
-            break;
-        case '2':
-            currentProjectileType = P_CYLINDER;
-            break;
-        case '3':
-            currentProjectileType = P_AXE;
-            break;
         case ' ':
             throwProjectile();
+            break;
+        case 'd':
+        case 'D':
+            // Toggle debug drawing
+            static bool debugEnabled = true;
+            debugEnabled = !debugEnabled;
+            world.setDebugDraw(debugEnabled);
             break;
         default:
             break;
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::spawnBox(const Vector& position, const Vector& dimensions, float mass) {
+    auto shape = std::make_unique<BoxShape>(dimensions);
+    Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
+    Matrix3 invInertiaTensor = inertiaTensor.inverse();
+
+    auto body = std::make_unique<RigidBody>(
+        position,           // center
+        position,           // massCenter
+        Vector(0, 0, 0),    // velocity
+        Vector(0, 0, 0),    // acceleration
+        Quaternion(),       // orientation
+        Vector(0, 0, 0),    // angular velocity
+        Vector(0, 0, 0),    // angular acceleration
+        mass,
+        invInertiaTensor,
+        std::move(shape)
+    );
+
+    world.addRigidBody(std::move(body));
+}
+
+//--------------------------------------------------------------
+void ofApp::throwProjectile() {
+    Vector position(0, 5, 0);
+    Vector dimensions(1, 1, 1);
+    float mass = 20.0f;
+
+    auto shape = std::make_unique<BoxShape>(dimensions);
+    Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
+    Matrix3 invInertiaTensor = inertiaTensor.inverse();
+
+    auto projectile = std::make_unique<RigidBody>(
+        position,           // center
+        position,           // massCenter
+        Vector(0, 0, 0),    // velocity
+        Vector(0, 0, 0),    // acceleration
+        Quaternion(),       // orientation
+        Vector(0, 0, 0),    // angular velocity
+        Vector(0, 0, 0),    // angular acceleration
+        mass,
+        invInertiaTensor,
+        std::move(shape)
+    );
+
+    // Apply force to throw the projectile
+    Vector force(0, 1500, 5000);
+    Vector applicationPoint = position + Vector(0.5f, 0.5f, 0); // Off-center for rotation
+    projectile->addForce(Force(force, applicationPoint));
+
+    world.addRigidBody(std::move(projectile));
 }
 
 //--------------------------------------------------------------
@@ -137,82 +171,3 @@ void ofApp::gotMessage(ofMessage msg) {
 void ofApp::dragEvent(ofDragInfo dragInfo) {
 }
 
-void ofApp::throwProjectile() {
-    // This function can be used to encapsulate projectile throwing logic
-    float mass = 20.0f;
-    Vector initialPosition(0, 5, 0);
-    Vector force(0, 1500, 5000); // Force propelling the projectile up and forward
-    Vector localApplicationPoint(0.5, 0.5, 0); // Apply force not in the center of mass to induce rotation
-    std::unique_ptr<RigidBody> projectile = nullptr;
-    Matrix3 inertiaTensor;
-    Matrix3 invInertiaTensor;
-
-    switch (currentProjectileType) {
-        case P_BOX: {
-            Vector boxDimensions(1, 1, 1);
-            float w = boxDimensions.x;
-            float h = boxDimensions.y;
-            float d = boxDimensions.z;
-            float k = (1.0f / 12.0f) * mass;
-            inertiaTensor = Matrix3::Identity();
-            inertiaTensor(0, 0) = k * (h * h + d * d);
-            inertiaTensor(1, 1) = k * (w * w + d * d);
-            inertiaTensor(2, 2) = k * (w * w + h * h);
-            invInertiaTensor = inertiaTensor.inverse();
-
-            auto boxShape = std::make_unique<BoxShape>(boxDimensions);
-            projectile = std::make_unique<RigidBody>(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-                                       Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-                                       mass, invInertiaTensor, std::move(boxShape));
-            break;
-        }
-        case P_CYLINDER: {
-            float radius = 0.5f;
-            float height = 2.0f;
-            float Ixx = (1.0f / 12.0f) * mass * (3 * radius * radius + height * height);
-            float Iyy = (0.5f) * mass * radius * radius;
-            float Izz = Ixx;
-            inertiaTensor = Matrix3::Identity();
-            inertiaTensor(0, 0) = Ixx;
-            inertiaTensor(1, 1) = Iyy;
-            inertiaTensor(2, 2) = Izz;
-            invInertiaTensor = inertiaTensor.inverse();
-
-            // For now, approximate cylinder as a box
-            Vector cylinderDims(radius * 2, height, radius * 2);
-            auto cylinderShape = std::make_unique<BoxShape>(cylinderDims);
-            projectile = std::make_unique<RigidBody>(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-                                       Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-                                       mass, invInertiaTensor, std::move(cylinderShape));
-            break;
-        }
-        case P_AXE: {
-            Vector handleDimensions(0.2f, 2.0f, 0.2f);
-            Vector headDimensions(0.8f, 0.5f, 0.1f);
-            // Approximate to a big box for simplicity
-            Vector overallDims(0.8f, 2.5f, 0.2f);
-            float w = overallDims.x;
-            float h = overallDims.y;
-            float d = overallDims.z;
-            float k = (1.0f / 12.0f) * mass;
-            inertiaTensor = Matrix3::Identity();
-            inertiaTensor(0, 0) = k * (h * h + d * d);
-            inertiaTensor(1, 1) = k * (w * w + d * d);
-            inertiaTensor(2, 2) = k * (w * w + h * h);
-            invInertiaTensor = inertiaTensor.inverse();
-
-            auto axeShape = std::make_unique<BoxShape>(overallDims);
-            projectile = std::make_unique<RigidBody>(initialPosition, initialPosition, Vector(0, 0, 0), Vector(0, 0, 0),
-                                       Quaternion(), Vector(0, 0, 0), Vector(0, 0, 0),
-                                       mass, invInertiaTensor, std::move(axeShape));
-            break;
-        }
-        default:
-            return; // Unknown type
-    }
-    Vector globalApplicationPoint = initialPosition + localApplicationPoint;
-    // Apply the force at the specified local application point
-    projectile->addForce(Force(force, globalApplicationPoint));
-    // Add the projectile to the world
-    world.addRigidBody(std::move(projectile));
-}
