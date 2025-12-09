@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Collisions/CollisionComponent.h"
 #include "Actors/RigidBody.h"
 #include <vector>
@@ -17,7 +18,9 @@ public:
 	void draw() const;
 
 	void setDebugDraw(bool enabled);
+
 	bool isDebugDrawEnabled() const;
+
 	void toggleDebugDraw();
 
 	// Configuration

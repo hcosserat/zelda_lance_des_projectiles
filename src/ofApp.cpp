@@ -97,7 +97,7 @@ void ofApp::throwProjectile() {
     float mass2 = volume2 * volumetricMass;
 
     // Boîte 1 : lancée depuis la gauche (X négatif)
-    Vector position1(-launchDistance, launchHeight, 0);
+    Vector position1(-launchDistance, launchHeight, launchDistance);
     auto shape1 = std::make_unique<BoxShape>(dimensions1);
     Matrix3 inertiaTensor1 = BoxShape::computeInertiaTensor(dimensions1, mass1);
     Matrix3 invInertiaTensor1 = inertiaTensor1.inverse();
@@ -105,7 +105,7 @@ void ofApp::throwProjectile() {
     auto projectile1 = std::make_unique<RigidBody>(
         position1, // centre
         position1, // centre de masse
-        Vector(15, 10, 0), // vitesse initiale
+        Vector(15, 10, -15), // vitesse initiale
         Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
         Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire
@@ -116,7 +116,7 @@ void ofApp::throwProjectile() {
     );
 
     // Boîte 2 : lancée depuis la droite (X positif)
-    Vector position2(launchDistance, launchHeight, 0);
+    Vector position2(launchDistance, launchHeight, -launchDistance);
     auto shape2 = std::make_unique<BoxShape>(dimensions2);
     Matrix3 inertiaTensor2 = BoxShape::computeInertiaTensor(dimensions2, mass2);
     Matrix3 invInertiaTensor2 = inertiaTensor2.inverse();
@@ -124,7 +124,7 @@ void ofApp::throwProjectile() {
     auto projectile2 = std::make_unique<RigidBody>(
         position2, // centre
         position2, // centre de masse
-        Vector(-15.0f, 10, 0), // vitesse initiale
+        Vector(-15.0f, 10, 15), // vitesse initiale
         Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
         Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire

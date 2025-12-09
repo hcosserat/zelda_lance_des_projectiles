@@ -28,7 +28,7 @@ World::~World() = default;
 
 void World::update(float dt) {
 	collisionComponent.updateSpatialStructure(rigidBodies);
-	collisionComponent.detectCollisions(rigidBodies);
+	collisionComponent.detectCollisions();
 	collisionComponent.resolveCollisions(dt);
 	applyGravity();
 	integrateAll(dt);

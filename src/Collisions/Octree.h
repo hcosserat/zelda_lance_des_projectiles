@@ -5,7 +5,7 @@
 class Octree {
 public:
 	Octree(const Vector &center, float halfSize,
-	       int depth = 0, int maxDepth = 3, int maxElements = 3);
+	       int depth = 0, int maxDepth = 8, int maxElements = 3);
 
 	void insert(RigidBody *body);
 

@@ -1,8 +1,24 @@
 #include "CollisionComponent.h"
 #include "ofMain.h"
+#include <unordered_set>
+
+// Déduplication de paires
+namespace {
+    struct PairKey {
+        RigidBody *a;
+        RigidBody *b;
+        bool operator==(const PairKey &other) const { return a == other.a && b == other.b; }
+    };
+
+    struct PairKeyHash {
+        size_t operator()(const PairKey &k) const {
+            return std::hash<RigidBody *>()(k.a) ^ (std::hash<RigidBody *>()(k.b) << 1);
+        }
+    };
+}
 
 CollisionComponent::CollisionComponent(float worldSize)
-    : tree(std::make_unique<Octree>(Vector(0, 0, 0), worldSize))
+    : tree(std::make_unique<Octree>(Vector(0, 10, 0), worldSize))
       , debugDrawEnabled(true)
       , elasticity(0.6f)
       , damping(0.8f) {
@@ -10,8 +26,11 @@ CollisionComponent::CollisionComponent(float worldSize)
 
 void CollisionComponent::updateSpatialStructure(const std::vector<std::unique_ptr<RigidBody> > &bodies) {
     tree->clear();
+    currentBodies.clear();
+    currentBodies.reserve(bodies.size());
     for (const auto &body: bodies) {
         tree->insert(body.get());
+        currentBodies.push_back(body.get());
     }
 }
 
@@ -22,37 +41,65 @@ bool CollisionComponent::broadPhaseCheck(RigidBody *a, RigidBody *b) const {
     return distSquared <= radiusSum * radiusSum;
 }
 
-void CollisionComponent::detectCollisions(const std::vector<std::unique_ptr<RigidBody> > &bodies) {
-    // Effacer les collisions de la frame précédent
+void CollisionComponent::detectCollisions() {
+    // Effacer les collisions de la frame précédente
     collisions.clear();
 
-    // Étape 1 : partitions de collision via l'octree
-    std::vector<std::vector<RigidBody *> > partitions;
-    tree->getCollisionPartitions(partitions);
+    // Neighbor-query broad phase
+    // Construire une liste de plans (rayon infini) pour les inclure avec tout le monde
+    std::vector<RigidBody *> planes;
+    planes.reserve(currentBodies.size());
+    for (RigidBody *b: currentBodies) {
+        if (std::isinf(b->shape->boundingRadius())) {
+            planes.push_back(b);
+        }
+    }
 
-    // Étape 2 : pour chaque partition, tester les paires
-    for (const auto & partition : partitions) {
-        size_t count = partition.size();
+    // Déduplication: paire triée de pointeurs -> hash
+    std::unordered_set<PairKey, PairKeyHash> testedPairs;
+    testedPairs.reserve(currentBodies.size() * 4);
 
-        if (count == 0) continue; // Skip empty partitions
+    const float neighborMargin = 0.25f; // petite marge pour les limites de noeuds
 
-        for (size_t i = 0; i < count; ++i) {
-            for (size_t j = i + 1; j < count; ++j) {
-                RigidBody *bodyA = partition[i];
-                RigidBody *bodyB = partition[j];
+    // Pour chaque corps, interroger ses voisins à partir de l'octree
+    for (RigidBody *bodyA: currentBodies) {
+        // Rayon de requête: rayon englobant + marge
+        float queryRadius = bodyA->boundingRadius();
+        if (!std::isinf(queryRadius)) {
+            queryRadius += neighborMargin;
+        } else {
+            // Pour un plan (rayon infini), on ne fait pas de query; on traitera via liste planes
+            continue;
+        }
 
-                // Étape 3 : broad phase
-                if (!broadPhaseCheck(bodyA, bodyB)) {
-                    continue;
-                }
+        std::vector<RigidBody *> neighbors;
+        neighbors.reserve(8);
+        tree->query(bodyA->center, queryRadius, neighbors);
 
-                // Étape 4 : narrow phase
-                CollisionData collision = NarrowPhase::CheckCollision(bodyA, bodyB);
+        // Ajouter les plans comme voisins potentiels
+        for (RigidBody *planeBody: planes) {
+            neighbors.push_back(planeBody);
+        }
 
-                if (collision.hasCollision()) {
-                    // Stocker pour résolution
-                    collisions.push_back(collision);
-                }
+        // Tester les paires (A, B) avec déduplication
+        for (RigidBody *bodyB: neighbors) {
+            if (bodyA == bodyB) continue;
+
+            RigidBody *minPtr = bodyA < bodyB ? bodyA : bodyB;
+            RigidBody *maxPtr = bodyA < bodyB ? bodyB : bodyA;
+            PairKey key{minPtr, maxPtr};
+            if (testedPairs.find(key) != testedPairs.end()) {
+                continue; // déjà testé
+            }
+            testedPairs.insert(key);
+
+            if (!broadPhaseCheck(bodyA, bodyB)) {
+                continue;
+            }
+
+            CollisionData collision = NarrowPhase::CheckCollision(bodyA, bodyB);
+            if (collision.hasCollision()) {
+                collisions.push_back(collision);
             }
         }
     }
