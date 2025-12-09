@@ -12,7 +12,4 @@ private:
     static CollisionData BoxAndPlane(RigidBody *boxBody, RigidBody *planeBody);
 
     static CollisionData BoxAndBox(RigidBody *boxBody1, RigidBody *boxBody2);
-
-    static void TestVerticesAgainstBox(RigidBody *testBody, RigidBody *targetBoxBody, CollisionData &collisionData,
-                                       bool flipNormal);
 };
