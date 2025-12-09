@@ -18,7 +18,7 @@ namespace {
 }
 
 CollisionComponent::CollisionComponent(float worldSize)
-    : tree(std::make_unique<Octree>(Vector(0, 10, 0), worldSize))
+    : tree(std::make_unique<Octree>(Vector(30, 30, 30), worldSize))
       , debugDrawEnabled(true)
       , elasticity(0.6f)
       , damping(0.8f) {

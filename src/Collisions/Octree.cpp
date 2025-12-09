@@ -103,27 +103,24 @@ int Octree::getChildIndex(const Vector &pos) const {
 // ------------------------------------------------------------
 // Insert
 // ------------------------------------------------------------
-void Octree::insert(RigidBody *body) {
-    // Si on a des enfants
-    if (children[0] != nullptr) {
-        int index = getChildIndex(body->center);
-        // Si l'objet rentre STRICTEMENT dans l'enfant, on le descend
-        if (containsStrict(children[index]->center, children[index]->halfSize, body)) {
-            children[index]->insert(body);
-        } else {
-            // Sinon on le garde ici
-            elements.push_back(body);
-        }
-        return;
-    }
+void Octree::insert(RigidBody * body) {
+	if (!contains(body))
+		return;
 
-    // Feuille : stocker
-    elements.push_back(body);
+	// Node feuille avec place disponible
+	if (depth == maxDepth || (elements.size() < maxElements && children[0] == nullptr)) {
 
-    // Si trop d'éléments, subdiviser
-    if (elements.size() > maxElements && depth < maxDepth) {
-        subdivide();
-    }
+		elements.push_back(body);
+		return;
+	}
+
+	// Sinon on subdivise
+	if (children[0] == nullptr)
+		subdivide();
+
+	// Insérer dans l’enfant
+	int idx = getChildIndex(body->center);
+	children[idx]->insert(body);
 }
 
 // ------------------------------------------------------------
