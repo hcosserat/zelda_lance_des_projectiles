@@ -41,5 +41,5 @@ public:
 private:
 	void redistributeElements();
 
-	void collectPartitions(std::vector<RigidBody *> &ancestors, std::vector<std::vector<RigidBody *> > &out) const;
+	void collectPartitions(std::vector<std::vector<RigidBody *> > &out) const;
 };

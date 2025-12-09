@@ -3,7 +3,7 @@
 #include "../Actors/ShapeComponent.h"
 
 // Aide: vérifier si un corps est strictement inclus dans les bornes d'un noeud
-static bool containsStrict(const Vector& nodeCenter, float halfSize, const RigidBody* body) {
+static bool containsStrict(const Vector &nodeCenter, float halfSize, const RigidBody *body) {
     float r = body->shape->boundingRadius();
     // Si rayon infini (Plane), ne peut jamais être strictement inclus
     if (std::isinf(r)) return false;
@@ -81,10 +81,10 @@ void Octree::subdivide() {
 // Redistribue les éléments après subdivision
 // ------------------------------------------------------------
 void Octree::redistributeElements() {
-    std::vector<RigidBody*> oldElements = std::move(elements);
+    std::vector<RigidBody *> oldElements = std::move(elements);
     elements.clear();
 
-    for (auto* body : oldElements) {
+    for (auto *body: oldElements) {
         insert(body);
     }
 }
@@ -160,34 +160,19 @@ void Octree::clear() {
 // ------------------------------------------------------------
 void Octree::getCollisionPartitions(std::vector<std::vector<RigidBody *> > &out) const {
     out.clear();
-    std::vector<RigidBody*> ancestors;
-    collectPartitions(ancestors, out);
+    collectPartitions(out);
 }
 
-void Octree::collectPartitions(std::vector<RigidBody *> &ancestors, std::vector<std::vector<RigidBody *> > &out) const {
-    // 1. Ajouter les éléments de ce niveau à la pile des ancêtres
-    size_t pushCount = 0;
-    for (auto* e : elements) {
-        ancestors.push_back(e);
-        pushCount++;
+void Octree::collectPartitions(std::vector<std::vector<RigidBody *> > &out) const {
+    // If this node has elements, add them as a partition
+    if (!elements.empty()) {
+        out.push_back(elements);
     }
 
-    // 2. Descendre récursivement
-    bool isLeaf = true;
-    for (const auto &child : children) {
+    // Recursively collect partitions from children
+    for (const auto &child: children) {
         if (child) {
-            isLeaf = false;
-            child->collectPartitions(ancestors, out);
+            child->collectPartitions(out);
         }
-    }
-
-    // 3. Si feuille, émettre une partition
-    if (isLeaf && !ancestors.empty()) {
-        out.push_back(ancestors);
-    }
-
-    // 4. Backtrack
-    for (size_t i = 0; i < pushCount; ++i) {
-        ancestors.pop_back();
     }
 }

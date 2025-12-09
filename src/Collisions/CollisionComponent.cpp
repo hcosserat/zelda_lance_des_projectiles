@@ -23,7 +23,7 @@ bool CollisionComponent::broadPhaseCheck(RigidBody *a, RigidBody *b) const {
 }
 
 void CollisionComponent::detectCollisions(const std::vector<std::unique_ptr<RigidBody> > &bodies) {
-    // Effacer les collisions du frame précédent
+    // Effacer les collisions de la frame précédent
     collisions.clear();
 
     // Étape 1 : partitions de collision via l'octree
@@ -31,8 +31,11 @@ void CollisionComponent::detectCollisions(const std::vector<std::unique_ptr<Rigi
     tree->getCollisionPartitions(partitions);
 
     // Étape 2 : pour chaque partition, tester les paires
-    for (const auto &partition: partitions) {
+    for (const auto & partition : partitions) {
         size_t count = partition.size();
+
+        if (count == 0) continue; // Skip empty partitions
+
         for (size_t i = 0; i < count; ++i) {
             for (size_t j = i + 1; j < count; ++j) {
                 RigidBody *bodyA = partition[i];

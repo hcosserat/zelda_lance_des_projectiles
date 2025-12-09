@@ -26,11 +26,11 @@ World::~World() = default;
 // ============== Physique ==============
 
 void World::update(float dt) {
-	applyGravity();
-	integrateAll(dt);
 	collisionComponent.updateSpatialStructure(rigidBodies);
 	collisionComponent.detectCollisions(rigidBodies);
 	collisionComponent.resolveCollisions(dt);
+	applyGravity();
+	integrateAll(dt);
 }
 
 void World::applyGravity() {
