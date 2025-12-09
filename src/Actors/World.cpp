@@ -3,7 +3,8 @@
 
 World::World(float worldSize)
 	: collisionComponent(worldSize)
-	  , gravity(0, -9.81f, 0) {
+	  , gravity(0, -9.81f, 0)
+	  , debugEnabled(true) {
 	// Créer le sol (plan) en y=0
 	auto groundShape = std::make_unique<PlaneShape>(Vector(0, 0, 0), Vector(0, 1, 0));
 	auto groundPlane = std::make_unique<RigidBody>(
@@ -66,7 +67,16 @@ void World::draw() const {
 }
 
 void World::setDebugDraw(bool enabled) {
+	debugEnabled = enabled;
 	collisionComponent.setDebugDraw(enabled);
+}
+
+bool World::isDebugDrawEnabled() const {
+	return debugEnabled;
+}
+
+void World::toggleDebugDraw() {
+	setDebugDraw(!debugEnabled);
 }
 
 void World::drawGrid() const {
@@ -89,7 +99,7 @@ void World::drawBodies() const {
 
 		ofPopMatrix();
 
-		if (collisionComponent.isDebugDrawEnabled()) {
+		if (debugEnabled) {
 			// Vecteur vitesse
 			ofSetColor(0, 255, 255); // Cyan
 			ofDrawLine(body->massCenter.x, body->massCenter.y, body->massCenter.z,

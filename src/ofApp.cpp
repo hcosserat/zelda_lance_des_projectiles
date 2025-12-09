@@ -66,9 +66,7 @@ void ofApp::keyPressed(const int key) {
         case 'd':
         case 'D':
             // Basculer le dessin debug
-            static bool debugEnabled = true;
-            debugEnabled = !debugEnabled;
-            world.setDebugDraw(debugEnabled);
+            world.toggleDebugDraw();
             break;
         default:
             break;

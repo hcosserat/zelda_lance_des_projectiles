@@ -17,6 +17,8 @@ public:
 	void draw() const;
 
 	void setDebugDraw(bool enabled);
+	bool isDebugDrawEnabled() const;
+	void toggleDebugDraw();
 
 	// Configuration
 	void setGravity(const Vector &g) { gravity = g; }
@@ -29,6 +31,7 @@ private:
 	std::vector<std::unique_ptr<RigidBody>> rigidBodies;
 	CollisionComponent collisionComponent;
 	Vector gravity;
+	bool debugEnabled;
 
 	// Aides physique
 	void applyGravity();
