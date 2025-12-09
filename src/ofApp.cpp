@@ -107,7 +107,7 @@ void ofApp::throwProjectile() {
     auto projectile1 = std::make_unique<RigidBody>(
         position1, // centre
         position1, // centre de masse
-        Vector(15, 10, 1), // vitesse initiale
+        Vector(15, 10, 0), // vitesse initiale
         Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
         Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire
@@ -126,7 +126,7 @@ void ofApp::throwProjectile() {
     auto projectile2 = std::make_unique<RigidBody>(
         position2, // centre
         position2, // centre de masse
-        Vector(-15.0f, 10, -1), // vitesse initiale
+        Vector(-15.0f, 10, 0), // vitesse initiale
         Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
         Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire
