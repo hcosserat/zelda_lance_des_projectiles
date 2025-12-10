@@ -19,7 +19,7 @@ World::World(float worldSize)
 		Matrix3() * 0, // inertie nulle pour objet statique
 		std::move(groundShape)
 	);
-	addRigidBody(std::move(groundPlane));
+	rigidBodies.push_back(std::move(groundPlane));
 }
 
 World::~World() = default;
