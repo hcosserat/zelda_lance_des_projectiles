@@ -59,18 +59,25 @@ void ofApp::exit() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(const int key) {
-    switch (key) {
-        case ' ':
-            throwProjectile();
-            break;
-        case 'd':
-        case 'D':
-            // Basculer le dessin debug
-            world.toggleDebugDraw();
-            break;
-        default:
-            break;
-    }
+
+	switch (key) {
+
+	case ' ': {
+		float now = ofGetElapsedTimef();
+		if (now - lastThrowTime >= throwCooldown) {
+			throwProjectile();
+			lastThrowTime = now;
+		}
+	} break;
+
+	case 'd':
+	case 'D':
+		world.toggleDebugDraw();
+		break;
+
+	default:
+		break;
+	}
 }
 
 //--------------------------------------------------------------
@@ -79,7 +86,7 @@ void ofApp::throwProjectile() {
     const float volumetricMass = 2500.0f; // similaire au béton
 
     // Hauteur de lancement
-    const float launchHeight = 10.0f;
+    const float launchHeight = 15.0f;
 
     // Distance sur l'axe X
     const float launchDistance = 30.0f;
@@ -105,7 +112,7 @@ void ofApp::throwProjectile() {
     auto projectile1 = std::make_unique<RigidBody>(
         position1, // centre
         position1, // centre de masse
-        Vector(15, 10, -15), // vitesse initiale
+        Vector(20, 10, -20), // vitesse initiale
         Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
         Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire
@@ -124,7 +131,7 @@ void ofApp::throwProjectile() {
     auto projectile2 = std::make_unique<RigidBody>(
         position2, // centre
         position2, // centre de masse
-        Vector(-15.0f, 10, 15), // vitesse initiale
+        Vector(-20.0f, 10, 20), // vitesse initiale
         Vector(0, 0, 0), // accélération
         Quaternion(), // orientation
         Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)), // vitesse angulaire aléatoire

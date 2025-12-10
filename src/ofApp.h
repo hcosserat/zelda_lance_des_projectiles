@@ -39,4 +39,7 @@ private:
 
     // UI
     void drawHUD() const;
+
+	float lastThrowTime = 0.0f;
+	const float throwCooldown = 0.3f; // 300 ms
 };

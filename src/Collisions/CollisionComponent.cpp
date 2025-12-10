@@ -21,7 +21,7 @@ CollisionComponent::CollisionComponent(float worldSize)
     : tree(std::make_unique<Octree>(Vector(30, 30, 30), worldSize))
       , debugDrawEnabled(true)
       , elasticity(0.6f)
-      , damping(0.8f) {
+      , damping(0.95f) {
 }
 
 void CollisionComponent::updateSpatialStructure(const std::vector<std::unique_ptr<RigidBody> > &bodies) {
@@ -108,20 +108,37 @@ void CollisionComponent::detectCollisions() {
 // ============== Résolution des collisions ==============
 
 void CollisionComponent::resolveCollisions(float dt) {
-    // Correction positionnelle pour tous les contacts
-    for (const auto &collision: collisions) {
-        for (const auto &contact: collision.contacts) {
-            correctPositions(contact, collision.body1, collision.body2);
-        }
-    }
+	// Correction positionnelle pour tous les contacts
+	for (const auto & collision : collisions) {
+		for (const auto & contact : collision.contacts) {
+			correctPositions(contact, collision.body1, collision.body2);
+		}
+	}
 
-    // Résolution par impulsions
-    for (const auto &collision: collisions) {
-        for (const auto &contact: collision.contacts) {
-            resolveContact(contact, collision.body1, collision.body2, dt);
-        }
-    }
+	// On garde une trace des corps qui ont eu au moins un contact
+	std::unordered_set<RigidBody *> touched;
+	touched.reserve(collisions.size() * 2);
+
+	// Résolution par impulsions (sans damping ici)
+	for (const auto & collision : collisions) {
+		for (const auto & contact : collision.contacts) {
+			resolveContact(contact, collision.body1, collision.body2, dt);
+
+			// marquer les deux corps comme "touchés" (s'ils existent)
+			if (collision.body1 && collision.body1->invMass > 0) touched.insert(collision.body1);
+			if (collision.body2 && collision.body2->invMass > 0) touched.insert(collision.body2);
+		}
+	}
+
+	// Appliquer l'amortissement **UNE** seule fois par corps touché cette frame
+	for (RigidBody * body : touched) {
+		if (body->invMass > 0) {
+			body->vel = body->vel * damping;
+			body->angularVel = body->angularVel * damping;
+		}
+	}
 }
+
 
 void CollisionComponent::resolveContact(const Contact &contact, RigidBody *body1, RigidBody *body2, float dt) {
     // Ignorer si les deux corps sont statiques
@@ -179,15 +196,15 @@ void CollisionComponent::resolveContact(const Contact &contact, RigidBody *body1
     body1->angularVel = body1->angularVel + body1->invInertiaTensor * r1.cross(impulse);
     body2->angularVel = body2->angularVel - body2->invInertiaTensor * r2.cross(impulse);
 
-    // Amortissement
-    if (body1->invMass > 0) {
-        body1->vel = body1->vel * damping;
-        body1->angularVel = body1->angularVel * damping;
-    }
-    if (body2->invMass > 0) {
-        body2->vel = body2->vel * damping;
-        body2->angularVel = body2->angularVel * damping;
-    }
+    //// Amortissement
+    //if (body1->invMass > 0) {
+    //    body1->vel = body1->vel * damping;
+    //    body1->angularVel = body1->angularVel * damping;
+    //}
+    //if (body2->invMass > 0) {
+    //    body2->vel = body2->vel * damping;
+    //    body2->angularVel = body2->angularVel * damping;
+    //}
 }
 
 void CollisionComponent::correctPositions(const Contact &contact, RigidBody *body1, RigidBody *body2) {
