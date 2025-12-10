@@ -195,16 +195,6 @@ void CollisionComponent::resolveContact(const Contact &contact, RigidBody *body1
     // Mettre à jour vitesses angulaires
     body1->angularVel = body1->angularVel + body1->invInertiaTensor * r1.cross(impulse);
     body2->angularVel = body2->angularVel - body2->invInertiaTensor * r2.cross(impulse);
-
-    //// Amortissement
-    //if (body1->invMass > 0) {
-    //    body1->vel = body1->vel * damping;
-    //    body1->angularVel = body1->angularVel * damping;
-    //}
-    //if (body2->invMass > 0) {
-    //    body2->vel = body2->vel * damping;
-    //    body2->angularVel = body2->angularVel * damping;
-    //}
 }
 
 void CollisionComponent::correctPositions(const Contact &contact, RigidBody *body1, RigidBody *body2) {

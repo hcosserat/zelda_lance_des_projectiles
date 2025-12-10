@@ -106,7 +106,6 @@ CollisionData NarrowPhase::BoxAndBox(RigidBody *one, RigidBody *two) {
     int bestAxisIndex = -1;
 
     // --- Étape 1 : Tester les 15 axes ---
-    // (Cette partie reste identique, elle trouve l'axe de moindre pénétration)
 
     // Axes de la boîte 1
     for (int i = 0; i < 3; i++) {
@@ -148,16 +147,11 @@ CollisionData NarrowPhase::BoxAndBox(RigidBody *one, RigidBody *two) {
 
     // --- Étape 2 : Résultat confirmé, générer le contact ---
 
-    // [CORRECTION ICI]
     // On veut que la normale pointe de Body2 vers Body1.
     // toCenter va de 1 vers 2. Donc si l'axe va dans le même sens (dot > 0), on l'inverse.
     if (bestAxis.dot(toCenter) > 0) {
         bestAxis = bestAxis * -1.0f;
     }
-
-    // Le reste du code devient correct mathématiquement grâce à cette inversion :
-    // - normalForIncident pointera maintenant vers la face incidente correcte (la plus proche)
-    // - resolveContact poussera les objets dans le bon sens
 
     Vector contactPoint;
 

@@ -36,6 +36,7 @@ private:
 
     // Génération de projectiles
     void throwProjectile();
+	void throwForwardProjectile();
 
     // UI
     void drawHUD() const;

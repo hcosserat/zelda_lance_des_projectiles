@@ -47,8 +47,9 @@ void ofApp::drawHUD() const {
     ofDrawBitmapString("Delta Time: " + ofToString(dt * 1000.0f, 2) + " ms", 10, 20);
     ofDrawBitmapString("FPS: " + ofToString(1.0f / dt, 1), 10, 40);
     ofDrawBitmapStringHighlight(
-        "Espace: Lancer deux boîtes", 40, 70);
-    ofDrawBitmapString("D: debug", 40, 90);
+        "Espace: Lancer deux boites", 40, 70);
+	ofDrawBitmapStringHighlight("C: Lancer une boite depuis la caméra", 40, 90);
+    ofDrawBitmapString("D: debug", 40, 110);
 
     ofEnableDepthTest();
 }
@@ -74,6 +75,16 @@ void ofApp::keyPressed(const int key) {
 	case 'D':
 		world.toggleDebugDraw();
 		break;
+
+	case 'c':
+	case 'C': {
+		float now = ofGetElapsedTimef();
+		if (now - lastThrowTime >= throwCooldown) {
+			throwForwardProjectile();
+			lastThrowTime = now;
+		}
+	} break;
+
 
 	default:
 		break;
@@ -145,6 +156,52 @@ void ofApp::throwProjectile() {
     world.addRigidBody(std::move(projectile1));
     world.addRigidBody(std::move(projectile2));
 }
+
+void ofApp::throwForwardProjectile() {
+	const float volumetricMass = 2500.0f;
+	const float boxSize = 2.0f;
+	const float initialSpeed = 60.0f;
+
+	// Dimensions
+	Vector dimensions(boxSize, boxSize, boxSize);
+	float volume = boxSize * boxSize * boxSize;
+	float mass = volume * volumetricMass;
+
+	// Direction de la caméra : glm::vec3
+	glm::vec3 camPos = cam.getGlobalPosition();
+	glm::vec3 dir = glm::normalize(cam.getLookAtDir()); // <-- correction
+
+	// Position de spawn : un peu devant la caméra
+	glm::vec3 spawn = camPos + dir * 5.0f;
+
+	Vector spawnPos(spawn.x, spawn.y, spawn.z);
+
+	// Vitesse dans l’axe caméra
+	Vector velocity(dir.x * initialSpeed,
+		dir.y * initialSpeed,
+		dir.z * initialSpeed);
+
+	// Shape + inertie
+	auto shape = std::make_unique<BoxShape>(dimensions);
+	Matrix3 inertiaTensor = BoxShape::computeInertiaTensor(dimensions, mass);
+	Matrix3 invInertiaTensor = inertiaTensor.inverse();
+
+	// Corps rigide
+	auto projectile = std::make_unique<RigidBody>(
+		spawnPos,
+		spawnPos,
+		velocity,
+		Vector(0, 0, 0),
+		Quaternion(),
+		Vector(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1)),
+		Vector(0, 0, 0),
+		mass,
+		invInertiaTensor,
+		std::move(shape));
+
+	world.addRigidBody(std::move(projectile));
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(const int key) {
